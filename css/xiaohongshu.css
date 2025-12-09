@@ -123,78 +123,45 @@
   overflow-y: auto;
 }
 
-.input-card #contentText {
-  height: 200px;
+/* 可编辑内容区域（支持粘贴图片） */
+.content-editor {
+  width: 100%;
   min-height: 200px;
-  max-height: 200px;
+  max-height: 300px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.6;
+  overflow-y: auto;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.content-editor:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(255, 71, 87, 0.1);
+}
+
+.content-editor:empty::before {
+  content: attr(data-placeholder);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.content-editor img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin: 8px 0;
+  display: block;
 }
 
 .input-card #xhsDesc {
   height: 150px;
   min-height: 150px;
   max-height: 150px;
-}
-
-/* 插入图片按钮 */
-.btn-insert-img {
-  padding: 2px 6px;
-  background: none;
-  border: 1px solid var(--border-subtle);
-  border-radius: 4px;
-  font-size: 14px;
-  color: var(--text-muted);
-  cursor: pointer;
-  margin-left: 8px;
-  transition: all 0.2s ease;
-}
-
-.btn-insert-img:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-/* 已插入的图片列表 */
-.inserted-images {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.inserted-image-item {
-  position: relative;
-  width: 60px;
-  height: 60px;
-  border-radius: 6px;
-  overflow: hidden;
-  border: 1px solid var(--border-subtle);
-}
-
-.inserted-image-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.inserted-image-item .remove-img {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  width: 18px;
-  height: 18px;
-  background: rgba(0,0,0,0.6);
-  border: none;
-  border-radius: 50%;
-  color: #fff;
-  font-size: 12px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.inserted-image-item .remove-img:hover {
-  background: var(--accent);
 }
 
 .form-row {

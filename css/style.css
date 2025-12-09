@@ -168,42 +168,42 @@ a {
   height: 20px;
 }
 
-/* 侧边栏收起状态 */
+/* 侧边栏收起状态 - 只显示logo和展开按钮 */
 .sidebar.is-collapsed {
-  width: 72px;
+  width: 56px;
   padding: 24px 12px;
-  overflow: hidden;
 }
 
 .sidebar.is-collapsed .sidebar-header {
   flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
 }
 
-.sidebar.is-collapsed .sidebar-toggle {
-  margin-top: 8px;
+.sidebar.is-collapsed .sidebar-logo > span {
+  display: none;
 }
 
-.sidebar.is-collapsed .sidebar-logo {
-  justify-content: center;
-}
-
-.sidebar.is-collapsed .nav-item {
-  justify-content: center;
-  padding: 12px;
-}
-
-.sidebar.is-collapsed .nav-item i,
-.sidebar.is-collapsed .nav-item .xhs-logo-icon {
-  font-size: 20px;
-}
-
-.sidebar.is-collapsed .coming-soon {
+.sidebar.is-collapsed .sidebar-nav {
   display: none;
 }
 
 .sidebar.is-collapsed + .main-content {
-  margin-left: 72px;
+  margin-left: 56px;
+}
+
+/* 侧边栏文字过渡动画 */
+.sidebar-logo > span,
+.nav-item > span,
+.coming-soon {
+  transition: opacity 0.2s ease;
+}
+
+.sidebar.is-collapsed .sidebar-logo > span,
+.sidebar.is-collapsed .nav-item > span,
+.sidebar.is-collapsed .coming-soon {
+  opacity: 0;
 }
 
 /* 主内容区 */

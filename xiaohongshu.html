@@ -106,13 +106,8 @@
             <div class="form-group">
               <label>
                 正文内容 <span class="char-count" id="contentCharCount">0 字</span>
-                <button type="button" class="btn-insert-img" id="insertImgBtn" title="插入图片">
-                  <i class="ri-image-add-line"></i>
-                </button>
               </label>
-              <input type="file" id="contentImgInput" accept="image/*" hidden>
-              <textarea id="contentText" placeholder="请输入正文内容" rows="6"></textarea>
-              <div class="inserted-images" id="insertedImages"></div>
+              <div class="content-editor" id="contentEditor" contenteditable="true" data-placeholder="请输入正文内容，支持粘贴图片"></div>
             </div>
             <div class="form-group">
               <label>发布标题</label>

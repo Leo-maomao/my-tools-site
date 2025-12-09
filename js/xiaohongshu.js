@@ -136,11 +136,8 @@
         bgTemplateInput: document.getElementById('bgTemplateInput'),
         bgPlaceholder: document.getElementById('bgPlaceholder'),
         bgPreviewImg: document.getElementById('bgPreviewImg'),
-        contentText: document.getElementById('contentText'),
+        contentEditor: document.getElementById('contentEditor'),
         contentCharCount: document.getElementById('contentCharCount'),
-        insertImgBtn: document.getElementById('insertImgBtn'),
-        contentImgInput: document.getElementById('contentImgInput'),
-        insertedImages: document.getElementById('insertedImages'),
         markBgArea: document.getElementById('markBgArea'),
         bgMarkIcon: document.getElementById('bgMarkIcon'),
         bgMarkText: document.getElementById('bgMarkText'),
@@ -174,8 +171,7 @@
         generatedImages: [],  // 生成的图片
         // 用户标记的区域（相对于原图的比例）
         coverArea: null,      // { x, y, width, height } 比例值 0-1
-        bgArea: null,         // { x, y, width, height } 比例值 0-1
-        contentImages: []     // 正文中插入的图片 [{ img: Image, data: base64 }]
+        bgArea: null          // { x, y, width, height } 比例值 0-1
     };
 
     // 初始化
@@ -269,22 +265,19 @@
         });
 
         // 正文字数统计
-        elements.contentText.addEventListener('input', function() {
-            var count = this.value.length;
+        elements.contentEditor.addEventListener('input', function() {
+            var count = this.innerText.length;
             elements.contentCharCount.textContent = count + ' 字';
         });
+
+        // 支持粘贴图片
+        elements.contentEditor.addEventListener('paste', handlePaste);
 
         // 正文描述字数统计
         elements.xhsDesc.addEventListener('input', function() {
             var count = this.value.length;
             elements.descCharCount.textContent = count + ' 字';
         });
-
-        // 插入图片按钮
-        elements.insertImgBtn.addEventListener('click', function() {
-            elements.contentImgInput.click();
-        });
-        elements.contentImgInput.addEventListener('change', handleContentImageInsert);
 
         // 生成按钮
         elements.generateBtn.addEventListener('click', generateImages);
@@ -354,73 +347,41 @@
         }
     }
 
-    // 处理正文图片插入
-    function handleContentImageInsert(e) {
-        var file = e.target.files[0];
-        if (!file) return;
+    // 处理粘贴事件
+    function handlePaste(e) {
+        var clipboardData = e.clipboardData || window.clipboardData;
+        if (!clipboardData) return;
 
-        var reader = new FileReader();
-        reader.onload = function(event) {
-            var imageData = event.target.result;
-            var img = new Image();
-            img.onload = function() {
-                state.contentImages.push({ img: img, data: imageData });
-                renderInsertedImages();
-                // 在文本框当前光标位置插入占位符
-                var textarea = elements.contentText;
-                var cursorPos = textarea.selectionStart;
-                var textBefore = textarea.value.substring(0, cursorPos);
-                var textAfter = textarea.value.substring(cursorPos);
-                var placeholder = '\n[图片' + state.contentImages.length + ']\n';
-                textarea.value = textBefore + placeholder + textAfter;
-                // 更新字数
-                elements.contentCharCount.textContent = textarea.value.length + ' 字';
-            };
-            img.src = imageData;
-        };
-        reader.readAsDataURL(file);
-        e.target.value = ''; // 清空以便重复上传同一文件
-    }
-
-    // 渲染已插入的图片列表
-    function renderInsertedImages() {
-        var html = '';
-        state.contentImages.forEach(function(item, index) {
-            html += '<div class="inserted-image-item" data-index="' + index + '">';
-            html += '  <img src="' + item.data + '" alt="图片' + (index + 1) + '">';
-            html += '  <button class="remove-img" title="删除"><i class="ri-close-line"></i></button>';
-            html += '</div>';
-        });
-        elements.insertedImages.innerHTML = html;
-
-        // 绑定删除事件
-        elements.insertedImages.querySelectorAll('.remove-img').forEach(function(btn) {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                var index = parseInt(this.parentElement.getAttribute('data-index'));
-                removeContentImage(index);
-            });
-        });
-    }
-
-    // 删除插入的图片
-    function removeContentImage(index) {
-        state.contentImages.splice(index, 1);
-        renderInsertedImages();
-        // 更新文本中的占位符
-        var textarea = elements.contentText;
-        // 移除对应的占位符并重新编号
-        var text = textarea.value;
-        text = text.replace(/\[图片\d+\]/g, function(match) {
-            return match; // 暂时保留
-        });
-        // 简单处理：删除所有占位符然后重新插入
-        for (var i = state.contentImages.length; i >= 0; i--) {
-            text = text.replace('[图片' + (i + 2) + ']', '[图片' + (i + 1) + ']');
+        var items = clipboardData.items;
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf('image') !== -1) {
+                e.preventDefault();
+                var file = items[i].getAsFile();
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    var img = document.createElement('img');
+                    img.src = event.target.result;
+                    // 插入图片到光标位置
+                    var selection = window.getSelection();
+                    if (selection.rangeCount > 0) {
+                        var range = selection.getRangeAt(0);
+                        range.deleteContents();
+                        range.insertNode(img);
+                        // 移动光标到图片后
+                        range.setStartAfter(img);
+                        range.collapse(true);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    } else {
+                        elements.contentEditor.appendChild(img);
+                    }
+                    // 更新字数
+                    elements.contentCharCount.textContent = elements.contentEditor.innerText.length + ' 字';
+                };
+                reader.readAsDataURL(file);
+                return;
+            }
         }
-        text = text.replace('[图片' + (index + 1) + ']', '');
-        textarea.value = text;
-        elements.contentCharCount.textContent = textarea.value.length + ' 字';
     }
 
     // 处理图片上传
@@ -472,10 +433,53 @@
     }
 
 
+    // 从contentEditor解析内容（文字和图片）
+    function parseEditorContent() {
+        var items = [];
+        var childNodes = elements.contentEditor.childNodes;
+
+        function processNode(node) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                var text = node.textContent;
+                if (text.trim()) {
+                    items.push({ type: 'text', text: text });
+                }
+            } else if (node.nodeType === Node.ELEMENT_NODE) {
+                if (node.tagName === 'IMG') {
+                    var img = new Image();
+                    img.src = node.src;
+                    items.push({ type: 'image', img: img, src: node.src });
+                } else if (node.tagName === 'BR') {
+                    items.push({ type: 'text', text: '\n' });
+                } else if (node.tagName === 'DIV' || node.tagName === 'P') {
+                    // 块级元素，递归处理子节点后添加换行
+                    for (var i = 0; i < node.childNodes.length; i++) {
+                        processNode(node.childNodes[i]);
+                    }
+                    items.push({ type: 'text', text: '\n' });
+                } else {
+                    // 其他元素，递归处理子节点
+                    for (var i = 0; i < node.childNodes.length; i++) {
+                        processNode(node.childNodes[i]);
+                    }
+                }
+            }
+        }
+
+        for (var i = 0; i < childNodes.length; i++) {
+            processNode(childNodes[i]);
+        }
+
+        return items;
+    }
+
     // 生成图片
     function generateImages() {
         var coverTitle = elements.coverTitle.value.trim();
-        var contentText = elements.contentText.value.trim();
+        var editorContent = parseEditorContent();
+        var hasContent = editorContent.some(function(item) {
+            return (item.type === 'text' && item.text.trim()) || item.type === 'image';
+        });
 
         if (!state.coverTemplate && !state.bgTemplate) {
             alert('请至少上传一个模板图片');
@@ -492,8 +496,8 @@
         }
 
         // 生成正文图
-        if (state.bgTemplate && contentText) {
-            var contentImages = generateContentImages(contentText);
+        if (state.bgTemplate && hasContent) {
+            var contentImages = generateContentImages(editorContent);
             contentImages.forEach(function(img, index) {
                 state.generatedImages.push({
                     type: 'content',
@@ -602,7 +606,7 @@
     }
 
     // 生成正文图（自动分页）
-    function generateContentImages(text) {
+    function generateContentImages(contentItems) {
         var canvas = elements.canvas;
         var ctx = canvas.getContext('2d');
         var cfg = CONFIG.content;
@@ -638,15 +642,12 @@
         ctx.textBaseline = 'top';
         ctx.fillStyle = cfg.textColor;
 
-        // 解析文本，将图片占位符替换为特殊标记
-        var contentItems = parseContentWithImages(text);
-
         // 分割段落并处理图片
         var allItems = [];
 
-        contentItems.forEach(function(item, itemIndex) {
+        contentItems.forEach(function(item) {
             if (item.type === 'image') {
-                allItems.push({ type: 'image', img: item.img, data: item.data });
+                allItems.push({ type: 'image', img: item.img });
             } else {
                 // 文本段落
                 var paragraphs = item.text.split(/\n+/);
@@ -720,44 +721,6 @@
         }
 
         return images;
-    }
-
-    // 解析文本中的图片占位符
-    function parseContentWithImages(text) {
-        var items = [];
-        var regex = /\[图片(\d+)\]/g;
-        var lastIndex = 0;
-        var match;
-
-        while ((match = regex.exec(text)) !== null) {
-            // 添加图片前的文本
-            if (match.index > lastIndex) {
-                var textBefore = text.substring(lastIndex, match.index);
-                if (textBefore.trim()) {
-                    items.push({ type: 'text', text: textBefore });
-                }
-            }
-            // 添加图片
-            var imgIndex = parseInt(match[1]) - 1;
-            if (state.contentImages[imgIndex]) {
-                items.push({
-                    type: 'image',
-                    img: state.contentImages[imgIndex].img,
-                    data: state.contentImages[imgIndex].data
-                });
-            }
-            lastIndex = regex.lastIndex;
-        }
-
-        // 添加最后的文本
-        if (lastIndex < text.length) {
-            var remaining = text.substring(lastIndex);
-            if (remaining.trim()) {
-                items.push({ type: 'text', text: remaining });
-            }
-        }
-
-        return items.length > 0 ? items : [{ type: 'text', text: text }];
     }
 
     // 文字换行处理
