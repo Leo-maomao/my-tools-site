@@ -119,20 +119,20 @@
 }
 
 .input-card textarea {
-  resize: none;
+  resize: none !important;
   overflow-y: auto;
 }
 
 .input-card #contentText {
-  height: 150px;
-  min-height: 150px;
-  max-height: 150px;
+  height: 200px;
+  min-height: 200px;
+  max-height: 200px;
 }
 
 .input-card #xhsDesc {
-  height: 100px;
-  min-height: 100px;
-  max-height: 100px;
+  height: 150px;
+  min-height: 150px;
+  max-height: 150px;
 }
 
 .form-row {
@@ -594,6 +594,17 @@
 
 .btn-mark-area:hover {
   background: rgba(255, 71, 87, 0.05);
+}
+
+.btn-mark-area.is-marked {
+  border-style: solid;
+  border-color: #10b981;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.btn-mark-area.is-marked:hover {
+  background: rgba(16, 185, 129, 0.1);
 }
 
 .area-info {

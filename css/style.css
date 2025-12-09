@@ -70,10 +70,29 @@ a {
   font-size: 18px;
   font-weight: 700;
   color: var(--accent);
+  overflow: hidden;
 }
 
-.sidebar-logo i {
-  font-size: 24px;
+.sidebar-logo > span:not(.app-logo-icon) {
+  white-space: nowrap;
+  overflow: hidden;
+  transition: opacity 0.15s ease, max-width 0.2s ease;
+  max-width: 150px;
+  opacity: 1;
+}
+
+/* App logo 图标样式 */
+.app-logo-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-light));
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 8px;
   flex-shrink: 0;
 }
 
@@ -113,11 +132,21 @@ a {
   font-weight: 500;
   color: var(--text-sub);
   transition: all 0.2s ease;
+  overflow: hidden;
 }
 
-.nav-item i {
+.nav-item i,
+.nav-item .xhs-logo-icon {
   font-size: 18px;
   flex-shrink: 0;
+}
+
+.nav-item > span:not(.xhs-logo-icon):not(.coming-soon) {
+  white-space: nowrap;
+  overflow: hidden;
+  transition: opacity 0.15s ease, max-width 0.2s ease;
+  max-width: 150px;
+  opacity: 1;
 }
 
 .nav-item:hover:not(.is-disabled) {
@@ -144,12 +173,26 @@ a {
   color: #6b7280;
 }
 
-/* 小红书SVG图标样式 */
-.xhs-icon {
-  width: 1em;
-  height: 1em;
-  fill: currentColor;
-  vertical-align: -0.125em;
+/* 小红书logo图标样式 */
+.xhs-logo-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: #ff2442;
+  color: #fff;
+  font-size: 11px;
+  font-weight: bold;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.xhs-logo-icon-lg {
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+  border-radius: 6px;
 }
 
 /* 侧边栏收起状态 */
@@ -163,8 +206,9 @@ a {
   gap: 8px;
 }
 
-.sidebar.is-collapsed .sidebar-logo span {
-  display: none;
+.sidebar.is-collapsed .sidebar-logo > span:not(.app-logo-icon) {
+  max-width: 0;
+  opacity: 0;
 }
 
 .sidebar.is-collapsed .sidebar-toggle {
@@ -180,8 +224,9 @@ a {
   padding: 12px;
 }
 
-.sidebar.is-collapsed .nav-item span {
-  display: none;
+.sidebar.is-collapsed .nav-item > span:not(.xhs-logo-icon) {
+  max-width: 0;
+  opacity: 0;
 }
 
 .sidebar.is-collapsed .nav-item i {

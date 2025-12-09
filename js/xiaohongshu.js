@@ -127,7 +127,8 @@
         coverPreviewImg: document.getElementById('coverPreviewImg'),
         coverTitle: document.getElementById('coverTitle'),
         markCoverArea: document.getElementById('markCoverArea'),
-        coverAreaInfo: document.getElementById('coverAreaInfo'),
+        coverMarkIcon: document.getElementById('coverMarkIcon'),
+        coverMarkText: document.getElementById('coverMarkText'),
         deleteCoverBtn: document.getElementById('deleteCoverBtn'),
 
         // 背景图
@@ -138,7 +139,8 @@
         contentText: document.getElementById('contentText'),
         contentCharCount: document.getElementById('contentCharCount'),
         markBgArea: document.getElementById('markBgArea'),
-        bgAreaInfo: document.getElementById('bgAreaInfo'),
+        bgMarkIcon: document.getElementById('bgMarkIcon'),
+        bgMarkText: document.getElementById('bgMarkText'),
         deleteBgBtn: document.getElementById('deleteBgBtn'),
 
         // 发布信息
@@ -192,15 +194,39 @@
         Storage.get('xhs_cover_area').then(function(data) {
             if (data) {
                 state.coverArea = data;
-                elements.coverAreaInfo.style.display = 'flex';
+                updateMarkButtonState('cover', true);
             }
         });
         Storage.get('xhs_bg_area').then(function(data) {
             if (data) {
                 state.bgArea = data;
-                elements.bgAreaInfo.style.display = 'flex';
+                updateMarkButtonState('bg', true);
             }
         });
+    }
+
+    // 更新标记按钮状态
+    function updateMarkButtonState(type, isMarked) {
+        var btn, icon, text;
+        if (type === 'cover') {
+            btn = elements.markCoverArea;
+            icon = elements.coverMarkIcon;
+            text = elements.coverMarkText;
+        } else {
+            btn = elements.markBgArea;
+            icon = elements.bgMarkIcon;
+            text = elements.bgMarkText;
+        }
+
+        if (isMarked) {
+            btn.classList.add('is-marked');
+            icon.className = 'ri-check-line';
+            text.textContent = '已标记';
+        } else {
+            btn.classList.remove('is-marked');
+            icon.className = 'ri-drag-move-line';
+            text.textContent = '标记区域';
+        }
     }
 
     // 加载已保存的模板
@@ -296,9 +322,9 @@
             elements.coverPlaceholder.style.display = 'flex';
             elements.coverUploadArea.classList.remove('has-image');
             elements.markCoverArea.style.display = 'none';
-            elements.coverAreaInfo.style.display = 'none';
             elements.deleteCoverBtn.style.display = 'none';
             elements.coverTemplateInput.value = '';
+            updateMarkButtonState('cover', false);
             Storage.remove('xhs_cover_template');
             Storage.remove('xhs_cover_area');
         } else if (type === 'bg') {
@@ -310,9 +336,9 @@
             elements.bgPlaceholder.style.display = 'flex';
             elements.bgUploadArea.classList.remove('has-image');
             elements.markBgArea.style.display = 'none';
-            elements.bgAreaInfo.style.display = 'none';
             elements.deleteBgBtn.style.display = 'none';
             elements.bgTemplateInput.value = '';
+            updateMarkButtonState('bg', false);
             Storage.remove('xhs_bg_template');
             Storage.remove('xhs_bg_area');
         }
@@ -910,11 +936,11 @@
 
         if (areaMarkerState.type === 'cover') {
             state.coverArea = area;
-            elements.coverAreaInfo.style.display = 'flex';
+            updateMarkButtonState('cover', true);
             Storage.save('xhs_cover_area', area);
         } else {
             state.bgArea = area;
-            elements.bgAreaInfo.style.display = 'flex';
+            updateMarkButtonState('bg', true);
             Storage.save('xhs_bg_area', area);
         }
 
