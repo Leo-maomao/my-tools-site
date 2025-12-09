@@ -128,6 +128,7 @@
         coverTitle: document.getElementById('coverTitle'),
         markCoverArea: document.getElementById('markCoverArea'),
         coverAreaInfo: document.getElementById('coverAreaInfo'),
+        deleteCoverBtn: document.getElementById('deleteCoverBtn'),
 
         // 背景图
         bgUploadArea: document.getElementById('bgUploadArea'),
@@ -138,10 +139,12 @@
         contentCharCount: document.getElementById('contentCharCount'),
         markBgArea: document.getElementById('markBgArea'),
         bgAreaInfo: document.getElementById('bgAreaInfo'),
+        deleteBgBtn: document.getElementById('deleteBgBtn'),
 
         // 发布信息
         xhsTitle: document.getElementById('xhsTitle'),
         xhsDesc: document.getElementById('xhsDesc'),
+        descCharCount: document.getElementById('descCharCount'),
 
         // 按钮
         generateBtn: document.getElementById('generateBtn'),
@@ -241,6 +244,12 @@
             elements.contentCharCount.textContent = count + ' 字';
         });
 
+        // 正文描述字数统计
+        elements.xhsDesc.addEventListener('input', function() {
+            var count = this.value.length;
+            elements.descCharCount.textContent = count + ' 字';
+        });
+
         // 生成按钮
         elements.generateBtn.addEventListener('click', generateImages);
 
@@ -264,6 +273,49 @@
             e.stopPropagation();
             openAreaMarker('bg');
         });
+
+        // 删除图片按钮
+        elements.deleteCoverBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            deleteTemplate('cover');
+        });
+        elements.deleteBgBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            deleteTemplate('bg');
+        });
+    }
+
+    // 删除模板
+    function deleteTemplate(type) {
+        if (type === 'cover') {
+            state.coverTemplate = null;
+            state.coverTemplateData = null;
+            state.coverArea = null;
+            elements.coverPreviewImg.style.display = 'none';
+            elements.coverPreviewImg.src = '';
+            elements.coverPlaceholder.style.display = 'flex';
+            elements.coverUploadArea.classList.remove('has-image');
+            elements.markCoverArea.style.display = 'none';
+            elements.coverAreaInfo.style.display = 'none';
+            elements.deleteCoverBtn.style.display = 'none';
+            elements.coverTemplateInput.value = '';
+            Storage.remove('xhs_cover_template');
+            Storage.remove('xhs_cover_area');
+        } else if (type === 'bg') {
+            state.bgTemplate = null;
+            state.bgTemplateData = null;
+            state.bgArea = null;
+            elements.bgPreviewImg.style.display = 'none';
+            elements.bgPreviewImg.src = '';
+            elements.bgPlaceholder.style.display = 'flex';
+            elements.bgUploadArea.classList.remove('has-image');
+            elements.markBgArea.style.display = 'none';
+            elements.bgAreaInfo.style.display = 'none';
+            elements.deleteBgBtn.style.display = 'none';
+            elements.bgTemplateInput.value = '';
+            Storage.remove('xhs_bg_template');
+            Storage.remove('xhs_bg_area');
+        }
     }
 
     // 处理图片上传
@@ -299,6 +351,7 @@
                 elements.coverPlaceholder.style.display = 'none';
                 elements.coverUploadArea.classList.add('has-image');
                 elements.markCoverArea.style.display = 'flex';
+                elements.deleteCoverBtn.style.display = 'flex';
             } else if (type === 'bg') {
                 state.bgTemplate = img;
                 state.bgTemplateData = imageData;
@@ -307,6 +360,7 @@
                 elements.bgPlaceholder.style.display = 'none';
                 elements.bgUploadArea.classList.add('has-image');
                 elements.markBgArea.style.display = 'flex';
+                elements.deleteBgBtn.style.display = 'flex';
             }
         };
         img.src = imageData;

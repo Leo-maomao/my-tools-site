@@ -27,7 +27,7 @@
           <span>首页</span>
         </a>
         <a href="xiaohongshu.html" class="nav-item is-active">
-          <i class="ri-xiaohongshu-fill"></i>
+          <svg class="xhs-icon" viewBox="0 0 200 200"><path fill="#ff2442" d="M100 0C44.8 0 0 44.8 0 100s44.8 100 100 100 100-44.8 100-100S155.2 0 100 0zm24.4 144.9H75.6c-4.4 0-8-3.6-8-8V63.1c0-4.4 3.6-8 8-8h48.8c4.4 0 8 3.6 8 8v73.8c0 4.4-3.6 8-8 8zm-40.8-69.7v57.6h32.8V75.2H83.6zm8 8h16.8v8H91.6v-8zm0 16h16.8v8H91.6v-8z"/></svg>
           <span>小红书</span>
         </a>
         <a href="#" class="nav-item is-disabled">
@@ -64,6 +64,9 @@
                 <span>上传封面</span>
               </div>
               <img id="coverPreviewImg" class="upload-preview" style="display:none;">
+              <button class="btn-delete-img" id="deleteCoverBtn" style="display:none;" title="删除图片">
+                <i class="ri-close-line"></i>
+              </button>
             </div>
             <button class="btn-mark-area btn-mark-sm" id="markCoverArea" style="display:none;">
               <i class="ri-drag-move-line"></i> 标记区域
@@ -84,6 +87,9 @@
                 <span>上传背景</span>
               </div>
               <img id="bgPreviewImg" class="upload-preview" style="display:none;">
+              <button class="btn-delete-img" id="deleteBgBtn" style="display:none;" title="删除图片">
+                <i class="ri-close-line"></i>
+              </button>
             </div>
             <button class="btn-mark-area btn-mark-sm" id="markBgArea" style="display:none;">
               <i class="ri-drag-move-line"></i> 标记区域
@@ -99,7 +105,7 @@
           <div class="input-card">
             <div class="form-group">
               <label>封面标题</label>
-              <textarea id="coverTitle" placeholder="输入封面标题，支持换行" rows="2"></textarea>
+              <input type="text" id="coverTitle" placeholder="输入封面标题">
             </div>
             <div class="form-group">
               <label>正文内容 <span class="char-count" id="contentCharCount">0 字</span></label>
@@ -110,7 +116,7 @@
               <input type="text" id="xhsTitle" placeholder="发布时的标题">
             </div>
             <div class="form-group">
-              <label>正文描述</label>
+              <label>正文描述 <span class="char-count" id="descCharCount">0 字</span></label>
               <textarea id="xhsDesc" placeholder="发布时的描述，支持多行输入" rows="4"></textarea>
             </div>
             <button class="btn-generate" id="generateBtn">

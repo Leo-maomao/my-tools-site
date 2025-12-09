@@ -14,6 +14,14 @@
   align-items: stretch;
 }
 
+/* 左侧和右侧填满高度 */
+.xhs-templates,
+.xhs-preview-panel {
+  height: 100%;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+}
+
 /* 左侧模板区 */
 .xhs-templates {
   display: flex;
@@ -112,11 +120,19 @@
 
 .input-card textarea {
   resize: none;
+  overflow-y: auto;
 }
 
 .input-card #contentText {
-  flex: 1;
-  min-height: 120px;
+  height: 150px;
+  min-height: 150px;
+  max-height: 150px;
+}
+
+.input-card #xhsDesc {
+  height: 100px;
+  min-height: 100px;
+  max-height: 100px;
 }
 
 .form-row {
@@ -269,6 +285,30 @@
   border-radius: var(--radius-md);
 }
 
+/* 删除图片按钮 */
+.btn-delete-img {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.btn-delete-img:hover {
+  background: var(--accent);
+}
+
 /* 话题标签 */
 .topic-tags {
   display: flex;
@@ -333,10 +373,6 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   padding: 20px;
-  position: sticky;
-  top: 32px;
-  max-height: calc(100vh - 64px);
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
 }
