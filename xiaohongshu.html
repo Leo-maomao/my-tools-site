@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>小红书内容生成 - 自媒体工具</title>
-  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/xiaohongshu.css">
 </head>
@@ -56,9 +56,6 @@
           <div class="template-card">
             <div class="template-header">
               <h3><i class="ri-image-line"></i> 封面模板</h3>
-              <button class="btn-mark-area btn-mark-sm" id="markCoverArea" style="display:none;">
-                <i class="ri-drag-move-line"></i> 标记区域
-              </button>
             </div>
             <div class="upload-area upload-area-sm" id="coverUploadArea">
               <input type="file" id="coverTemplateInput" accept="image/*" hidden>
@@ -68,6 +65,9 @@
               </div>
               <img id="coverPreviewImg" class="upload-preview" style="display:none;">
             </div>
+            <button class="btn-mark-area btn-mark-sm" id="markCoverArea" style="display:none;">
+              <i class="ri-drag-move-line"></i> 标记区域
+            </button>
             <div class="area-info" id="coverAreaInfo" style="display:none;">
               <i class="ri-check-line"></i> 已标记
             </div>
@@ -76,9 +76,6 @@
           <div class="template-card">
             <div class="template-header">
               <h3><i class="ri-file-text-line"></i> 正文模板</h3>
-              <button class="btn-mark-area btn-mark-sm" id="markBgArea" style="display:none;">
-                <i class="ri-drag-move-line"></i> 标记区域
-              </button>
             </div>
             <div class="upload-area upload-area-sm" id="bgUploadArea">
               <input type="file" id="bgTemplateInput" accept="image/*" hidden>
@@ -88,6 +85,9 @@
               </div>
               <img id="bgPreviewImg" class="upload-preview" style="display:none;">
             </div>
+            <button class="btn-mark-area btn-mark-sm" id="markBgArea" style="display:none;">
+              <i class="ri-drag-move-line"></i> 标记区域
+            </button>
             <div class="area-info" id="bgAreaInfo" style="display:none;">
               <i class="ri-check-line"></i> 已标记
             </div>
@@ -105,15 +105,13 @@
               <label>正文内容 <span class="char-count" id="contentCharCount">0 字</span></label>
               <textarea id="contentText" placeholder="输入正文内容，系统会自动分页" rows="6"></textarea>
             </div>
-            <div class="form-row">
-              <div class="form-group form-group-half">
-                <label>发布标题</label>
-                <input type="text" id="xhsTitle" placeholder="发布时的标题">
-              </div>
-              <div class="form-group form-group-half">
-                <label>正文描述</label>
-                <input type="text" id="xhsDesc" placeholder="发布时的描述">
-              </div>
+            <div class="form-group">
+              <label>发布标题</label>
+              <input type="text" id="xhsTitle" placeholder="发布时的标题">
+            </div>
+            <div class="form-group">
+              <label>正文描述</label>
+              <textarea id="xhsDesc" placeholder="发布时的描述，支持多行输入" rows="4"></textarea>
             </div>
             <button class="btn-generate" id="generateBtn">
               <i class="ri-magic-line"></i> 生成图片
@@ -172,10 +170,22 @@
       </div>
       <div class="area-marker-canvas-wrap">
         <canvas id="areaMarkerCanvas"></canvas>
-        <div class="area-marker-selection" id="areaSelection"></div>
+        <div class="area-marker-selection" id="areaSelection">
+          <div class="resize-handle resize-handle-nw" data-dir="nw"></div>
+          <div class="resize-handle resize-handle-n" data-dir="n"></div>
+          <div class="resize-handle resize-handle-ne" data-dir="ne"></div>
+          <div class="resize-handle resize-handle-e" data-dir="e"></div>
+          <div class="resize-handle resize-handle-se" data-dir="se"></div>
+          <div class="resize-handle resize-handle-s" data-dir="s"></div>
+          <div class="resize-handle resize-handle-sw" data-dir="sw"></div>
+          <div class="resize-handle resize-handle-w" data-dir="w"></div>
+        </div>
       </div>
       <div class="area-marker-footer">
         <button class="btn-cancel" id="areaMarkerCancel">取消</button>
+        <button class="btn-center" id="areaMarkerCenter" disabled>
+          <i class="ri-align-center"></i> 水平居中
+        </button>
         <button class="btn-confirm" id="areaMarkerConfirm">确认</button>
       </div>
     </div>

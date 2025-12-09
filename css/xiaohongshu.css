@@ -73,9 +73,11 @@
 }
 
 .btn-mark-sm {
-  padding: 4px 8px;
-  font-size: 11px;
-  margin-top: 0;
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 12px;
+  margin-top: 10px;
+  justify-content: center;
 }
 
 .template-card .area-info {
@@ -639,13 +641,33 @@
   position: absolute;
   border: 2px dashed var(--accent);
   background: rgba(255, 71, 87, 0.1);
-  pointer-events: none;
   display: none;
+  cursor: move;
 }
 
 .area-marker-selection.is-active {
   display: block;
 }
+
+/* 拖动调整手柄 */
+.resize-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: var(--accent);
+  border: 2px solid #fff;
+  border-radius: 2px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.resize-handle-nw { top: -6px; left: -6px; cursor: nw-resize; }
+.resize-handle-n { top: -6px; left: 50%; transform: translateX(-50%); cursor: n-resize; }
+.resize-handle-ne { top: -6px; right: -6px; cursor: ne-resize; }
+.resize-handle-e { top: 50%; right: -6px; transform: translateY(-50%); cursor: e-resize; }
+.resize-handle-se { bottom: -6px; right: -6px; cursor: se-resize; }
+.resize-handle-s { bottom: -6px; left: 50%; transform: translateX(-50%); cursor: s-resize; }
+.resize-handle-sw { bottom: -6px; left: -6px; cursor: sw-resize; }
+.resize-handle-w { top: 50%; left: -6px; transform: translateY(-50%); cursor: w-resize; }
 
 .area-marker-footer {
   padding: 16px 20px;
@@ -675,6 +697,29 @@
 }
 
 .area-marker-footer .btn-confirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.area-marker-footer .btn-center {
+  padding: 10px 16px;
+  background: var(--bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.area-marker-footer .btn-center:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.area-marker-footer .btn-center:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }

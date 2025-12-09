@@ -253,23 +253,19 @@ a {
 }
 
 .platform-card--xhs .platform-icon {
-  background: linear-gradient(135deg, #ff4757, #ff6b7a);
-  color: #fff;
+  color: #ff2442;
 }
 
 .platform-card--douyin .platform-icon {
-  background: linear-gradient(135deg, #25f4ee, #fe2c55);
-  color: #fff;
+  color: #000;
 }
 
 .platform-card--wechat .platform-icon {
-  background: linear-gradient(135deg, #07c160, #10d66a);
-  color: #fff;
+  color: #07c160;
 }
 
 .platform-card--weibo .platform-icon {
-  background: linear-gradient(135deg, #e6162d, #f5515f);
-  color: #fff;
+  color: #e6162d;
 }
 
 .platform-info {

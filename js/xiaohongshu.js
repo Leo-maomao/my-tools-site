@@ -592,10 +592,16 @@
         ctx: null,
         selection: null,
         confirmBtn: null,
+        centerBtn: null,
         type: null, // 'cover' or 'bg'
         isDrawing: false,
+        isDragging: false,
+        isResizing: false,
+        resizeDir: null,
         startX: 0,
         startY: 0,
+        dragOffsetX: 0,
+        dragOffsetY: 0,
         rect: null,
         canvasRect: null,
         scale: 1
@@ -607,57 +613,180 @@
         areaMarkerState.ctx = areaMarkerState.canvas.getContext('2d');
         areaMarkerState.selection = document.getElementById('areaSelection');
         areaMarkerState.confirmBtn = document.getElementById('areaMarkerConfirm');
+        areaMarkerState.centerBtn = document.getElementById('areaMarkerCenter');
 
         var canvasWrap = document.querySelector('.area-marker-canvas-wrap');
 
-        // 鼠标按下开始绘制
+        // 鼠标按下事件
         canvasWrap.addEventListener('mousedown', function(e) {
-            if (e.target !== areaMarkerState.canvas) return;
-            areaMarkerState.isDrawing = true;
             areaMarkerState.canvasRect = areaMarkerState.canvas.getBoundingClientRect();
-            areaMarkerState.startX = e.clientX - areaMarkerState.canvasRect.left;
-            areaMarkerState.startY = e.clientY - areaMarkerState.canvasRect.top;
-            areaMarkerState.selection.classList.add('is-active');
+            var mouseX = e.clientX - areaMarkerState.canvasRect.left;
+            var mouseY = e.clientY - areaMarkerState.canvasRect.top;
+
+            // 检查是否点击了调整手柄
+            if (e.target.classList.contains('resize-handle')) {
+                areaMarkerState.isResizing = true;
+                areaMarkerState.resizeDir = e.target.getAttribute('data-dir');
+                areaMarkerState.startX = mouseX;
+                areaMarkerState.startY = mouseY;
+                return;
+            }
+
+            // 检查是否点击了选区内部（拖动）
+            if (e.target === areaMarkerState.selection || e.target.parentElement === areaMarkerState.selection) {
+                if (areaMarkerState.rect) {
+                    areaMarkerState.isDragging = true;
+                    var wrapRect = canvasWrap.getBoundingClientRect();
+                    var offsetX = areaMarkerState.canvasRect.left - wrapRect.left;
+                    var offsetY = areaMarkerState.canvasRect.top - wrapRect.top;
+                    areaMarkerState.dragOffsetX = mouseX - areaMarkerState.rect.x;
+                    areaMarkerState.dragOffsetY = mouseY - areaMarkerState.rect.y;
+                    return;
+                }
+            }
+
+            // 在画布上绘制新选区
+            if (e.target === areaMarkerState.canvas) {
+                areaMarkerState.isDrawing = true;
+                areaMarkerState.startX = mouseX;
+                areaMarkerState.startY = mouseY;
+                areaMarkerState.selection.classList.add('is-active');
+            }
         });
 
-        // 鼠标移动更新选区
+        // 鼠标移动事件
         canvasWrap.addEventListener('mousemove', function(e) {
-            if (!areaMarkerState.isDrawing) return;
-            var currentX = e.clientX - areaMarkerState.canvasRect.left;
-            var currentY = e.clientY - areaMarkerState.canvasRect.top;
+            if (!areaMarkerState.canvasRect) return;
+            var mouseX = e.clientX - areaMarkerState.canvasRect.left;
+            var mouseY = e.clientY - areaMarkerState.canvasRect.top;
 
-            var x = Math.min(areaMarkerState.startX, currentX);
-            var y = Math.min(areaMarkerState.startY, currentY);
-            var width = Math.abs(currentX - areaMarkerState.startX);
-            var height = Math.abs(currentY - areaMarkerState.startY);
+            // 调整大小
+            if (areaMarkerState.isResizing && areaMarkerState.rect) {
+                resizeSelection(mouseX, mouseY);
+                updateSelectionDisplay();
+                return;
+            }
 
-            // 限制在画布内
-            x = Math.max(0, x);
-            y = Math.max(0, y);
-            width = Math.min(width, areaMarkerState.canvasRect.width - x);
-            height = Math.min(height, areaMarkerState.canvasRect.height - y);
+            // 拖动选区
+            if (areaMarkerState.isDragging && areaMarkerState.rect) {
+                var newX = mouseX - areaMarkerState.dragOffsetX;
+                var newY = mouseY - areaMarkerState.dragOffsetY;
+                // 限制在画布内
+                newX = Math.max(0, Math.min(newX, areaMarkerState.canvasRect.width - areaMarkerState.rect.width));
+                newY = Math.max(0, Math.min(newY, areaMarkerState.canvasRect.height - areaMarkerState.rect.height));
+                areaMarkerState.rect.x = newX;
+                areaMarkerState.rect.y = newY;
+                updateSelectionDisplay();
+                return;
+            }
 
-            areaMarkerState.rect = { x: x, y: y, width: width, height: height };
-            updateSelectionDisplay();
+            // 绘制新选区
+            if (areaMarkerState.isDrawing) {
+                var x = Math.min(areaMarkerState.startX, mouseX);
+                var y = Math.min(areaMarkerState.startY, mouseY);
+                var width = Math.abs(mouseX - areaMarkerState.startX);
+                var height = Math.abs(mouseY - areaMarkerState.startY);
+
+                // 限制在画布内
+                x = Math.max(0, x);
+                y = Math.max(0, y);
+                width = Math.min(width, areaMarkerState.canvasRect.width - x);
+                height = Math.min(height, areaMarkerState.canvasRect.height - y);
+
+                areaMarkerState.rect = { x: x, y: y, width: width, height: height };
+                updateSelectionDisplay();
+            }
         });
 
-        // 鼠标松开结束绘制
-        canvasWrap.addEventListener('mouseup', function() {
-            if (!areaMarkerState.isDrawing) return;
-            areaMarkerState.isDrawing = false;
-            if (areaMarkerState.rect && areaMarkerState.rect.width > 10 && areaMarkerState.rect.height > 10) {
-                areaMarkerState.confirmBtn.disabled = false;
+        // 鼠标松开事件
+        document.addEventListener('mouseup', function() {
+            if (areaMarkerState.isDrawing || areaMarkerState.isDragging || areaMarkerState.isResizing) {
+                areaMarkerState.isDrawing = false;
+                areaMarkerState.isDragging = false;
+                areaMarkerState.isResizing = false;
+                areaMarkerState.resizeDir = null;
+                if (areaMarkerState.rect && areaMarkerState.rect.width > 10 && areaMarkerState.rect.height > 10) {
+                    areaMarkerState.confirmBtn.disabled = false;
+                    areaMarkerState.centerBtn.disabled = false;
+                }
             }
         });
 
         // 取消按钮
         document.getElementById('areaMarkerCancel').addEventListener('click', closeAreaMarker);
 
+        // 居中按钮
+        areaMarkerState.centerBtn.addEventListener('click', centerSelection);
+
         // 确认按钮
         areaMarkerState.confirmBtn.addEventListener('click', confirmAreaMarker);
 
         // 背景点击关闭
         document.querySelector('.area-marker-backdrop').addEventListener('click', closeAreaMarker);
+    }
+
+    // 调整选区大小
+    function resizeSelection(mouseX, mouseY) {
+        var r = areaMarkerState.rect;
+        var dir = areaMarkerState.resizeDir;
+        var minSize = 20;
+
+        switch(dir) {
+            case 'nw':
+                var newWidth = r.x + r.width - mouseX;
+                var newHeight = r.y + r.height - mouseY;
+                if (newWidth >= minSize) { r.width = newWidth; r.x = mouseX; }
+                if (newHeight >= minSize) { r.height = newHeight; r.y = mouseY; }
+                break;
+            case 'n':
+                var newHeight = r.y + r.height - mouseY;
+                if (newHeight >= minSize) { r.height = newHeight; r.y = mouseY; }
+                break;
+            case 'ne':
+                var newWidth = mouseX - r.x;
+                var newHeight = r.y + r.height - mouseY;
+                if (newWidth >= minSize) { r.width = newWidth; }
+                if (newHeight >= minSize) { r.height = newHeight; r.y = mouseY; }
+                break;
+            case 'e':
+                var newWidth = mouseX - r.x;
+                if (newWidth >= minSize) { r.width = newWidth; }
+                break;
+            case 'se':
+                var newWidth = mouseX - r.x;
+                var newHeight = mouseY - r.y;
+                if (newWidth >= minSize) { r.width = newWidth; }
+                if (newHeight >= minSize) { r.height = newHeight; }
+                break;
+            case 's':
+                var newHeight = mouseY - r.y;
+                if (newHeight >= minSize) { r.height = newHeight; }
+                break;
+            case 'sw':
+                var newWidth = r.x + r.width - mouseX;
+                var newHeight = mouseY - r.y;
+                if (newWidth >= minSize) { r.width = newWidth; r.x = mouseX; }
+                if (newHeight >= minSize) { r.height = newHeight; }
+                break;
+            case 'w':
+                var newWidth = r.x + r.width - mouseX;
+                if (newWidth >= minSize) { r.width = newWidth; r.x = mouseX; }
+                break;
+        }
+
+        // 限制在画布范围内
+        r.x = Math.max(0, r.x);
+        r.y = Math.max(0, r.y);
+        r.width = Math.min(r.width, areaMarkerState.canvasRect.width - r.x);
+        r.height = Math.min(r.height, areaMarkerState.canvasRect.height - r.y);
+    }
+
+    // 水平居中选区
+    function centerSelection() {
+        if (!areaMarkerState.rect || !areaMarkerState.canvasRect) return;
+        var canvasWidth = areaMarkerState.canvasRect.width;
+        areaMarkerState.rect.x = (canvasWidth - areaMarkerState.rect.width) / 2;
+        updateSelectionDisplay();
     }
 
     function updateSelectionDisplay() {
@@ -681,6 +810,7 @@
         areaMarkerState.rect = null;
         areaMarkerState.selection.classList.remove('is-active');
         areaMarkerState.confirmBtn.disabled = true;
+        areaMarkerState.centerBtn.disabled = true;
 
         // 设置标题
         var title = type === 'cover' ? '标记标题区域' : '标记正文区域';
