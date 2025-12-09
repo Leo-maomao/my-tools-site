@@ -10,10 +10,15 @@
 <body>
   <div class="app">
     <!-- 侧边栏 -->
-    <aside class="sidebar">
-      <div class="sidebar-logo">
-        <i class="ri-window-line"></i>
-        <span>自媒体工具</span>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <i class="ri-window-line"></i>
+          <span>自媒体工具</span>
+        </div>
+        <button class="sidebar-toggle" id="sidebarToggle" title="收起侧边栏">
+          <i class="ri-menu-fold-line"></i>
+        </button>
       </div>
       <nav class="sidebar-nav">
         <a href="index.html" class="nav-item is-active">
@@ -21,21 +26,21 @@
           <span>首页</span>
         </a>
         <a href="xiaohongshu.html" class="nav-item">
-          <i class="ri-red-packet-line"></i>
+          <i class="ri-xiaohongshu-fill"></i>
           <span>小红书</span>
         </a>
         <a href="#" class="nav-item is-disabled">
-          <i class="ri-douyin-line"></i>
+          <i class="ri-tiktok-fill"></i>
           <span>抖音</span>
           <span class="coming-soon">即将推出</span>
         </a>
         <a href="#" class="nav-item is-disabled">
-          <i class="ri-wechat-line"></i>
+          <i class="ri-wechat-channels-fill"></i>
           <span>公众号</span>
           <span class="coming-soon">即将推出</span>
         </a>
         <a href="#" class="nav-item is-disabled">
-          <i class="ri-weibo-line"></i>
+          <i class="ri-weibo-fill"></i>
           <span>微博</span>
           <span class="coming-soon">即将推出</span>
         </a>
@@ -52,7 +57,7 @@
       <div class="platform-grid">
         <a href="xiaohongshu.html" class="platform-card platform-card--xhs">
           <div class="platform-icon">
-            <i class="ri-book-2-line"></i>
+            <i class="ri-xiaohongshu-fill"></i>
           </div>
           <div class="platform-info">
             <h3>小红书</h3>
@@ -65,44 +70,45 @@
 
         <div class="platform-card platform-card--douyin is-disabled">
           <div class="platform-icon">
-            <i class="ri-douyin-line"></i>
+            <i class="ri-tiktok-fill"></i>
           </div>
           <div class="platform-info">
             <h3>抖音</h3>
             <p>短视频脚本和封面生成</p>
           </div>
           <div class="platform-status platform-status--coming">
-            <i class="ri-time-line"></i> 即将推出
+            即将推出
           </div>
         </div>
 
         <div class="platform-card platform-card--wechat is-disabled">
           <div class="platform-icon">
-            <i class="ri-wechat-line"></i>
+            <i class="ri-wechat-channels-fill"></i>
           </div>
           <div class="platform-info">
             <h3>公众号</h3>
             <p>图文排版和封面设计</p>
           </div>
           <div class="platform-status platform-status--coming">
-            <i class="ri-time-line"></i> 即将推出
+            即将推出
           </div>
         </div>
 
         <div class="platform-card platform-card--weibo is-disabled">
           <div class="platform-icon">
-            <i class="ri-weibo-line"></i>
+            <i class="ri-weibo-fill"></i>
           </div>
           <div class="platform-info">
             <h3>微博</h3>
             <p>长图文和九宫格图片生成</p>
           </div>
           <div class="platform-status platform-status--coming">
-            <i class="ri-time-line"></i> 即将推出
+            即将推出
           </div>
         </div>
       </div>
     </main>
   </div>
+  <script src="js/sidebar.js"></script>
 </body>
 </html>

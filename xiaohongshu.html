@@ -11,10 +11,15 @@
 <body>
   <div class="app">
     <!-- 侧边栏 -->
-    <aside class="sidebar">
-      <div class="sidebar-logo">
-        <i class="ri-window-line"></i>
-        <span>自媒体工具</span>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <i class="ri-window-line"></i>
+          <span>自媒体工具</span>
+        </div>
+        <button class="sidebar-toggle" id="sidebarToggle" title="收起侧边栏">
+          <i class="ri-menu-fold-line"></i>
+        </button>
       </div>
       <nav class="sidebar-nav">
         <a href="index.html" class="nav-item">
@@ -22,21 +27,21 @@
           <span>首页</span>
         </a>
         <a href="xiaohongshu.html" class="nav-item is-active">
-          <i class="ri-book-2-line"></i>
+          <i class="ri-xiaohongshu-fill"></i>
           <span>小红书</span>
         </a>
         <a href="#" class="nav-item is-disabled">
-          <i class="ri-douyin-line"></i>
+          <i class="ri-tiktok-fill"></i>
           <span>抖音</span>
           <span class="coming-soon">即将推出</span>
         </a>
         <a href="#" class="nav-item is-disabled">
-          <i class="ri-wechat-line"></i>
+          <i class="ri-wechat-channels-fill"></i>
           <span>公众号</span>
           <span class="coming-soon">即将推出</span>
         </a>
         <a href="#" class="nav-item is-disabled">
-          <i class="ri-weibo-line"></i>
+          <i class="ri-weibo-fill"></i>
           <span>微博</span>
           <span class="coming-soon">即将推出</span>
         </a>
@@ -44,115 +49,96 @@
     </aside>
 
     <!-- 主内容区 -->
-    <main class="main-content">
-      <div class="page-header">
-        <h1><i class="ri-book-2-line"></i> 小红书内容生成</h1>
-        <p>上传模板，输入内容，自动生成封面图和正文图</p>
-      </div>
-
-      <div class="xhs-layout">
-        <!-- 左侧：输入区 -->
-        <div class="xhs-input-panel">
-          <!-- 封面图设置 -->
-          <section class="input-section">
-            <div class="section-header">
-              <h3><i class="ri-image-line"></i> 封面图</h3>
-            </div>
-            <div class="form-group">
-              <label>封面模板</label>
-              <div class="upload-area" id="coverUploadArea">
-                <input type="file" id="coverTemplateInput" accept="image/*" hidden>
-                <div class="upload-placeholder" id="coverPlaceholder">
-                  <i class="ri-upload-cloud-2-line"></i>
-                  <span>点击上传封面模板</span>
-                  <small>建议尺寸 1080×1440 (3:4)</small>
-                </div>
-                <img id="coverPreviewImg" class="upload-preview" style="display:none;">
-              </div>
-              <button class="btn-mark-area" id="markCoverArea" style="display:none;">
-                <i class="ri-drag-move-line"></i> 标记标题区域
+    <main class="main-content xhs-main">
+      <div class="xhs-layout-new">
+        <!-- 左侧：模板上传 -->
+        <div class="xhs-templates">
+          <div class="template-card">
+            <div class="template-header">
+              <h3><i class="ri-image-line"></i> 封面模板</h3>
+              <button class="btn-mark-area btn-mark-sm" id="markCoverArea" style="display:none;">
+                <i class="ri-drag-move-line"></i> 标记区域
               </button>
-              <div class="area-info" id="coverAreaInfo" style="display:none;">
-                <i class="ri-check-line"></i> 已标记标题区域
-              </div>
             </div>
+            <div class="upload-area upload-area-sm" id="coverUploadArea">
+              <input type="file" id="coverTemplateInput" accept="image/*" hidden>
+              <div class="upload-placeholder" id="coverPlaceholder">
+                <i class="ri-upload-cloud-2-line"></i>
+                <span>上传封面</span>
+              </div>
+              <img id="coverPreviewImg" class="upload-preview" style="display:none;">
+            </div>
+            <div class="area-info" id="coverAreaInfo" style="display:none;">
+              <i class="ri-check-line"></i> 已标记
+            </div>
+          </div>
+
+          <div class="template-card">
+            <div class="template-header">
+              <h3><i class="ri-file-text-line"></i> 正文模板</h3>
+              <button class="btn-mark-area btn-mark-sm" id="markBgArea" style="display:none;">
+                <i class="ri-drag-move-line"></i> 标记区域
+              </button>
+            </div>
+            <div class="upload-area upload-area-sm" id="bgUploadArea">
+              <input type="file" id="bgTemplateInput" accept="image/*" hidden>
+              <div class="upload-placeholder" id="bgPlaceholder">
+                <i class="ri-upload-cloud-2-line"></i>
+                <span>上传背景</span>
+              </div>
+              <img id="bgPreviewImg" class="upload-preview" style="display:none;">
+            </div>
+            <div class="area-info" id="bgAreaInfo" style="display:none;">
+              <i class="ri-check-line"></i> 已标记
+            </div>
+          </div>
+        </div>
+
+        <!-- 中间：内容输入 -->
+        <div class="xhs-content-input">
+          <div class="input-card">
             <div class="form-group">
               <label>封面标题</label>
-              <textarea id="coverTitle" placeholder="输入封面标题，支持换行" rows="3"></textarea>
-            </div>
-          </section>
-
-          <!-- 正文内容设置 -->
-          <section class="input-section">
-            <div class="section-header">
-              <h3><i class="ri-file-text-line"></i> 正文内容</h3>
-            </div>
-            <div class="form-group">
-              <label>背景模板</label>
-              <div class="upload-area" id="bgUploadArea">
-                <input type="file" id="bgTemplateInput" accept="image/*" hidden>
-                <div class="upload-placeholder" id="bgPlaceholder">
-                  <i class="ri-upload-cloud-2-line"></i>
-                  <span>点击上传背景模板</span>
-                  <small>建议尺寸 1080×1440 (3:4)</small>
-                </div>
-                <img id="bgPreviewImg" class="upload-preview" style="display:none;">
-              </div>
-              <button class="btn-mark-area" id="markBgArea" style="display:none;">
-                <i class="ri-drag-move-line"></i> 标记正文区域
-              </button>
-              <div class="area-info" id="bgAreaInfo" style="display:none;">
-                <i class="ri-check-line"></i> 已标记正文区域
-              </div>
+              <textarea id="coverTitle" placeholder="输入封面标题，支持换行" rows="2"></textarea>
             </div>
             <div class="form-group">
               <label>正文内容 <span class="char-count" id="contentCharCount">0 字</span></label>
-              <textarea id="contentText" placeholder="输入正文内容，系统会自动分页生成多张图片" rows="10"></textarea>
+              <textarea id="contentText" placeholder="输入正文内容，系统会自动分页" rows="6"></textarea>
             </div>
-          </section>
-
-          <!-- 发布辅助信息 -->
-          <section class="input-section">
-            <div class="section-header">
-              <h3><i class="ri-hashtag"></i> 发布信息</h3>
+            <div class="form-row">
+              <div class="form-group form-group-half">
+                <label>发布标题</label>
+                <input type="text" id="xhsTitle" placeholder="发布时的标题">
+              </div>
+              <div class="form-group form-group-half">
+                <label>正文描述</label>
+                <input type="text" id="xhsDesc" placeholder="发布时的描述">
+              </div>
             </div>
-            <div class="form-group">
-              <label>小红书标题</label>
-              <input type="text" id="xhsTitle" placeholder="用于发布时的标题（可与封面标题不同）">
-            </div>
-            <div class="form-group">
-              <label>正文描述</label>
-              <textarea id="xhsDesc" placeholder="发布时显示的文字描述" rows="3"></textarea>
-            </div>
-          </section>
-
-          <!-- 生成按钮 -->
-          <button class="btn-generate" id="generateBtn">
-            <i class="ri-magic-line"></i> 生成图片
-          </button>
+            <button class="btn-generate" id="generateBtn">
+              <i class="ri-magic-line"></i> 生成图片
+            </button>
+          </div>
         </div>
 
         <!-- 右侧：预览区 -->
         <div class="xhs-preview-panel">
           <div class="preview-header">
             <h3>预览</h3>
-            <div class="preview-actions">
-              <button class="btn-action" id="downloadAllBtn" disabled>
-                <i class="ri-download-2-line"></i> 下载全部
-              </button>
-            </div>
+            <button class="btn-action" id="downloadAllBtn" disabled>
+              <i class="ri-download-2-line"></i> 下载
+            </button>
           </div>
 
           <div class="preview-container" id="previewContainer">
             <div class="preview-empty">
               <i class="ri-image-2-line"></i>
-              <p>上传模板并输入内容后<br>点击"生成图片"查看预览</p>
+              <p>生成后预览</p>
             </div>
           </div>
 
           <!-- 复制区域 -->
           <div class="copy-section" id="copySection" style="display:none;">
-            <h4>发布内容</h4>
             <div class="copy-item">
               <span class="copy-label">标题</span>
               <div class="copy-content" id="copyTitle">-</div>
@@ -161,7 +147,7 @@
               </button>
             </div>
             <div class="copy-item">
-              <span class="copy-label">正文</span>
+              <span class="copy-label">描述</span>
               <div class="copy-content" id="copyDesc">-</div>
               <button class="btn-copy" data-target="copyDesc">
                 <i class="ri-file-copy-line"></i>
@@ -213,6 +199,7 @@
     </div>
   </div>
 
+  <script src="js/sidebar.js"></script>
   <script src="js/xiaohongshu.js"></script>
 </body>
 </html>

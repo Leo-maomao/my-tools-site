@@ -1,5 +1,136 @@
 /* 小红书页面专属样式 */
 
+/* 小红书主内容区减少padding */
+.xhs-main {
+  padding: 20px 24px !important;
+}
+
+/* 新三列布局 */
+.xhs-layout-new {
+  display: grid;
+  grid-template-columns: 200px 1fr 280px;
+  gap: 20px;
+  height: calc(100vh - 40px);
+  align-items: stretch;
+}
+
+/* 左侧模板区 */
+.xhs-templates {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.template-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px;
+}
+
+.template-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.template-header h3 {
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.template-header h3 i {
+  color: var(--accent);
+  font-size: 14px;
+}
+
+.upload-area-sm {
+  padding: 16px 12px;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-area-sm .upload-placeholder {
+  gap: 4px;
+}
+
+.upload-area-sm .upload-placeholder i {
+  font-size: 24px;
+}
+
+.upload-area-sm .upload-placeholder span {
+  font-size: 12px;
+}
+
+.upload-area-sm .upload-preview {
+  max-height: 140px;
+}
+
+.btn-mark-sm {
+  padding: 4px 8px;
+  font-size: 11px;
+  margin-top: 0;
+}
+
+.template-card .area-info {
+  margin-top: 6px;
+  padding: 4px 8px;
+  font-size: 11px;
+}
+
+/* 中间内容输入区 */
+.xhs-content-input {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-card .form-group {
+  margin-bottom: 12px;
+}
+
+.input-card .form-group:last-of-type {
+  margin-bottom: 16px;
+}
+
+.input-card textarea {
+  resize: none;
+}
+
+.input-card #contentText {
+  flex: 1;
+  min-height: 120px;
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+}
+
+.form-group-half {
+  flex: 1;
+}
+
+.input-card .btn-generate {
+  margin-top: auto;
+}
+
+/* 旧布局兼容 */
 .xhs-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -706,7 +837,29 @@
 }
 
 /* 响应式 */
+@media (max-width: 1400px) {
+  .xhs-layout-new {
+    grid-template-columns: 180px 1fr 240px;
+    gap: 16px;
+  }
+}
+
 @media (max-width: 1200px) {
+  .xhs-layout-new {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr;
+    height: auto;
+  }
+
+  .xhs-templates {
+    flex-direction: row;
+    grid-column: 1 / -1;
+  }
+
+  .template-card {
+    flex: 1;
+  }
+
   .xhs-layout {
     grid-template-columns: 1fr;
   }
@@ -714,6 +867,17 @@
   .xhs-preview-panel {
     position: relative;
     top: 0;
+    min-height: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .xhs-layout-new {
+    grid-template-columns: 1fr;
+  }
+
+  .xhs-templates {
+    flex-direction: column;
   }
 }
 
