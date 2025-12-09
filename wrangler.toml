@@ -1,0 +1,5 @@
+name = "we-media"
+compatibility_date = "2024-12-09"
+
+[assets]
+directory = "./"
