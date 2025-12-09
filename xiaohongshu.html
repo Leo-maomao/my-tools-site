@@ -54,15 +54,27 @@
               <h3><i class="ri-image-line"></i> 封面图</h3>
             </div>
             <div class="form-group">
-              <label>封面模板</label>
+              <label>填充模板图</label>
               <div class="upload-area" id="coverUploadArea">
                 <input type="file" id="coverTemplateInput" accept="image/*" hidden>
                 <div class="upload-placeholder" id="coverPlaceholder">
                   <i class="ri-upload-cloud-2-line"></i>
-                  <span>点击上传封面模板</span>
+                  <span>上传填充模板（用于生成最终图片）</span>
                   <small>建议尺寸 1080×1440 (3:4)</small>
                 </div>
                 <img id="coverPreviewImg" class="upload-preview" style="display:none;">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>参考图（划分区域）</label>
+              <div class="upload-area" id="coverRefUploadArea">
+                <input type="file" id="coverRefInput" accept="image/*" hidden>
+                <div class="upload-placeholder" id="coverRefPlaceholder">
+                  <i class="ri-upload-cloud-2-line"></i>
+                  <span>上传参考图（用于标记标题区域）</span>
+                  <small>可与模板图相同或不同</small>
+                </div>
+                <img id="coverRefPreviewImg" class="upload-preview" style="display:none;">
               </div>
               <button class="btn-mark-area" id="markCoverArea" style="display:none;">
                 <i class="ri-drag-move-line"></i> 标记标题区域
@@ -83,15 +95,27 @@
               <h3><i class="ri-file-text-line"></i> 正文内容</h3>
             </div>
             <div class="form-group">
-              <label>背景模板</label>
+              <label>填充模板图</label>
               <div class="upload-area" id="bgUploadArea">
                 <input type="file" id="bgTemplateInput" accept="image/*" hidden>
                 <div class="upload-placeholder" id="bgPlaceholder">
                   <i class="ri-upload-cloud-2-line"></i>
-                  <span>点击上传背景模板</span>
+                  <span>上传填充模板（用于生成最终图片）</span>
                   <small>建议尺寸 1080×1440 (3:4)</small>
                 </div>
                 <img id="bgPreviewImg" class="upload-preview" style="display:none;">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>参考图（划分区域）</label>
+              <div class="upload-area" id="bgRefUploadArea">
+                <input type="file" id="bgRefInput" accept="image/*" hidden>
+                <div class="upload-placeholder" id="bgRefPlaceholder">
+                  <i class="ri-upload-cloud-2-line"></i>
+                  <span>上传参考图（用于标记正文区域）</span>
+                  <small>可与模板图相同或不同</small>
+                </div>
+                <img id="bgRefPreviewImg" class="upload-preview" style="display:none;">
               </div>
               <button class="btn-mark-area" id="markBgArea" style="display:none;">
                 <i class="ri-drag-move-line"></i> 标记正文区域
@@ -120,18 +144,8 @@
               <textarea id="xhsDesc" placeholder="发布时显示的文字描述" rows="3"></textarea>
             </div>
             <div class="form-group">
-              <label>推荐话题</label>
-              <div class="topic-tags" id="topicTags">
-                <span class="topic-tag" data-topic="#产品经理">#产品经理</span>
-                <span class="topic-tag" data-topic="#AI">#AI</span>
-                <span class="topic-tag" data-topic="#职场">#职场</span>
-                <span class="topic-tag" data-topic="#互联网">#互联网</span>
-                <span class="topic-tag" data-topic="#个人成长">#个人成长</span>
-                <span class="topic-tag" data-topic="#工作日常">#工作日常</span>
-                <span class="topic-tag" data-topic="#效率工具">#效率工具</span>
-                <span class="topic-tag" data-topic="#干货分享">#干货分享</span>
-              </div>
-              <input type="text" id="customTopic" placeholder="自定义话题（以 # 开头）">
+              <label>话题标签</label>
+              <input type="text" id="customTopic" placeholder="输入话题标签（以 # 开头，多个用空格分隔）">
             </div>
           </section>
 
