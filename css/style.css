@@ -138,13 +138,13 @@ a {
 }
 
 .nav-item:hover:not(.is-disabled) {
-  background: rgba(255, 71, 87, 0.06);
-  color: var(--accent);
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--text-main);
 }
 
 .nav-item.is-active {
-  background: rgba(255, 71, 87, 0.1);
-  color: var(--accent);
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-main);
 }
 
 .nav-item.is-disabled {
