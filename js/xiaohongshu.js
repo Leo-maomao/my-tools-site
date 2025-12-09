@@ -125,10 +125,6 @@
         coverTemplateInput: document.getElementById('coverTemplateInput'),
         coverPlaceholder: document.getElementById('coverPlaceholder'),
         coverPreviewImg: document.getElementById('coverPreviewImg'),
-        coverRefUploadArea: document.getElementById('coverRefUploadArea'),
-        coverRefInput: document.getElementById('coverRefInput'),
-        coverRefPlaceholder: document.getElementById('coverRefPlaceholder'),
-        coverRefPreviewImg: document.getElementById('coverRefPreviewImg'),
         coverTitle: document.getElementById('coverTitle'),
         markCoverArea: document.getElementById('markCoverArea'),
         coverAreaInfo: document.getElementById('coverAreaInfo'),
@@ -138,10 +134,6 @@
         bgTemplateInput: document.getElementById('bgTemplateInput'),
         bgPlaceholder: document.getElementById('bgPlaceholder'),
         bgPreviewImg: document.getElementById('bgPreviewImg'),
-        bgRefUploadArea: document.getElementById('bgRefUploadArea'),
-        bgRefInput: document.getElementById('bgRefInput'),
-        bgRefPlaceholder: document.getElementById('bgRefPlaceholder'),
-        bgRefPreviewImg: document.getElementById('bgRefPreviewImg'),
         contentText: document.getElementById('contentText'),
         contentCharCount: document.getElementById('contentCharCount'),
         markBgArea: document.getElementById('markBgArea'),
@@ -150,7 +142,6 @@
         // 发布信息
         xhsTitle: document.getElementById('xhsTitle'),
         xhsDesc: document.getElementById('xhsDesc'),
-        customTopic: document.getElementById('customTopic'),
 
         // 按钮
         generateBtn: document.getElementById('generateBtn'),
@@ -161,7 +152,6 @@
         copySection: document.getElementById('copySection'),
         copyTitle: document.getElementById('copyTitle'),
         copyDesc: document.getElementById('copyDesc'),
-        copyTopics: document.getElementById('copyTopics'),
 
         // Canvas
         canvas: document.getElementById('renderCanvas')
@@ -169,14 +159,10 @@
 
     // 状态
     var state = {
-        coverTemplate: null,  // 封面模板图片（用于生成）
+        coverTemplate: null,  // 封面模板图片
         coverTemplateData: null, // 封面模板 base64
-        coverRef: null,       // 封面参考图（用于标记区域）
-        coverRefData: null,   // 封面参考图 base64
-        bgTemplate: null,     // 背景模板图片（用于生成）
+        bgTemplate: null,     // 背景模板图片
         bgTemplateData: null, // 背景模板 base64
-        bgRef: null,          // 背景参考图（用于标记区域）
-        bgRefData: null,      // 背景参考图 base64
         generatedImages: [],  // 生成的图片
         // 用户标记的区域（相对于原图的比例）
         coverArea: null,      // { x, y, width, height } 比例值 0-1
@@ -241,16 +227,6 @@
             handleImageUpload(e, 'cover');
         });
 
-        // 封面参考图上传
-        if (elements.coverRefUploadArea) {
-            elements.coverRefUploadArea.addEventListener('click', function() {
-                elements.coverRefInput.click();
-            });
-            elements.coverRefInput.addEventListener('change', function(e) {
-                handleImageUpload(e, 'coverRef');
-            });
-        }
-
         // 背景模板上传
         elements.bgUploadArea.addEventListener('click', function() {
             elements.bgTemplateInput.click();
@@ -258,16 +234,6 @@
         elements.bgTemplateInput.addEventListener('change', function(e) {
             handleImageUpload(e, 'bg');
         });
-
-        // 背景参考图上传
-        if (elements.bgRefUploadArea) {
-            elements.bgRefUploadArea.addEventListener('click', function() {
-                elements.bgRefInput.click();
-            });
-            elements.bgRefInput.addEventListener('change', function(e) {
-                handleImageUpload(e, 'bgRef');
-            });
-        }
 
         // 正文字数统计
         elements.contentText.addEventListener('input', function() {
@@ -332,16 +298,7 @@
                 elements.coverPreviewImg.style.display = 'block';
                 elements.coverPlaceholder.style.display = 'none';
                 elements.coverUploadArea.classList.add('has-image');
-            } else if (type === 'coverRef') {
-                state.coverRef = img;
-                state.coverRefData = imageData;
-                if (elements.coverRefPreviewImg) {
-                    elements.coverRefPreviewImg.src = imageData;
-                    elements.coverRefPreviewImg.style.display = 'block';
-                    elements.coverRefPlaceholder.style.display = 'none';
-                    elements.coverRefUploadArea.classList.add('has-image');
-                    elements.markCoverArea.style.display = 'flex';
-                }
+                elements.markCoverArea.style.display = 'flex';
             } else if (type === 'bg') {
                 state.bgTemplate = img;
                 state.bgTemplateData = imageData;
@@ -349,26 +306,12 @@
                 elements.bgPreviewImg.style.display = 'block';
                 elements.bgPlaceholder.style.display = 'none';
                 elements.bgUploadArea.classList.add('has-image');
-            } else if (type === 'bgRef') {
-                state.bgRef = img;
-                state.bgRefData = imageData;
-                if (elements.bgRefPreviewImg) {
-                    elements.bgRefPreviewImg.src = imageData;
-                    elements.bgRefPreviewImg.style.display = 'block';
-                    elements.bgRefPlaceholder.style.display = 'none';
-                    elements.bgRefUploadArea.classList.add('has-image');
-                    elements.markBgArea.style.display = 'flex';
-                }
+                elements.markBgArea.style.display = 'flex';
             }
         };
         img.src = imageData;
     }
 
-    // 获取用户输入的话题
-    function getUserTopics() {
-        var topics = elements.customTopic.value.trim();
-        return topics ? topics.split(/\s+/).filter(function(t) { return t.startsWith('#'); }) : [];
-    }
 
     // 生成图片
     function generateImages() {
@@ -743,10 +686,8 @@
         var title = type === 'cover' ? '标记标题区域' : '标记正文区域';
         document.getElementById('areaMarkerTitle').textContent = title;
 
-        // 绘制图片到 canvas（优先使用参考图，否则使用模板图）
-        var img = type === 'cover'
-            ? (state.coverRef || state.coverTemplate)
-            : (state.bgRef || state.bgTemplate);
+        // 绘制图片到 canvas
+        var img = type === 'cover' ? state.coverTemplate : state.bgTemplate;
         if (!img) return;
 
         // 计算缩放后的尺寸，使图片适应屏幕
@@ -875,10 +816,6 @@
         // 正文描述
         var desc = elements.xhsDesc.value.trim() || '-';
         elements.copyDesc.textContent = desc;
-
-        // 话题
-        var topics = getUserTopics();
-        elements.copyTopics.textContent = topics.length > 0 ? topics.join(' ') : '-';
     }
 
     // 下载单张图片
