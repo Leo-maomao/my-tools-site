@@ -168,9 +168,9 @@ a {
   height: 20px;
 }
 
-/* 侧边栏收起状态 - 只显示logo和展开按钮 */
+/* 侧边栏收起状态 - 显示logo图标、展开按钮、菜单图标 */
 .sidebar.is-collapsed {
-  width: 56px;
+  width: 64px;
   padding: 24px 12px;
 }
 
@@ -185,25 +185,18 @@ a {
   display: none;
 }
 
-.sidebar.is-collapsed .sidebar-nav {
+.sidebar.is-collapsed .nav-item {
+  justify-content: center;
+  padding: 12px;
+}
+
+.sidebar.is-collapsed .nav-item > span,
+.sidebar.is-collapsed .coming-soon {
   display: none;
 }
 
 .sidebar.is-collapsed + .main-content {
-  margin-left: 56px;
-}
-
-/* 侧边栏文字过渡动画 */
-.sidebar-logo > span,
-.nav-item > span,
-.coming-soon {
-  transition: opacity 0.2s ease;
-}
-
-.sidebar.is-collapsed .sidebar-logo > span,
-.sidebar.is-collapsed .nav-item > span,
-.sidebar.is-collapsed .coming-soon {
-  opacity: 0;
+  margin-left: 64px;
 }
 
 /* 主内容区 */
