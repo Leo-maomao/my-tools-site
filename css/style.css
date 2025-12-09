@@ -70,29 +70,15 @@ a {
   font-size: 18px;
   font-weight: 700;
   color: var(--accent);
-  overflow: hidden;
-}
-
-.sidebar-logo > span:not(.app-logo-icon) {
   white-space: nowrap;
-  overflow: hidden;
-  transition: opacity 0.15s ease, max-width 0.2s ease;
-  max-width: 150px;
-  opacity: 1;
 }
 
-/* App logo 图标样式 */
-.app-logo-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-light));
-  color: #fff;
-  font-size: 14px;
-  font-weight: bold;
-  border-radius: 8px;
+.sidebar-logo > span {
+  display: inline-block;
+}
+
+.sidebar-logo i {
+  font-size: 24px;
   flex-shrink: 0;
 }
 
@@ -132,7 +118,7 @@ a {
   font-weight: 500;
   color: var(--text-sub);
   transition: all 0.2s ease;
-  overflow: hidden;
+  white-space: nowrap;
 }
 
 .nav-item i,
@@ -141,12 +127,8 @@ a {
   flex-shrink: 0;
 }
 
-.nav-item > span:not(.xhs-logo-icon):not(.coming-soon) {
-  white-space: nowrap;
-  overflow: hidden;
-  transition: opacity 0.15s ease, max-width 0.2s ease;
-  max-width: 150px;
-  opacity: 1;
+.nav-item > span {
+  display: inline-block;
 }
 
 .nav-item:hover:not(.is-disabled) {
@@ -175,40 +157,27 @@ a {
 
 /* 小红书logo图标样式 */
 .xhs-logo-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: inline-block;
   width: 18px;
-  height: 18px;
-  background: #ff2442;
-  color: #fff;
-  font-size: 11px;
-  font-weight: bold;
-  border-radius: 4px;
+  height: 12px;
   flex-shrink: 0;
 }
 
 .xhs-logo-icon-lg {
-  width: 28px;
-  height: 28px;
-  font-size: 16px;
-  border-radius: 6px;
+  width: 32px;
+  height: 20px;
 }
 
 /* 侧边栏收起状态 */
 .sidebar.is-collapsed {
   width: 72px;
   padding: 24px 12px;
+  overflow: hidden;
 }
 
 .sidebar.is-collapsed .sidebar-header {
   flex-direction: column;
   gap: 8px;
-}
-
-.sidebar.is-collapsed .sidebar-logo > span:not(.app-logo-icon) {
-  max-width: 0;
-  opacity: 0;
 }
 
 .sidebar.is-collapsed .sidebar-toggle {
@@ -224,12 +193,8 @@ a {
   padding: 12px;
 }
 
-.sidebar.is-collapsed .nav-item > span:not(.xhs-logo-icon) {
-  max-width: 0;
-  opacity: 0;
-}
-
-.sidebar.is-collapsed .nav-item i {
+.sidebar.is-collapsed .nav-item i,
+.sidebar.is-collapsed .nav-item .xhs-logo-icon {
   font-size: 20px;
 }
 

@@ -14,7 +14,7 @@
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-logo">
-          <span class="app-logo-icon">媒</span>
+          <i class="ri-quill-pen-line"></i>
           <span>自媒体工具</span>
         </div>
         <button class="sidebar-toggle" id="sidebarToggle" title="收起侧边栏">
@@ -27,7 +27,7 @@
           <span>首页</span>
         </a>
         <a href="xiaohongshu.html" class="nav-item is-active">
-          <span class="xhs-logo-icon">小</span>
+          <svg class="xhs-logo-icon" viewBox="0 0 200 120"><rect fill="#ff2442" rx="60" width="200" height="120"/><text x="100" y="82" text-anchor="middle" fill="#fff" font-size="52" font-weight="bold" font-family="sans-serif">小红书</text></svg>
           <span>小红书</span>
         </a>
         <a href="#" class="nav-item is-disabled">
@@ -104,8 +104,15 @@
               <input type="text" id="coverTitle" placeholder="请输入封面标题">
             </div>
             <div class="form-group">
-              <label>正文内容 <span class="char-count" id="contentCharCount">0 字</span></label>
+              <label>
+                正文内容 <span class="char-count" id="contentCharCount">0 字</span>
+                <button type="button" class="btn-insert-img" id="insertImgBtn" title="插入图片">
+                  <i class="ri-image-add-line"></i>
+                </button>
+              </label>
+              <input type="file" id="contentImgInput" accept="image/*" hidden>
               <textarea id="contentText" placeholder="请输入正文内容" rows="6"></textarea>
+              <div class="inserted-images" id="insertedImages"></div>
             </div>
             <div class="form-group">
               <label>发布标题</label>

@@ -138,6 +138,9 @@
         bgPreviewImg: document.getElementById('bgPreviewImg'),
         contentText: document.getElementById('contentText'),
         contentCharCount: document.getElementById('contentCharCount'),
+        insertImgBtn: document.getElementById('insertImgBtn'),
+        contentImgInput: document.getElementById('contentImgInput'),
+        insertedImages: document.getElementById('insertedImages'),
         markBgArea: document.getElementById('markBgArea'),
         bgMarkIcon: document.getElementById('bgMarkIcon'),
         bgMarkText: document.getElementById('bgMarkText'),
@@ -171,7 +174,8 @@
         generatedImages: [],  // 生成的图片
         // 用户标记的区域（相对于原图的比例）
         coverArea: null,      // { x, y, width, height } 比例值 0-1
-        bgArea: null          // { x, y, width, height } 比例值 0-1
+        bgArea: null,         // { x, y, width, height } 比例值 0-1
+        contentImages: []     // 正文中插入的图片 [{ img: Image, data: base64 }]
     };
 
     // 初始化
@@ -276,6 +280,12 @@
             elements.descCharCount.textContent = count + ' 字';
         });
 
+        // 插入图片按钮
+        elements.insertImgBtn.addEventListener('click', function() {
+            elements.contentImgInput.click();
+        });
+        elements.contentImgInput.addEventListener('change', handleContentImageInsert);
+
         // 生成按钮
         elements.generateBtn.addEventListener('click', generateImages);
 
@@ -342,6 +352,75 @@
             Storage.remove('xhs_bg_template');
             Storage.remove('xhs_bg_area');
         }
+    }
+
+    // 处理正文图片插入
+    function handleContentImageInsert(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+
+        var reader = new FileReader();
+        reader.onload = function(event) {
+            var imageData = event.target.result;
+            var img = new Image();
+            img.onload = function() {
+                state.contentImages.push({ img: img, data: imageData });
+                renderInsertedImages();
+                // 在文本框当前光标位置插入占位符
+                var textarea = elements.contentText;
+                var cursorPos = textarea.selectionStart;
+                var textBefore = textarea.value.substring(0, cursorPos);
+                var textAfter = textarea.value.substring(cursorPos);
+                var placeholder = '\n[图片' + state.contentImages.length + ']\n';
+                textarea.value = textBefore + placeholder + textAfter;
+                // 更新字数
+                elements.contentCharCount.textContent = textarea.value.length + ' 字';
+            };
+            img.src = imageData;
+        };
+        reader.readAsDataURL(file);
+        e.target.value = ''; // 清空以便重复上传同一文件
+    }
+
+    // 渲染已插入的图片列表
+    function renderInsertedImages() {
+        var html = '';
+        state.contentImages.forEach(function(item, index) {
+            html += '<div class="inserted-image-item" data-index="' + index + '">';
+            html += '  <img src="' + item.data + '" alt="图片' + (index + 1) + '">';
+            html += '  <button class="remove-img" title="删除"><i class="ri-close-line"></i></button>';
+            html += '</div>';
+        });
+        elements.insertedImages.innerHTML = html;
+
+        // 绑定删除事件
+        elements.insertedImages.querySelectorAll('.remove-img').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var index = parseInt(this.parentElement.getAttribute('data-index'));
+                removeContentImage(index);
+            });
+        });
+    }
+
+    // 删除插入的图片
+    function removeContentImage(index) {
+        state.contentImages.splice(index, 1);
+        renderInsertedImages();
+        // 更新文本中的占位符
+        var textarea = elements.contentText;
+        // 移除对应的占位符并重新编号
+        var text = textarea.value;
+        text = text.replace(/\[图片\d+\]/g, function(match) {
+            return match; // 暂时保留
+        });
+        // 简单处理：删除所有占位符然后重新插入
+        for (var i = state.contentImages.length; i >= 0; i--) {
+            text = text.replace('[图片' + (i + 2) + ']', '[图片' + (i + 1) + ']');
+        }
+        text = text.replace('[图片' + (index + 1) + ']', '');
+        textarea.value = text;
+        elements.contentCharCount.textContent = textarea.value.length + ' 字';
     }
 
     // 处理图片上传
@@ -559,55 +638,126 @@
         ctx.textBaseline = 'top';
         ctx.fillStyle = cfg.textColor;
 
-        // 分割段落
-        var paragraphs = text.split(/\n+/);
-        var allLines = [];
+        // 解析文本，将图片占位符替换为特殊标记
+        var contentItems = parseContentWithImages(text);
 
-        paragraphs.forEach(function(para, pIndex) {
-            var lines = wrapText(ctx, para, textWidth);
-            lines.forEach(function(line, lIndex) {
-                allLines.push({
-                    text: line,
-                    isLastOfParagraph: lIndex === lines.length - 1 && pIndex < paragraphs.length - 1
+        // 分割段落并处理图片
+        var allItems = [];
+
+        contentItems.forEach(function(item, itemIndex) {
+            if (item.type === 'image') {
+                allItems.push({ type: 'image', img: item.img, data: item.data });
+            } else {
+                // 文本段落
+                var paragraphs = item.text.split(/\n+/);
+                paragraphs.forEach(function(para, pIndex) {
+                    if (para.trim() === '') return;
+                    var lines = wrapText(ctx, para, textWidth);
+                    lines.forEach(function(line, lIndex) {
+                        allItems.push({
+                            type: 'text',
+                            text: line,
+                            isLastOfParagraph: lIndex === lines.length - 1 && pIndex < paragraphs.length - 1
+                        });
+                    });
                 });
-            });
+            }
         });
 
-        // 计算每页能放多少行
-        var linesPerPage = Math.floor(textHeight / lineHeight);
+        // 图片最大高度（区域高度的40%）
+        var maxImageHeight = textHeight * 0.4;
         var images = [];
-        var currentLine = 0;
+        var currentIdx = 0;
 
-        while (currentLine < allLines.length) {
+        while (currentIdx < allItems.length) {
             // 绘制背景
             ctx.drawImage(state.bgTemplate, 0, 0, canvas.width, canvas.height);
+            ctx.font = cfg.textFont.replace('{size}', fontSize);
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            ctx.fillStyle = cfg.textColor;
 
-            // 绘制本页文字
+            // 绘制本页内容
             var y = textY;
-            var linesOnThisPage = 0;
 
-            while (currentLine < allLines.length && linesOnThisPage < linesPerPage) {
-                var lineObj = allLines[currentLine];
-                ctx.fillText(lineObj.text, textX, y);
+            while (currentIdx < allItems.length && y < textY + textHeight) {
+                var item = allItems[currentIdx];
 
-                y += lineHeight;
-                if (lineObj.isLastOfParagraph) {
-                    y += paragraphSpacing;
-                    // 检查是否还有空间放下一段
-                    if (y + lineHeight > textY + textHeight) {
-                        currentLine++;
+                if (item.type === 'image') {
+                    // 绘制图片（居中）
+                    var img = item.img;
+                    var imgRatio = img.width / img.height;
+                    var drawHeight = Math.min(maxImageHeight, textHeight - (y - textY) - lineHeight);
+                    if (drawHeight < lineHeight * 2) {
+                        // 本页空间不够，换页
                         break;
                     }
+                    var drawWidth = drawHeight * imgRatio;
+                    if (drawWidth > textWidth) {
+                        drawWidth = textWidth;
+                        drawHeight = drawWidth / imgRatio;
+                    }
+                    // 居中绘制
+                    var imgX = textX + (textWidth - drawWidth) / 2;
+                    ctx.drawImage(img, imgX, y, drawWidth, drawHeight);
+                    y += drawHeight + paragraphSpacing;
+                    currentIdx++;
+                } else {
+                    // 绘制文字
+                    if (y + lineHeight > textY + textHeight) {
+                        break;
+                    }
+                    ctx.fillText(item.text, textX, y);
+                    y += lineHeight;
+                    if (item.isLastOfParagraph) {
+                        y += paragraphSpacing;
+                    }
+                    currentIdx++;
                 }
-
-                currentLine++;
-                linesOnThisPage++;
             }
 
             images.push(canvas.toDataURL('image/png'));
         }
 
         return images;
+    }
+
+    // 解析文本中的图片占位符
+    function parseContentWithImages(text) {
+        var items = [];
+        var regex = /\[图片(\d+)\]/g;
+        var lastIndex = 0;
+        var match;
+
+        while ((match = regex.exec(text)) !== null) {
+            // 添加图片前的文本
+            if (match.index > lastIndex) {
+                var textBefore = text.substring(lastIndex, match.index);
+                if (textBefore.trim()) {
+                    items.push({ type: 'text', text: textBefore });
+                }
+            }
+            // 添加图片
+            var imgIndex = parseInt(match[1]) - 1;
+            if (state.contentImages[imgIndex]) {
+                items.push({
+                    type: 'image',
+                    img: state.contentImages[imgIndex].img,
+                    data: state.contentImages[imgIndex].data
+                });
+            }
+            lastIndex = regex.lastIndex;
+        }
+
+        // 添加最后的文本
+        if (lastIndex < text.length) {
+            var remaining = text.substring(lastIndex);
+            if (remaining.trim()) {
+                items.push({ type: 'text', text: remaining });
+            }
+        }
+
+        return items.length > 0 ? items : [{ type: 'text', text: text }];
     }
 
     // 文字换行处理
