@@ -1,17 +1,23 @@
-/* 全局样式变量 */
+/* 全局样式变量（与 Nav/Blog 统一） */
 :root {
   --bg: #f5f7fb;
   --card-bg: #ffffff;
   --text-main: #111827;
   --text-sub: #6b7280;
   --text-muted: #9ca3af;
-  --accent: #ff4757;
-  --accent-light: #ff6b7a;
+  --accent: #2563eb;
+  --accent-light: #3b82f6;
+  --success: #10b981;
+  --warning: #f97316;
+  --error: #ef4444;
   --border-subtle: #e5e7eb;
-  --radius-lg: 16px;
+  --radius-lg: 18px;
   --radius-md: 12px;
-  --shadow-soft: 0 4px 20px rgba(15, 23, 42, 0.08);
+  --radius-sm: 8px;
+  --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.12);
+  --shadow-hover: 0 20px 50px rgba(15, 23, 42, 0.18);
   --sidebar-width: 240px;
+  --transition-base: 0.2s ease;
 }
 
 * {

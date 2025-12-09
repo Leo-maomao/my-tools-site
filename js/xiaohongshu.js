@@ -16,7 +16,6 @@
                 var request = indexedDB.open(self.dbName, 1);
 
                 request.onerror = function() {
-                    console.error('IndexedDB 打开失败');
                     reject(request.error);
                 };
 
@@ -185,7 +184,7 @@
             loadSavedTemplates();
             loadSavedAreas();
         }).catch(function(err) {
-            console.error('存储初始化失败:', err);
+            // 存储初始化失败，静默处理
         });
     }
 
@@ -396,10 +395,8 @@
 
             // 保存到 IndexedDB
             var storageKey = 'xhs_' + type + '_template';
-            Storage.save(storageKey, imageData).then(function() {
-                console.log('模板已保存到本地');
-            }).catch(function(err) {
-                console.error('保存失败:', err);
+            Storage.save(storageKey, imageData).catch(function(err) {
+                // 保存失败，静默处理
             });
         };
         reader.readAsDataURL(file);
