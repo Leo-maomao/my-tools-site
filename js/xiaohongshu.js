@@ -4,6 +4,87 @@
 (function() {
     'use strict';
 
+    // IndexedDB 存储模块
+    var Storage = {
+        dbName: 'weMediaDB',
+        storeName: 'templates',
+        db: null,
+
+        init: function() {
+            var self = this;
+            return new Promise(function(resolve, reject) {
+                var request = indexedDB.open(self.dbName, 1);
+
+                request.onerror = function() {
+                    console.error('IndexedDB 打开失败');
+                    reject(request.error);
+                };
+
+                request.onsuccess = function() {
+                    self.db = request.result;
+                    resolve();
+                };
+
+                request.onupgradeneeded = function(e) {
+                    var db = e.target.result;
+                    if (!db.objectStoreNames.contains(self.storeName)) {
+                        db.createObjectStore(self.storeName, { keyPath: 'id' });
+                    }
+                };
+            });
+        },
+
+        save: function(id, imageData) {
+            var self = this;
+            return new Promise(function(resolve, reject) {
+                if (!self.db) {
+                    reject(new Error('数据库未初始化'));
+                    return;
+                }
+                var tx = self.db.transaction(self.storeName, 'readwrite');
+                var store = tx.objectStore(self.storeName);
+                var request = store.put({ id: id, data: imageData, timestamp: Date.now() });
+
+                request.onsuccess = function() { resolve(); };
+                request.onerror = function() { reject(request.error); };
+            });
+        },
+
+        get: function(id) {
+            var self = this;
+            return new Promise(function(resolve, reject) {
+                if (!self.db) {
+                    reject(new Error('数据库未初始化'));
+                    return;
+                }
+                var tx = self.db.transaction(self.storeName, 'readonly');
+                var store = tx.objectStore(self.storeName);
+                var request = store.get(id);
+
+                request.onsuccess = function() {
+                    resolve(request.result ? request.result.data : null);
+                };
+                request.onerror = function() { reject(request.error); };
+            });
+        },
+
+        remove: function(id) {
+            var self = this;
+            return new Promise(function(resolve, reject) {
+                if (!self.db) {
+                    reject(new Error('数据库未初始化'));
+                    return;
+                }
+                var tx = self.db.transaction(self.storeName, 'readwrite');
+                var store = tx.objectStore(self.storeName);
+                var request = store.delete(id);
+
+                request.onsuccess = function() { resolve(); };
+                request.onerror = function() { reject(request.error); };
+            });
+        }
+    };
+
     // 配置参数（根据模板图片分析）
     var CONFIG = {
         // 图片尺寸
@@ -86,6 +167,30 @@
     // 初始化
     function init() {
         bindEvents();
+
+        // 初始化 IndexedDB 并恢复已保存的模板
+        Storage.init().then(function() {
+            loadSavedTemplates();
+        }).catch(function(err) {
+            console.error('存储初始化失败:', err);
+        });
+    }
+
+    // 加载已保存的模板
+    function loadSavedTemplates() {
+        // 加载封面模板
+        Storage.get('xhs_cover_template').then(function(data) {
+            if (data) {
+                loadImageFromData(data, 'cover');
+            }
+        });
+
+        // 加载背景模板
+        Storage.get('xhs_bg_template').then(function(data) {
+            if (data) {
+                loadImageFromData(data, 'bg');
+            }
+        });
     }
 
     // 绑定事件
@@ -143,25 +248,39 @@
 
         var reader = new FileReader();
         reader.onload = function(event) {
-            var img = new Image();
-            img.onload = function() {
-                if (type === 'cover') {
-                    state.coverTemplate = img;
-                    elements.coverPreviewImg.src = event.target.result;
-                    elements.coverPreviewImg.style.display = 'block';
-                    elements.coverPlaceholder.style.display = 'none';
-                    elements.coverUploadArea.classList.add('has-image');
-                } else {
-                    state.bgTemplate = img;
-                    elements.bgPreviewImg.src = event.target.result;
-                    elements.bgPreviewImg.style.display = 'block';
-                    elements.bgPlaceholder.style.display = 'none';
-                    elements.bgUploadArea.classList.add('has-image');
-                }
-            };
-            img.src = event.target.result;
+            var imageData = event.target.result;
+            loadImageFromData(imageData, type);
+
+            // 保存到 IndexedDB
+            var storageKey = 'xhs_' + type + '_template';
+            Storage.save(storageKey, imageData).then(function() {
+                console.log('模板已保存到本地');
+            }).catch(function(err) {
+                console.error('保存失败:', err);
+            });
         };
         reader.readAsDataURL(file);
+    }
+
+    // 从 base64 数据加载图片
+    function loadImageFromData(imageData, type) {
+        var img = new Image();
+        img.onload = function() {
+            if (type === 'cover') {
+                state.coverTemplate = img;
+                elements.coverPreviewImg.src = imageData;
+                elements.coverPreviewImg.style.display = 'block';
+                elements.coverPlaceholder.style.display = 'none';
+                elements.coverUploadArea.classList.add('has-image');
+            } else {
+                state.bgTemplate = img;
+                elements.bgPreviewImg.src = imageData;
+                elements.bgPreviewImg.style.display = 'block';
+                elements.bgPlaceholder.style.display = 'none';
+                elements.bgUploadArea.classList.add('has-image');
+            }
+        };
+        img.src = imageData;
     }
 
     // 更新选中的话题
