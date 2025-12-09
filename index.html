@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>自媒体内容工具</title>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <i class="ri-quill-pen-line"></i>
+        <span>自媒体工具</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item is-active">
+          <i class="ri-home-4-line"></i>
+          <span>首页</span>
+        </a>
+        <a href="xiaohongshu.html" class="nav-item">
+          <i class="ri-red-packet-line"></i>
+          <span>小红书</span>
+        </a>
+        <a href="#" class="nav-item is-disabled">
+          <i class="ri-douyin-line"></i>
+          <span>抖音</span>
+          <span class="coming-soon">即将推出</span>
+        </a>
+        <a href="#" class="nav-item is-disabled">
+          <i class="ri-wechat-line"></i>
+          <span>公众号</span>
+          <span class="coming-soon">即将推出</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+      <div class="page-header">
+        <h1>欢迎使用自媒体内容工具</h1>
+        <p>一站式生成多平台自媒体内容</p>
+      </div>
+
+      <div class="platform-grid">
+        <a href="xiaohongshu.html" class="platform-card platform-card--xhs">
+          <div class="platform-icon">
+            <i class="ri-red-packet-line"></i>
+          </div>
+          <div class="platform-info">
+            <h3>小红书</h3>
+            <p>生成封面图和正文图，支持自动分页</p>
+          </div>
+          <div class="platform-status platform-status--active">
+            <i class="ri-checkbox-circle-fill"></i> 可用
+          </div>
+        </a>
+
+        <div class="platform-card platform-card--douyin is-disabled">
+          <div class="platform-icon">
+            <i class="ri-douyin-line"></i>
+          </div>
+          <div class="platform-info">
+            <h3>抖音</h3>
+            <p>短视频脚本和封面生成</p>
+          </div>
+          <div class="platform-status platform-status--coming">
+            <i class="ri-time-line"></i> 即将推出
+          </div>
+        </div>
+
+        <div class="platform-card platform-card--wechat is-disabled">
+          <div class="platform-icon">
+            <i class="ri-wechat-line"></i>
+          </div>
+          <div class="platform-info">
+            <h3>公众号</h3>
+            <p>图文排版和封面设计</p>
+          </div>
+          <div class="platform-status platform-status--coming">
+            <i class="ri-time-line"></i> 即将推出
+          </div>
+        </div>
+
+        <div class="platform-card platform-card--weibo is-disabled">
+          <div class="platform-icon">
+            <i class="ri-weibo-line"></i>
+          </div>
+          <div class="platform-info">
+            <h3>微博</h3>
+            <p>长图文和九宫格图片生成</p>
+          </div>
+          <div class="platform-status platform-status--coming">
+            <i class="ri-time-line"></i> 即将推出
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

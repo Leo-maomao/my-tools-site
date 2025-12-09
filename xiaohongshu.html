@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小红书内容生成 - 自媒体工具</title>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/xiaohongshu.css">
+</head>
+<body>
+  <div class="app">
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <i class="ri-quill-pen-line"></i>
+        <span>自媒体工具</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item">
+          <i class="ri-home-4-line"></i>
+          <span>首页</span>
+        </a>
+        <a href="xiaohongshu.html" class="nav-item is-active">
+          <i class="ri-red-packet-line"></i>
+          <span>小红书</span>
+        </a>
+        <a href="#" class="nav-item is-disabled">
+          <i class="ri-douyin-line"></i>
+          <span>抖音</span>
+          <span class="coming-soon">即将推出</span>
+        </a>
+        <a href="#" class="nav-item is-disabled">
+          <i class="ri-wechat-line"></i>
+          <span>公众号</span>
+          <span class="coming-soon">即将推出</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+      <div class="page-header">
+        <h1><i class="ri-red-packet-line"></i> 小红书内容生成</h1>
+        <p>上传模板，输入内容，自动生成封面图和正文图</p>
+      </div>
+
+      <div class="xhs-layout">
+        <!-- 左侧：输入区 -->
+        <div class="xhs-input-panel">
+          <!-- 封面图设置 -->
+          <section class="input-section">
+            <div class="section-header">
+              <h3><i class="ri-image-line"></i> 封面图</h3>
+            </div>
+            <div class="form-group">
+              <label>封面模板</label>
+              <div class="upload-area" id="coverUploadArea">
+                <input type="file" id="coverTemplateInput" accept="image/*" hidden>
+                <div class="upload-placeholder" id="coverPlaceholder">
+                  <i class="ri-upload-cloud-2-line"></i>
+                  <span>点击上传封面模板</span>
+                  <small>建议尺寸 1080×1440 (3:4)</small>
+                </div>
+                <img id="coverPreviewImg" class="upload-preview" style="display:none;">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>封面标题</label>
+              <textarea id="coverTitle" placeholder="输入封面标题，支持换行" rows="3"></textarea>
+            </div>
+          </section>
+
+          <!-- 正文内容设置 -->
+          <section class="input-section">
+            <div class="section-header">
+              <h3><i class="ri-file-text-line"></i> 正文内容</h3>
+            </div>
+            <div class="form-group">
+              <label>背景模板</label>
+              <div class="upload-area" id="bgUploadArea">
+                <input type="file" id="bgTemplateInput" accept="image/*" hidden>
+                <div class="upload-placeholder" id="bgPlaceholder">
+                  <i class="ri-upload-cloud-2-line"></i>
+                  <span>点击上传背景模板</span>
+                  <small>建议尺寸 1080×1440 (3:4)</small>
+                </div>
+                <img id="bgPreviewImg" class="upload-preview" style="display:none;">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>正文内容 <span class="char-count" id="contentCharCount">0 字</span></label>
+              <textarea id="contentText" placeholder="输入正文内容，系统会自动分页生成多张图片" rows="10"></textarea>
+            </div>
+          </section>
+
+          <!-- 发布辅助信息 -->
+          <section class="input-section">
+            <div class="section-header">
+              <h3><i class="ri-hashtag"></i> 发布信息</h3>
+            </div>
+            <div class="form-group">
+              <label>小红书标题</label>
+              <input type="text" id="xhsTitle" placeholder="用于发布时的标题（可与封面标题不同）">
+            </div>
+            <div class="form-group">
+              <label>正文描述</label>
+              <textarea id="xhsDesc" placeholder="发布时显示的文字描述" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label>推荐话题</label>
+              <div class="topic-tags" id="topicTags">
+                <span class="topic-tag" data-topic="#产品经理">#产品经理</span>
+                <span class="topic-tag" data-topic="#AI">#AI</span>
+                <span class="topic-tag" data-topic="#职场">#职场</span>
+                <span class="topic-tag" data-topic="#互联网">#互联网</span>
+                <span class="topic-tag" data-topic="#个人成长">#个人成长</span>
+                <span class="topic-tag" data-topic="#工作日常">#工作日常</span>
+                <span class="topic-tag" data-topic="#效率工具">#效率工具</span>
+                <span class="topic-tag" data-topic="#干货分享">#干货分享</span>
+              </div>
+              <input type="text" id="customTopic" placeholder="自定义话题（以 # 开头）">
+            </div>
+          </section>
+
+          <!-- 生成按钮 -->
+          <button class="btn-generate" id="generateBtn">
+            <i class="ri-magic-line"></i> 生成图片
+          </button>
+        </div>
+
+        <!-- 右侧：预览区 -->
+        <div class="xhs-preview-panel">
+          <div class="preview-header">
+            <h3>预览</h3>
+            <div class="preview-actions">
+              <button class="btn-action" id="downloadAllBtn" disabled>
+                <i class="ri-download-2-line"></i> 下载全部
+              </button>
+            </div>
+          </div>
+
+          <div class="preview-container" id="previewContainer">
+            <div class="preview-empty">
+              <i class="ri-image-2-line"></i>
+              <p>上传模板并输入内容后<br>点击"生成图片"查看预览</p>
+            </div>
+          </div>
+
+          <!-- 复制区域 -->
+          <div class="copy-section" id="copySection" style="display:none;">
+            <h4>发布内容</h4>
+            <div class="copy-item">
+              <span class="copy-label">标题</span>
+              <div class="copy-content" id="copyTitle">-</div>
+              <button class="btn-copy" data-target="copyTitle">
+                <i class="ri-file-copy-line"></i>
+              </button>
+            </div>
+            <div class="copy-item">
+              <span class="copy-label">正文</span>
+              <div class="copy-content" id="copyDesc">-</div>
+              <button class="btn-copy" data-target="copyDesc">
+                <i class="ri-file-copy-line"></i>
+              </button>
+            </div>
+            <div class="copy-item">
+              <span class="copy-label">话题</span>
+              <div class="copy-content" id="copyTopics">-</div>
+              <button class="btn-copy" data-target="copyTopics">
+                <i class="ri-file-copy-line"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Canvas 用于图片生成（隐藏） -->
+  <canvas id="renderCanvas" style="display:none;"></canvas>
+
+  <script src="js/xiaohongshu.js"></script>
+</body>
+</html>
