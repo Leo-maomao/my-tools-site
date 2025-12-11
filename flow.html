@@ -4,156 +4,222 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Flow | 毛毛的工具箱</title>
-  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
   <link rel="stylesheet" href="css/flow.css">
 </head>
 <body>
-  <div class="flow-app">
-    <!-- 顶部导航 -->
-    <header class="flow-header">
-      <div class="flow-logo">
-        <i class="ri-flow-chart"></i>
-        <span>Flow</span>
-      </div>
-      <div class="flow-header-right">
-        <div class="flow-credits">
-          <i class="ri-vip-diamond-fill"></i>
-          <span>1000</span>
-        </div>
-        <div class="flow-user">
-          <i class="ri-user-3-fill"></i>
-        </div>
-      </div>
-    </header>
-
+  <div class="page flex-row">
     <!-- 左侧边栏 -->
-    <aside class="flow-sidebar">
-      <button class="flow-sidebar-btn flow-sidebar-btn--primary" title="新建项目">
-        <i class="ri-add-line"></i>
-      </button>
-      <button class="flow-sidebar-btn is-active" title="首页">
-        <i class="ri-home-4-line"></i>
-      </button>
-      <button class="flow-sidebar-btn" title="模板库">
-        <i class="ri-apps-line"></i>
-      </button>
+    <aside class="sidebar flex-col">
+      <!-- 新建按钮 -->
+      <div class="sidebar-create">
+        <img src="flow-assets/FigmaDDSSlicePNG5fe972cb15ee37fd53b6013d46bcda11.png" alt="新建">
+      </div>
+      <!-- 导航按钮组 -->
+      <div class="sidebar-nav flex-col">
+        <div class="nav-btn is-active">
+          <img src="flow-assets/FigmaDDSSlicePNG5912feb34d11a2efaed4a711f2b692e8.png" alt="首页">
+        </div>
+        <div class="nav-btn">
+          <img src="flow-assets/FigmaDDSSlicePNG918dd66d92deb98c1f9dece15419e824.png" alt="模板">
+        </div>
+      </div>
     </aside>
 
     <!-- 主内容区 -->
-    <main class="flow-main">
+    <main class="main flex-col">
+      <!-- 顶部导航 -->
+      <header class="header flex-row">
+        <div class="header-left flex-row">
+          <img class="header-logo" src="flow-assets/FigmaDDSSlicePNG8085996efe9c2d93f007984b0433793e.png" alt="SEAART.AI">
+        </div>
+        <div class="header-right flex-row">
+          <span class="header-lang">简体中文</span>
+          <img class="header-arrow" src="flow-assets/FigmaDDSSlicePNGf70a254e8d93cb79b4c275c637b322e5.png" alt="">
+          <div class="header-credits flex-row">
+            <img src="flow-assets/FigmaDDSSlicePNG647fa09308d13f736b6444212fe83aac.png" alt="">
+            <span>12.4k</span>
+          </div>
+          <div class="header-credits flex-row">
+            <img src="flow-assets/FigmaDDSSlicePNG371ae5b8f485e1b410efb376d5786bee.png" alt="">
+            <span>66</span>
+          </div>
+        </div>
+      </header>
+
       <!-- 欢迎区域 -->
-      <section class="flow-welcome">
-        <h1 class="flow-title">今天我们设计些什么，毛毛？</h1>
+      <section class="welcome flex-col">
+        <h1 class="welcome-title">
+          <span>今天我们设计些什么</span><span class="comma">，</span><span class="username">毛毛？</span>
+        </h1>
 
         <!-- 输入框 -->
-        <div class="flow-input-box">
-          <div class="flow-input-wrapper">
-            <button class="flow-input-btn">
-              <i class="ri-add-line"></i>
-            </button>
-            <input type="text" class="flow-input" placeholder="告诉 Flow 你的设计想法">
-            <button class="flow-input-btn flow-input-submit">
-              <i class="ri-arrow-up-line"></i>
-            </button>
+        <div class="input-box flex-col">
+          <span class="input-placeholder">告诉SeaArt Flow你的设计想法</span>
+          <div class="input-actions flex-row">
+            <img class="input-add" src="flow-assets/FigmaDDSSlicePNG94e63c203ca9a49de39c1ad9ae1efb16.png" alt="添加">
+            <img class="input-submit" src="flow-assets/FigmaDDSSlicePNG14c6d29a41e56f96c432f216dbf59044.png" alt="发送">
           </div>
+        </div>
 
-          <!-- 快捷标签 -->
-          <div class="flow-quick-tags">
-            <div class="flow-tag">
-              <span>产品海报</span>
-              <div class="flow-tag-img" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
-            </div>
-            <div class="flow-tag">
-              <span>人物写真</span>
-              <div class="flow-tag-img" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div>
-            </div>
-            <div class="flow-tag">
-              <span>电商主图</span>
-              <div class="flow-tag-img" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"></div>
-            </div>
-            <div class="flow-tag">
-              <span>插画设计</span>
-              <div class="flow-tag-img" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);"></div>
-            </div>
+        <!-- 快捷标签 - 在输入框外部 -->
+        <div class="quick-tags flex-row">
+          <div class="tag flex-row">
+            <span class="tag-text">皮具制作</span>
+            <img class="tag-img" src="flow-assets/FigmaDDSSlicePNGf97a6763d00dc77e6e7380d993a63fe0.png" alt="">
+          </div>
+          <div class="tag flex-row">
+            <span class="tag-text">敦煌一梦</span>
+            <img class="tag-img" src="flow-assets/FigmaDDSSlicePNG0e694c819ddfd530fab5f9206df65ba8.png" alt="">
+          </div>
+          <div class="tag flex-row">
+            <span class="tag-text">面包烘焙</span>
+            <img class="tag-img" src="flow-assets/FigmaDDSSlicePNG8cfb059536e6535f1f4e5ae0779f9c63.png" alt="">
+          </div>
+          <div class="tag flex-row">
+            <span class="tag-text">十二生肖</span>
+            <img class="tag-img" src="flow-assets/FigmaDDSSlicePNG5dadffd159f63b2c8df08adb222aab4d.png" alt="">
+            <img class="tag-img-overlay" src="flow-assets/FigmaDDSSlicePNG15c39c81288b8646c19b02f0987354e4.png" alt="">
           </div>
         </div>
       </section>
 
-      <!-- 推荐模板 -->
-      <section class="flow-templates">
-        <div class="flow-template-card">
-          <div class="flow-template-cover" style="background: linear-gradient(135deg, #434343 0%, #000000 100%);"></div>
-          <div class="flow-template-info">
-            <span class="flow-template-name">产品精修</span>
+      <!-- 推荐模板 Banner -->
+      <section class="templates flex-row">
+        <div class="template-card">
+          <img class="template-cover" src="flow-assets/FigmaDDSSlicePNG4300779e80559aa7f160508ca082f3ef.png" alt="">
+          <div class="template-info">
+            <span class="template-name">Athlete-Grade Portrait</span>
           </div>
         </div>
-        <div class="flow-template-card">
-          <div class="flow-template-cover" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
-          <div class="flow-template-info">
-            <span class="flow-template-name">人像美化</span>
+        <div class="template-card">
+          <img class="template-cover" src="flow-assets/FigmaDDSSlicePNGe489402bcd094c90f68599e51cf4e230.png" alt="">
+          <div class="template-info">
+            <span class="template-name">Monochrome Portrait</span>
           </div>
         </div>
-        <div class="flow-template-card">
-          <div class="flow-template-cover" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div>
-          <div class="flow-template-info">
-            <span class="flow-template-name">创意合成</span>
+        <div class="template-card">
+          <img class="template-cover" src="flow-assets/FigmaDDSSlicePNG17cff24ba48aed5d6559024a143a751c.png" alt="">
+          <div class="template-info">
+            <span class="template-name">Human & Pets Portrait</span>
           </div>
         </div>
-        <div class="flow-template-card">
-          <div class="flow-template-cover" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"></div>
-          <div class="flow-template-info">
-            <span class="flow-template-name">证件照</span>
+        <div class="template-card">
+          <img class="template-cover" src="flow-assets/FigmaDDSSlicePNG48642b79c4d7adabf78d70a507d3e170.png" alt="">
+          <div class="template-info">
+            <span class="template-name">Pro Head Photo</span>
           </div>
         </div>
       </section>
 
       <!-- 最近项目 -->
-      <section class="flow-recent">
-        <div class="flow-section-header">
-          <h2>最近项目</h2>
-          <a href="#" class="flow-view-all">查看全部 <i class="ri-arrow-right-s-line"></i></a>
+      <section class="recent flex-col">
+        <div class="recent-header flex-row">
+          <h2 class="recent-title">最近项目</h2>
+          <a href="#" class="view-all flex-row">
+            <span>查看全部</span>
+            <img src="flow-assets/FigmaDDSSlicePNGb3a52ce2c9073f759849cb0bc251b400.png" alt="">
+          </a>
         </div>
-        <div class="flow-recent-grid">
+        <div class="recent-grid flex-row">
           <!-- 新建项目卡片 -->
-          <div class="flow-project-card flow-project-card--new">
-            <button class="flow-new-btn">
-              <i class="ri-add-line"></i>
-            </button>
-          </div>
-          <!-- 项目卡片 -->
-          <div class="flow-project-card">
-            <div class="flow-project-cover"></div>
-            <div class="flow-project-info">
-              <span class="flow-project-name">Untitled</span>
-              <span class="flow-project-date">更新于 2025-12-10</span>
+          <div class="project-card project-card--new flex-col">
+            <div class="project-cover-new flex-col">
+              <div class="new-icon-wrapper">
+                <img class="new-icon" src="flow-assets/FigmaDDSSlicePNG94e63c203ca9a49de39c1ad9ae1efb16.png" alt="">
+              </div>
+              <span class="new-text">新建项目</span>
             </div>
           </div>
-          <div class="flow-project-card">
-            <div class="flow-project-cover"></div>
-            <div class="flow-project-info">
-              <span class="flow-project-name">Untitled</span>
-              <span class="flow-project-date">更新于 2025-12-09</span>
+          <!-- 项目卡片1 -->
+          <div class="project-card flex-col">
+            <div class="project-cover">
+              <div class="project-thumb-grid">
+                <img src="flow-assets/FigmaDDSSlicePNG6ea2bb276c6567c0a074c221986ab57a.png" alt="">
+                <div class="thumb-with-menu">
+                  <img src="flow-assets/FigmaDDSSlicePNG1f9a04e226a5ab40371317b7b0152f14.png" alt="">
+                  <div class="thumb-menu">
+                    <img src="flow-assets/FigmaDDSSlicePNG60037c3ddf29571b1229d0ea23874fc2.png" alt="">
+                  </div>
+                </div>
+                <img src="flow-assets/FigmaDDSSlicePNG5c810e75169ecbd5da528a03e02d9614.png" alt="">
+                <img src="flow-assets/FigmaDDSSlicePNG5f267ea5f0dca2e748bc837d8e132f9e.png" alt="">
+              </div>
+            </div>
+            <div class="project-info flex-col">
+              <span class="project-name">Untitled</span>
+              <span class="project-date">更新于 2025-10-23</span>
             </div>
           </div>
-          <div class="flow-project-card">
-            <div class="flow-project-cover"></div>
-            <div class="flow-project-info">
-              <span class="flow-project-name">Untitled</span>
-              <span class="flow-project-date">更新于 2025-12-08</span>
+          <!-- 项目卡片2 -->
+          <div class="project-card flex-col">
+            <div class="project-cover">
+              <div class="project-thumb-grid">
+                <img src="flow-assets/FigmaDDSSlicePNG1538a07b68a45a81bab7fd7709beacdb.png" alt="">
+                <div class="thumb-with-menu">
+                  <img src="flow-assets/FigmaDDSSlicePNG1f9a04e226a5ab40371317b7b0152f14.png" alt="">
+                  <div class="thumb-menu">
+                    <img src="flow-assets/FigmaDDSSlicePNG60037c3ddf29571b1229d0ea23874fc2.png" alt="">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="project-info flex-col">
+              <span class="project-name">Untitled</span>
+              <span class="project-date">更新于 2025-10-23</span>
             </div>
           </div>
-          <div class="flow-project-card">
-            <div class="flow-project-cover"></div>
-            <div class="flow-project-info">
-              <span class="flow-project-name">Untitled</span>
-              <span class="flow-project-date">更新于 2025-12-07</span>
+          <!-- 项目卡片3 -->
+          <div class="project-card flex-col">
+            <div class="project-cover">
+              <div class="project-thumb-grid">
+                <img src="flow-assets/FigmaDDSSlicePNG1538a07b68a45a81bab7fd7709beacdb.png" alt="">
+                <div class="thumb-with-menu">
+                  <img src="flow-assets/FigmaDDSSlicePNG1f9a04e226a5ab40371317b7b0152f14.png" alt="">
+                  <div class="thumb-menu">
+                    <img src="flow-assets/FigmaDDSSlicePNG60037c3ddf29571b1229d0ea23874fc2.png" alt="">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="project-info flex-col">
+              <span class="project-name">Untitled</span>
+              <span class="project-date">更新于 2025-10-22</span>
             </div>
           </div>
-          <div class="flow-project-card">
-            <div class="flow-project-cover"></div>
-            <div class="flow-project-info">
-              <span class="flow-project-name">Untitled</span>
-              <span class="flow-project-date">更新于 2025-12-06</span>
+          <!-- 项目卡片4 -->
+          <div class="project-card flex-col">
+            <div class="project-cover">
+              <div class="project-thumb-grid">
+                <img src="flow-assets/FigmaDDSSlicePNGecfee706476d2c5d28cf02317d1ed3b1.png" alt="">
+                <div class="thumb-with-menu">
+                  <img src="flow-assets/FigmaDDSSlicePNG1f9a04e226a5ab40371317b7b0152f14.png" alt="">
+                  <div class="thumb-menu">
+                    <img src="flow-assets/FigmaDDSSlicePNG60037c3ddf29571b1229d0ea23874fc2.png" alt="">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="project-info flex-col">
+              <span class="project-name">Untitled</span>
+              <span class="project-date">更新于 2025-10-21</span>
+            </div>
+          </div>
+          <!-- 项目卡片5 -->
+          <div class="project-card flex-col">
+            <div class="project-cover">
+              <div class="project-thumb-grid">
+                <img src="flow-assets/FigmaDDSSlicePNGecfee706476d2c5d28cf02317d1ed3b1.png" alt="">
+                <div class="thumb-with-menu">
+                  <img src="flow-assets/FigmaDDSSlicePNG1f9a04e226a5ab40371317b7b0152f14.png" alt="">
+                  <div class="thumb-menu">
+                    <img src="flow-assets/FigmaDDSSlicePNG60037c3ddf29571b1229d0ea23874fc2.png" alt="">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="project-info flex-col">
+              <span class="project-name">Untitled</span>
+              <span class="project-date">更新于 2025-09-22</span>
             </div>
           </div>
         </div>
