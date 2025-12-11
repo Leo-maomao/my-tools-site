@@ -36,38 +36,60 @@
           <i class="ri-robot-line"></i>
           <span>产品助理</span>
         </a>
+        <a href="#" class="nav-item is-disabled">
+          <i class="ri-tiktok-fill"></i>
+          <span>抖音</span>
+          <span class="coming-soon">即将推出</span>
+        </a>
+        <a href="#" class="nav-item is-disabled">
+          <i class="ri-wechat-channels-fill"></i>
+          <span>公众号</span>
+          <span class="coming-soon">即将推出</span>
+        </a>
+        <a href="#" class="nav-item is-disabled">
+          <i class="ri-weibo-fill"></i>
+          <span>微博</span>
+          <span class="coming-soon">即将推出</span>
+        </a>
       </nav>
     </aside>
 
     <!-- 主内容区 -->
     <main class="main-content pa-main">
-      <!-- 顶部工具栏 -->
-      <div class="pa-toolbar">
-        <div class="pa-toolbar-left">
-          <button class="pa-btn pa-btn--icon" id="newChatBtn" title="新建对话">
-            <i class="ri-add-line"></i>
-          </button>
-          <select class="pa-select" id="conversationSelect">
-            <option value="">选择对话...</option>
-          </select>
+      <!-- 三栏布局：对话列表 + 对话 + 预览 -->
+      <div class="pa-layout">
+        <!-- 左侧：对话列表 -->
+        <div class="pa-conversations">
+          <div class="pa-conversations-header">
+            <span>对话记录</span>
+            <button class="pa-btn pa-btn--icon" id="newChatBtn" title="新建对话">
+              <i class="ri-add-line"></i>
+            </button>
+          </div>
+          <div class="pa-conversations-list" id="conversationList">
+            <!-- 动态渲染 -->
+          </div>
+          <div class="pa-conversations-footer">
+            <button class="pa-btn pa-btn--full" id="settingsBtn">
+              <i class="ri-settings-3-line"></i>
+              <span>产品设置</span>
+            </button>
+          </div>
         </div>
-        <div class="pa-toolbar-right">
-          <button class="pa-btn" id="settingsBtn">
-            <i class="ri-settings-3-line"></i>
-            <span>设置</span>
-          </button>
-        </div>
-      </div>
 
-      <!-- 主体区域：对话 + 预览 -->
-      <div class="pa-body">
-        <!-- 对话区 -->
+        <!-- 中间：对话区 -->
         <div class="pa-chat">
           <div class="pa-messages" id="messageList">
             <div class="pa-welcome">
               <i class="ri-robot-line"></i>
               <h3>毛毛的产品助理</h3>
               <p>描述你的需求，我帮你生成原型图</p>
+              <div class="pa-welcome-tips">
+                <div class="pa-tip">
+                  <i class="ri-lightbulb-line"></i>
+                  <span>例如：帮我设计一个登录页面，包含手机号和验证码登录</span>
+                </div>
+              </div>
             </div>
           </div>
           <div class="pa-input-area">
@@ -79,12 +101,11 @@
             ></textarea>
             <button class="pa-btn pa-btn--primary" id="sendBtn">
               <i class="ri-send-plane-fill"></i>
-              <span>发送</span>
             </button>
           </div>
         </div>
 
-        <!-- 预览区 -->
+        <!-- 右侧：预览区 -->
         <div class="pa-preview">
           <div class="pa-preview-header">
             <span>原型预览</span>
@@ -109,12 +130,24 @@
     <div class="pa-modal-overlay"></div>
     <div class="pa-modal-content">
       <div class="pa-modal-header">
-        <h3>设置</h3>
+        <h3>产品设置</h3>
         <button class="pa-modal-close" id="settingsClose">
           <i class="ri-close-line"></i>
         </button>
       </div>
       <div class="pa-modal-body">
+        <!-- 使用说明 -->
+        <div class="pa-settings-section">
+          <div class="pa-settings-title">
+            <span>使用说明</span>
+          </div>
+          <div class="pa-info-box">
+            <p><strong>什么是 Cookie/Token？</strong></p>
+            <p>Cookie 和 Token 是用于访问需要登录的网站的凭证。配置后，AI 可以更准确地了解你的产品。</p>
+            <p class="pa-info-note">当前版本暂不支持自动读取产品信息，配置仅作记录用途。后续版本将支持。</p>
+          </div>
+        </div>
+
         <!-- 我的产品 -->
         <div class="pa-settings-section">
           <div class="pa-settings-title">
@@ -152,16 +185,19 @@
       </div>
       <div class="pa-modal-body">
         <div class="pa-form-group">
-          <label>名称</label>
+          <label>名称 <span class="pa-required">*</span></label>
           <input type="text" class="pa-form-input" id="itemName" placeholder="如：短剧创作平台">
         </div>
         <div class="pa-form-group">
-          <label>网址</label>
+          <label>网址 <span class="pa-required">*</span></label>
           <input type="url" class="pa-form-input" id="itemUrl" placeholder="https://...">
         </div>
         <div class="pa-form-group">
-          <label>Cookie/Token（可选）</label>
-          <textarea class="pa-form-input" id="itemToken" rows="3" placeholder="用于访问需要登录的页面"></textarea>
+          <label>
+            Cookie/Token
+            <span class="pa-optional">（可选，暂不使用）</span>
+          </label>
+          <textarea class="pa-form-input" id="itemToken" rows="3" placeholder="后续版本将支持自动读取产品信息"></textarea>
         </div>
       </div>
       <div class="pa-modal-footer">

@@ -1,35 +1,130 @@
 /* 产品助理页面样式 */
 
-/* 主内容区重置 */
+/* 主内容区 - 继承 margin-left */
 .pa-main {
-  padding: 16px 24px;
+  padding: 0;
   display: flex;
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
 }
 
-/* 顶部工具栏 */
-.pa-toolbar {
+/* 三栏布局 */
+.pa-layout {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border-subtle);
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 左侧：对话列表 */
+.pa-conversations {
+  width: 220px;
+  background: var(--card-bg);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
   flex-shrink: 0;
 }
 
-.pa-toolbar-left,
-.pa-toolbar-right {
+.pa-conversations-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pa-conversations-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.pa-conversations-footer {
+  padding: 12px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* 对话列表项 */
+.pa-conv-item {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  margin-bottom: 4px;
+}
+
+.pa-conv-item:hover {
+  background: var(--bg);
+}
+
+.pa-conv-item.is-active {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--accent);
+}
+
+.pa-conv-item i {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.pa-conv-item-title {
+  flex: 1;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pa-conv-item-delete {
+  opacity: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.pa-conv-item:hover .pa-conv-item-delete {
+  opacity: 1;
+}
+
+.pa-conv-item-delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+
+/* 空状态 */
+.pa-conv-empty {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.pa-conv-empty i {
+  font-size: 32px;
+  margin-bottom: 8px;
+  display: block;
 }
 
 /* 按钮样式 */
 .pa-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   padding: 8px 16px;
   border: 1px solid var(--border-subtle);
@@ -65,7 +160,9 @@
 }
 
 .pa-btn--icon {
-  padding: 8px;
+  padding: 6px;
+  width: 32px;
+  height: 32px;
 }
 
 .pa-btn--small {
@@ -73,50 +170,27 @@
   font-size: 13px;
 }
 
-/* 下拉选择框 */
-.pa-select {
-  padding: 8px 32px 8px 12px;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  background: var(--card-bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center;
-  font-size: 14px;
-  color: var(--text-main);
-  cursor: pointer;
-  min-width: 200px;
-  appearance: none;
+.pa-btn--full {
+  width: 100%;
 }
 
-.pa-select:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-/* 主体区域 */
-.pa-body {
-  display: flex;
-  gap: 24px;
-  flex: 1;
-  overflow: hidden;
-  padding-top: 16px;
-}
-
-/* 对话区 */
+/* 中间：对话区 */
 .pa-chat {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: var(--card-bg);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  background: var(--bg);
   overflow: hidden;
+  min-width: 0;
 }
 
 .pa-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
+  padding: 24px;
 }
 
+/* 欢迎页 */
 .pa-welcome {
   display: flex;
   flex-direction: column;
@@ -125,27 +199,52 @@
   height: 100%;
   color: var(--text-muted);
   text-align: center;
+  padding: 40px;
 }
 
 .pa-welcome i {
-  font-size: 48px;
+  font-size: 56px;
   margin-bottom: 16px;
   color: var(--accent);
 }
 
 .pa-welcome h3 {
-  font-size: 18px;
+  font-size: 20px;
   color: var(--text-main);
   margin-bottom: 8px;
 }
 
 .pa-welcome p {
   font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.pa-welcome-tips {
+  max-width: 400px;
+}
+
+.pa-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--card-bg);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  text-align: left;
+  color: var(--text-sub);
+}
+
+.pa-tip i {
+  font-size: 16px;
+  color: var(--warning);
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 /* 消息样式 */
 .pa-message {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   display: flex;
   gap: 12px;
 }
@@ -171,7 +270,8 @@
 }
 
 .pa-message--assistant .pa-message-avatar {
-  background: var(--border-subtle);
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
   color: var(--text-main);
 }
 
@@ -181,6 +281,7 @@
   border-radius: var(--radius-md);
   font-size: 14px;
   line-height: 1.6;
+  white-space: pre-wrap;
 }
 
 .pa-message--user .pa-message-content {
@@ -190,7 +291,7 @@
 }
 
 .pa-message--assistant .pa-message-content {
-  background: var(--bg);
+  background: var(--card-bg);
   color: var(--text-main);
   border-bottom-left-radius: 4px;
 }
@@ -199,9 +300,9 @@
 .pa-input-area {
   display: flex;
   gap: 12px;
-  padding: 16px;
+  padding: 16px 24px;
+  background: var(--card-bg);
   border-top: 1px solid var(--border-subtle);
-  background: var(--bg);
 }
 
 .pa-input {
@@ -212,22 +313,29 @@
   font-size: 14px;
   resize: none;
   font-family: inherit;
+  background: var(--bg);
 }
 
 .pa-input:focus {
   outline: none;
   border-color: var(--accent);
+  background: var(--card-bg);
 }
 
-/* 预览区 */
+.pa-input-area .pa-btn--primary {
+  padding: 12px 16px;
+  align-self: flex-end;
+}
+
+/* 右侧：预览区 */
 .pa-preview {
   width: 45%;
+  max-width: 500px;
   display: flex;
   flex-direction: column;
   background: var(--card-bg);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
+  border-left: 1px solid var(--border-subtle);
+  flex-shrink: 0;
 }
 
 .pa-preview-header {
@@ -438,6 +546,34 @@
   font-size: 13px;
 }
 
+/* 信息提示框 */
+.pa-info-box {
+  padding: 16px;
+  background: rgba(37, 99, 235, 0.05);
+  border: 1px solid rgba(37, 99, 235, 0.1);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-sub);
+}
+
+.pa-info-box p {
+  margin-bottom: 8px;
+}
+
+.pa-info-box p:last-child {
+  margin-bottom: 0;
+}
+
+.pa-info-box strong {
+  color: var(--text-main);
+}
+
+.pa-info-note {
+  color: var(--warning);
+  font-size: 12px;
+}
+
 /* 表单样式 */
 .pa-form-group {
   margin-bottom: 16px;
@@ -453,6 +589,16 @@
   font-weight: 500;
   margin-bottom: 6px;
   color: var(--text-main);
+}
+
+.pa-required {
+  color: var(--error);
+}
+
+.pa-optional {
+  font-weight: 400;
+  color: var(--text-muted);
+  font-size: 12px;
 }
 
 .pa-form-input {
@@ -496,37 +642,68 @@ textarea.pa-form-input {
 }
 
 /* 响应式 */
+@media (max-width: 1200px) {
+  .pa-preview {
+    width: 40%;
+  }
+}
+
 @media (max-width: 1024px) {
-  .pa-body {
+  .pa-layout {
     flex-direction: column;
+  }
+
+  .pa-conversations {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .pa-conversations-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  .pa-conv-item {
+    margin-bottom: 0;
+  }
+
+  .pa-conversations-footer {
+    display: none;
   }
 
   .pa-preview {
     width: 100%;
+    max-width: none;
     height: 300px;
+    border-left: none;
+    border-top: 1px solid var(--border-subtle);
   }
 }
 
 @media (max-width: 768px) {
   .pa-main {
-    margin-left: 0;
     height: auto;
     min-height: 100vh;
   }
 
-  .pa-toolbar {
-    flex-direction: column;
-    gap: 12px;
-    align-items: stretch;
+  .pa-conversations {
+    max-height: 150px;
   }
 
-  .pa-toolbar-left,
-  .pa-toolbar-right {
-    justify-content: center;
+  .pa-messages {
+    padding: 16px;
   }
 
-  .pa-select {
-    min-width: auto;
-    flex: 1;
+  .pa-input-area {
+    padding: 12px 16px;
+  }
+
+  .pa-message-content {
+    max-width: 85%;
   }
 }
