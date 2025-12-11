@@ -15,7 +15,9 @@
     conversations: [],
     products: [],
     competitors: [],
-    messages: []
+    messages: [],
+    pendingImages: [],
+    currentPrototypeHtml: null
   };
 
   function init() {
@@ -98,6 +100,99 @@
 
     var downloadBtn = document.getElementById('downloadBtn');
     if (downloadBtn) downloadBtn.addEventListener('click', handleDownload);
+
+    var previewScale = document.getElementById('previewScale');
+    if (previewScale) previewScale.addEventListener('change', function() { applyPreviewScale(); });
+
+    var fullscreenBtn = document.getElementById('fullscreenBtn');
+    if (fullscreenBtn) fullscreenBtn.addEventListener('click', openFullscreen);
+
+    var fullscreenClose = document.getElementById('fullscreenClose');
+    if (fullscreenClose) fullscreenClose.addEventListener('click', closeFullscreen);
+
+    var fullscreenScale = document.getElementById('fullscreenScale');
+    if (fullscreenScale) fullscreenScale.addEventListener('change', function() { applyFullscreenScale(); });
+
+    var fullscreenModal = document.getElementById('fullscreenModal');
+    if (fullscreenModal) {
+      fullscreenModal.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeFullscreen();
+      });
+    }
+
+    var imageBtn = document.getElementById('imageBtn');
+    var imageInput = document.getElementById('imageInput');
+    if (imageBtn && imageInput) {
+      imageBtn.addEventListener('click', function() { imageInput.click(); });
+      imageInput.addEventListener('change', function(e) {
+        if (e.target.files && e.target.files[0]) {
+          handleImageFile(e.target.files[0]);
+          e.target.value = '';
+        }
+      });
+    }
+
+    if (userInput) {
+      userInput.addEventListener('paste', handlePaste);
+    }
+  }
+
+  function handlePaste(e) {
+    var items = e.clipboardData && e.clipboardData.items;
+    if (!items) return;
+
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        e.preventDefault();
+        var file = items[i].getAsFile();
+        if (file) handleImageFile(file);
+        return;
+      }
+    }
+  }
+
+  function handleImageFile(file) {
+    if (!file || !file.type.startsWith('image/')) return;
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var imageData = {
+        id: Date.now().toString(),
+        dataUrl: e.target.result,
+        file: file
+      };
+      state.pendingImages.push(imageData);
+      renderImagePreview();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function renderImagePreview() {
+    var container = document.getElementById('imagePreview');
+    if (!container) return;
+
+    if (state.pendingImages.length === 0) {
+      container.innerHTML = '';
+      container.style.display = 'none';
+      return;
+    }
+
+    container.style.display = 'flex';
+    container.innerHTML = '';
+
+    state.pendingImages.forEach(function(img) {
+      var div = document.createElement('div');
+      div.className = 'pa-image-thumb';
+      div.innerHTML = '<img src="' + img.dataUrl + '" alt="预览">' +
+        '<button class="pa-image-remove" data-id="' + img.id + '"><i class="ri-close-line"></i></button>';
+
+      div.querySelector('.pa-image-remove').addEventListener('click', function() {
+        state.pendingImages = state.pendingImages.filter(function(i) { return i.id !== img.id; });
+        renderImagePreview();
+      });
+
+      container.appendChild(div);
+    });
   }
 
   async function loadConversations() {
@@ -131,12 +226,19 @@
       var div = document.createElement('div');
       div.className = 'pa-conv-item' + (conv.id === state.currentConversationId ? ' is-active' : '');
       div.innerHTML = '<i class="ri-message-3-line"></i>' +
-        '<span class="pa-conv-item-title">' + escapeHtml(conv.title || '未命名对话') + '</span>' +
+        '<span class="pa-conv-item-title" data-id="' + conv.id + '" title="双击编辑标题">' + escapeHtml(conv.title || '未命名对话') + '</span>' +
         '<button class="pa-conv-item-delete" data-id="' + conv.id + '" title="删除"><i class="ri-delete-bin-line"></i></button>';
 
       div.addEventListener('click', function(e) {
         if (e.target.closest('.pa-conv-item-delete')) return;
+        if (e.target.closest('.pa-conv-item-title.is-editing')) return;
         selectConversation(conv.id);
+      });
+
+      var titleSpan = div.querySelector('.pa-conv-item-title');
+      titleSpan.addEventListener('dblclick', function(e) {
+        e.stopPropagation();
+        startEditTitle(conv.id, titleSpan);
       });
 
       var deleteBtn = div.querySelector('.pa-conv-item-delete');
@@ -147,6 +249,57 @@
 
       container.appendChild(div);
     });
+  }
+
+  function startEditTitle(conversationId, titleSpan) {
+    if (titleSpan.classList.contains('is-editing')) return;
+
+    var currentTitle = titleSpan.textContent;
+    titleSpan.classList.add('is-editing');
+
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'pa-conv-title-input';
+    input.value = currentTitle;
+
+    titleSpan.textContent = '';
+    titleSpan.appendChild(input);
+    input.focus();
+    input.select();
+
+    function saveTitle() {
+      var newTitle = input.value.trim() || '未命名对话';
+      titleSpan.classList.remove('is-editing');
+      titleSpan.textContent = newTitle;
+
+      if (newTitle !== currentTitle) {
+        updateConversationTitle(conversationId, newTitle);
+      }
+    }
+
+    input.addEventListener('blur', saveTitle);
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        input.blur();
+      } else if (e.key === 'Escape') {
+        input.value = currentTitle;
+        input.blur();
+      }
+    });
+  }
+
+  async function updateConversationTitle(conversationId, newTitle) {
+    if (!state.supabase) return;
+    try {
+      await state.supabase
+        .from('tools_conversations')
+        .update({ title: newTitle })
+        .eq('id', conversationId);
+
+      var conv = state.conversations.find(function(c) { return c.id === conversationId; });
+      if (conv) conv.title = newTitle;
+    } catch (e) {}
   }
 
   async function selectConversation(conversationId) {
@@ -205,23 +358,35 @@
   async function handleSend() {
     var input = document.getElementById('userInput');
     var content = input.value.trim();
-    if (!content) return;
+    var images = state.pendingImages.slice();
+
+    if (!content && images.length === 0) return;
 
     input.value = '';
+    state.pendingImages = [];
+    renderImagePreview();
     input.disabled = true;
     document.getElementById('sendBtn').disabled = true;
 
     if (!state.currentConversationId) {
-      await createConversation(content.substring(0, 50));
+      await createConversation(content.substring(0, 50) || '图片对话');
     }
 
-    var userMsg = { role: 'user', content: content };
+    var imageUrls = [];
+    if (images.length > 0) {
+      for (var i = 0; i < images.length; i++) {
+        var url = await uploadImage(images[i].file);
+        if (url) imageUrls.push(url);
+      }
+    }
+
+    var userMsg = { role: 'user', content: content, images: imageUrls };
     state.messages.push(userMsg);
     renderMessages();
     await saveMessage(userMsg);
 
     try {
-      var aiResponse = await callAI(content);
+      var aiResponse = await callAI(content, imageUrls);
       var assistantMsg = { role: 'assistant', content: aiResponse.text, prototype_html: aiResponse.html };
       state.messages.push(assistantMsg);
       renderMessages();
@@ -240,6 +405,28 @@
     input.disabled = false;
     document.getElementById('sendBtn').disabled = false;
     input.focus();
+  }
+
+  async function uploadImage(file) {
+    if (!state.supabase || !file) return null;
+
+    var fileName = 'pa-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9) + '.' + file.name.split('.').pop();
+
+    try {
+      var result = await state.supabase.storage
+        .from('chat-images')
+        .upload(fileName, file, { cacheControl: '3600', upsert: false });
+
+      if (result.error) throw result.error;
+
+      var urlResult = state.supabase.storage
+        .from('chat-images')
+        .getPublicUrl(fileName);
+
+      return urlResult.data.publicUrl;
+    } catch (e) {
+      return null;
+    }
   }
 
   async function createConversation(title) {
@@ -264,7 +451,8 @@
         conversation_id: state.currentConversationId,
         role: msg.role,
         content: msg.content,
-        prototype_html: msg.prototype_html || null
+        prototype_html: msg.prototype_html || null,
+        images: msg.images || null
       }]);
       await state.supabase.from('tools_conversations')
         .update({ updated_at: new Date().toISOString() })
@@ -272,14 +460,25 @@
     } catch (e) {}
   }
 
-  async function callAI(userContent) {
+  async function callAI(userContent, imageUrls) {
     var systemPrompt = buildSystemPrompt();
     var messages = [{ role: 'system', content: systemPrompt }];
     var history = state.messages.slice(-10);
     history.forEach(function(m) {
-      messages.push({ role: m.role, content: m.content });
+      messages.push({ role: m.role, content: m.content || '' });
     });
-    messages.push({ role: 'user', content: userContent });
+
+    if (imageUrls && imageUrls.length > 0) {
+      var userMsgContent = [{ type: 'text', text: userContent || '请分析这张图片' }];
+      imageUrls.forEach(function(url) {
+        userMsgContent.push({ type: 'image_url', image_url: { url: url } });
+      });
+      messages.push({ role: 'user', content: userMsgContent });
+    } else {
+      messages.push({ role: 'user', content: userContent });
+    }
+
+    var modelToUse = (imageUrls && imageUrls.length > 0) ? 'qwen-vl-plus' : CONFIG.AI_MODEL;
 
     var response = await fetch(CONFIG.AI_API_URL, {
       method: 'POST',
@@ -287,7 +486,7 @@
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + CONFIG.AI_API_KEY
       },
-      body: JSON.stringify({ model: CONFIG.AI_MODEL, messages: messages })
+      body: JSON.stringify({ model: modelToUse, messages: messages })
     });
 
     if (!response.ok) throw new Error('AI 请求失败');
@@ -336,32 +535,187 @@
     state.messages.forEach(function(msg) {
       var div = document.createElement('div');
       div.className = 'pa-message pa-message--' + msg.role;
+
+      var imagesHtml = '';
+      if (msg.images && msg.images.length > 0) {
+        imagesHtml = '<div class="pa-message-images">';
+        msg.images.forEach(function(imgUrl) {
+          imagesHtml += '<img src="' + imgUrl + '" alt="图片" class="pa-message-img" onclick="window.openImageModal(this.src)">';
+        });
+        imagesHtml += '</div>';
+      }
+
+      var contentHtml = msg.content ? '<div class="pa-message-text">' + escapeHtml(msg.content) + '</div>' : '';
+
       div.innerHTML = '<div class="pa-message-avatar"><i class="' + (msg.role === 'user' ? 'ri-user-line' : 'ri-robot-line') + '"></i></div>' +
-        '<div class="pa-message-content">' + escapeHtml(msg.content) + '</div>';
+        '<div class="pa-message-content">' + imagesHtml + contentHtml + '</div>';
       container.appendChild(div);
     });
     container.scrollTop = container.scrollHeight;
   }
 
+  window.openImageModal = function(src) {
+    var modal = document.createElement('div');
+    modal.className = 'pa-image-modal';
+    modal.innerHTML = '<div class="pa-image-modal-overlay"></div><img src="' + src + '" class="pa-image-modal-img">';
+    modal.addEventListener('click', function() { modal.remove(); });
+    document.body.appendChild(modal);
+  };
+
   function renderPreview(html) {
+    state.currentPrototypeHtml = html;
     var container = document.getElementById('previewContent');
     if (!container) return;
-    container.innerHTML = html;
+
+    var iframe = document.createElement('iframe');
+    iframe.className = 'pa-preview-iframe';
+    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+
+    container.innerHTML = '';
+    container.appendChild(iframe);
+
+    var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    iframeDoc.open();
+    iframeDoc.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}</style></head><body>' + html + '</body></html>');
+    iframeDoc.close();
+
+    iframe.onload = function() {
+      try {
+        var body = iframe.contentDocument.body;
+        var contentHeight = body.scrollHeight;
+        var contentWidth = body.scrollWidth;
+        iframe.style.height = contentHeight + 'px';
+        iframe.dataset.originalWidth = contentWidth;
+        iframe.dataset.originalHeight = contentHeight;
+        applyPreviewScale();
+      } catch (e) {}
+    };
+
+    document.getElementById('downloadBtn').disabled = false;
+    document.getElementById('fullscreenBtn').disabled = false;
+  }
+
+  function applyPreviewScale() {
+    var container = document.getElementById('previewContent');
+    var iframe = container && container.querySelector('iframe');
+    if (!iframe) return;
+
+    var viewport = document.getElementById('previewViewport');
+    var scaleSelect = document.getElementById('previewScale');
+    var scaleValue = scaleSelect ? scaleSelect.value : 'fit';
+
+    var viewportWidth = viewport.clientWidth - 32;
+    var originalWidth = parseInt(iframe.dataset.originalWidth) || 800;
+
+    var scale;
+    if (scaleValue === 'fit') {
+      scale = Math.min(1, viewportWidth / originalWidth);
+    } else {
+      scale = parseFloat(scaleValue);
+    }
+
+    iframe.style.transform = 'scale(' + scale + ')';
+    iframe.style.transformOrigin = 'top left';
+    iframe.style.width = originalWidth + 'px';
+
+    container.style.height = (parseInt(iframe.dataset.originalHeight) || 600) * scale + 'px';
+    container.style.overflow = 'visible';
+  }
+
+  function openFullscreen() {
+    if (!state.currentPrototypeHtml) return;
+
+    var modal = document.getElementById('fullscreenModal');
+    var content = document.getElementById('fullscreenContent');
+    if (!modal || !content) return;
+
+    var iframe = document.createElement('iframe');
+    iframe.className = 'pa-fullscreen-iframe';
+    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+
+    content.innerHTML = '';
+    content.appendChild(iframe);
+
+    var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    iframeDoc.open();
+    iframeDoc.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{margin:0;padding:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}</style></head><body>' + state.currentPrototypeHtml + '</body></html>');
+    iframeDoc.close();
+
+    iframe.onload = function() {
+      try {
+        var body = iframe.contentDocument.body;
+        iframe.dataset.originalWidth = body.scrollWidth;
+        iframe.dataset.originalHeight = body.scrollHeight;
+        applyFullscreenScale();
+      } catch (e) {}
+    };
+
+    modal.classList.add('is-active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function applyFullscreenScale() {
+    var content = document.getElementById('fullscreenContent');
+    var iframe = content && content.querySelector('iframe');
+    if (!iframe) return;
+
+    var viewport = document.getElementById('fullscreenViewport');
+    var scaleSelect = document.getElementById('fullscreenScale');
+    var scaleValue = scaleSelect ? scaleSelect.value : '1';
+
+    var viewportWidth = viewport.clientWidth - 40;
+    var viewportHeight = viewport.clientHeight - 40;
+    var originalWidth = parseInt(iframe.dataset.originalWidth) || 800;
+    var originalHeight = parseInt(iframe.dataset.originalHeight) || 600;
+
+    var scale;
+    if (scaleValue === 'fit') {
+      scale = Math.min(viewportWidth / originalWidth, viewportHeight / originalHeight, 1);
+    } else {
+      scale = parseFloat(scaleValue);
+    }
+
+    iframe.style.transform = 'scale(' + scale + ')';
+    iframe.style.transformOrigin = 'top left';
+    iframe.style.width = originalWidth + 'px';
+    iframe.style.height = originalHeight + 'px';
+
+    content.style.width = originalWidth * scale + 'px';
+    content.style.height = originalHeight * scale + 'px';
+  }
+
+  function closeFullscreen() {
+    var modal = document.getElementById('fullscreenModal');
+    if (modal) modal.classList.remove('is-active');
+    document.body.style.overflow = '';
   }
 
   function clearPreview() {
+    state.currentPrototypeHtml = null;
     var container = document.getElementById('previewContent');
     if (!container) return;
     container.innerHTML = '<div class="pa-preview-empty"><i class="ri-layout-line"></i><p>原型将在这里显示</p></div>';
+    container.style.height = '';
     var downloadBtn = document.getElementById('downloadBtn');
+    var fullscreenBtn = document.getElementById('fullscreenBtn');
     if (downloadBtn) downloadBtn.disabled = true;
+    if (fullscreenBtn) fullscreenBtn.disabled = true;
   }
 
   async function handleDownload() {
     var container = document.getElementById('previewContent');
-    if (!container || !window.html2canvas) return;
+    var iframe = container && container.querySelector('iframe');
+    if (!iframe || !window.html2canvas) return;
+
     try {
-      var canvas = await html2canvas(container, { backgroundColor: '#ffffff' });
+      var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+      var body = iframeDoc.body;
+      var canvas = await html2canvas(body, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        useCORS: true,
+        logging: false
+      });
       var link = document.createElement('a');
       link.download = 'prototype-' + Date.now() + '.png';
       link.href = canvas.toDataURL('image/png');

@@ -93,15 +93,24 @@
             </div>
           </div>
           <div class="pa-input-area">
-            <textarea
-              class="pa-input"
-              id="userInput"
-              placeholder="描述你想要的功能或原型..."
-              rows="3"
-            ></textarea>
-            <button class="pa-btn pa-btn--primary" id="sendBtn">
-              <i class="ri-send-plane-fill"></i>
-            </button>
+            <div class="pa-input-wrapper">
+              <div class="pa-image-preview" id="imagePreview"></div>
+              <textarea
+                class="pa-input"
+                id="userInput"
+                placeholder="描述你想要的功能或原型...（支持粘贴图片）"
+                rows="3"
+              ></textarea>
+            </div>
+            <div class="pa-input-actions">
+              <button class="pa-btn pa-btn--icon" id="imageBtn" title="添加图片">
+                <i class="ri-image-add-line"></i>
+              </button>
+              <input type="file" id="imageInput" accept="image/*" style="display:none">
+              <button class="pa-btn pa-btn--primary" id="sendBtn">
+                <i class="ri-send-plane-fill"></i>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -109,15 +118,28 @@
         <div class="pa-preview">
           <div class="pa-preview-header">
             <span>原型预览</span>
-            <button class="pa-btn pa-btn--small" id="downloadBtn" disabled>
-              <i class="ri-download-line"></i>
-              <span>下载PNG</span>
-            </button>
+            <div class="pa-preview-controls">
+              <select class="pa-preview-scale" id="previewScale" title="缩放比例">
+                <option value="fit">适应宽度</option>
+                <option value="0.5">50%</option>
+                <option value="0.75">75%</option>
+                <option value="1">100%</option>
+              </select>
+              <button class="pa-btn pa-btn--icon" id="fullscreenBtn" title="全屏预览" disabled>
+                <i class="ri-fullscreen-line"></i>
+              </button>
+              <button class="pa-btn pa-btn--small" id="downloadBtn" disabled>
+                <i class="ri-download-line"></i>
+                <span>下载</span>
+              </button>
+            </div>
           </div>
-          <div class="pa-preview-content" id="previewContent">
-            <div class="pa-preview-empty">
-              <i class="ri-layout-line"></i>
-              <p>原型将在这里显示</p>
+          <div class="pa-preview-viewport" id="previewViewport">
+            <div class="pa-preview-content" id="previewContent">
+              <div class="pa-preview-empty">
+                <i class="ri-layout-line"></i>
+                <p>原型将在这里显示</p>
+              </div>
             </div>
           </div>
         </div>
@@ -211,6 +233,28 @@
         <button class="pa-btn" id="addItemCancel">取消</button>
         <button class="pa-btn pa-btn--primary" id="addItemConfirm">确定</button>
       </div>
+    </div>
+  </div>
+
+  <!-- 全屏预览弹窗 -->
+  <div class="pa-fullscreen-modal" id="fullscreenModal">
+    <div class="pa-fullscreen-header">
+      <span>原型预览</span>
+      <div class="pa-fullscreen-controls">
+        <select class="pa-preview-scale" id="fullscreenScale">
+          <option value="fit">适应窗口</option>
+          <option value="0.5">50%</option>
+          <option value="0.75">75%</option>
+          <option value="1" selected>100%</option>
+          <option value="1.5">150%</option>
+        </select>
+        <button class="pa-btn pa-btn--icon" id="fullscreenClose" title="退出全屏">
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+    </div>
+    <div class="pa-fullscreen-viewport" id="fullscreenViewport">
+      <div class="pa-fullscreen-content" id="fullscreenContent"></div>
     </div>
   </div>
 
