@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>毛毛的产品助理 | 毛毛的工具箱</title>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/product-assistant.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <i class="ri-tools-line"></i>
+          <span>毛毛的工具箱</span>
+        </div>
+        <button class="sidebar-toggle" id="sidebarToggle" title="收起侧边栏">
+          <i class="ri-menu-fold-line"></i>
+        </button>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item">
+          <i class="ri-home-4-line"></i>
+          <span>首页</span>
+        </a>
+        <a href="xiaohongshu.html" class="nav-item">
+          <svg class="xhs-logo-icon" viewBox="0 0 200 120"><rect fill="#ff2442" rx="60" width="200" height="120"/><text x="100" y="82" text-anchor="middle" fill="#fff" font-size="52" font-weight="bold" font-family="sans-serif">小红书</text></svg>
+          <span>小红书</span>
+        </a>
+        <a href="product-assistant.html" class="nav-item is-active">
+          <i class="ri-robot-line"></i>
+          <span>产品助理</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="main-content pa-main">
+      <!-- 顶部工具栏 -->
+      <div class="pa-toolbar">
+        <div class="pa-toolbar-left">
+          <button class="pa-btn pa-btn--icon" id="newChatBtn" title="新建对话">
+            <i class="ri-add-line"></i>
+          </button>
+          <select class="pa-select" id="conversationSelect">
+            <option value="">选择对话...</option>
+          </select>
+        </div>
+        <div class="pa-toolbar-right">
+          <button class="pa-btn" id="settingsBtn">
+            <i class="ri-settings-3-line"></i>
+            <span>设置</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 主体区域：对话 + 预览 -->
+      <div class="pa-body">
+        <!-- 对话区 -->
+        <div class="pa-chat">
+          <div class="pa-messages" id="messageList">
+            <div class="pa-welcome">
+              <i class="ri-robot-line"></i>
+              <h3>毛毛的产品助理</h3>
+              <p>描述你的需求，我帮你生成原型图</p>
+            </div>
+          </div>
+          <div class="pa-input-area">
+            <textarea
+              class="pa-input"
+              id="userInput"
+              placeholder="描述你想要的功能或原型..."
+              rows="3"
+            ></textarea>
+            <button class="pa-btn pa-btn--primary" id="sendBtn">
+              <i class="ri-send-plane-fill"></i>
+              <span>发送</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 预览区 -->
+        <div class="pa-preview">
+          <div class="pa-preview-header">
+            <span>原型预览</span>
+            <button class="pa-btn pa-btn--small" id="downloadBtn" disabled>
+              <i class="ri-download-line"></i>
+              <span>下载PNG</span>
+            </button>
+          </div>
+          <div class="pa-preview-content" id="previewContent">
+            <div class="pa-preview-empty">
+              <i class="ri-layout-line"></i>
+              <p>原型将在这里显示</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 设置弹窗 -->
+  <div class="pa-modal" id="settingsModal">
+    <div class="pa-modal-overlay"></div>
+    <div class="pa-modal-content">
+      <div class="pa-modal-header">
+        <h3>设置</h3>
+        <button class="pa-modal-close" id="settingsClose">
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+      <div class="pa-modal-body">
+        <!-- 我的产品 -->
+        <div class="pa-settings-section">
+          <div class="pa-settings-title">
+            <span>我的产品</span>
+            <button class="pa-btn pa-btn--small" id="addProductBtn">
+              <i class="ri-add-line"></i> 添加
+            </button>
+          </div>
+          <div class="pa-settings-list" id="productList"></div>
+        </div>
+
+        <!-- 竞品 -->
+        <div class="pa-settings-section">
+          <div class="pa-settings-title">
+            <span>竞品</span>
+            <button class="pa-btn pa-btn--small" id="addCompetitorBtn">
+              <i class="ri-add-line"></i> 添加
+            </button>
+          </div>
+          <div class="pa-settings-list" id="competitorList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 添加产品/竞品弹窗 -->
+  <div class="pa-modal" id="addItemModal">
+    <div class="pa-modal-overlay"></div>
+    <div class="pa-modal-content pa-modal-content--small">
+      <div class="pa-modal-header">
+        <h3 id="addItemTitle">添加产品</h3>
+        <button class="pa-modal-close" id="addItemClose">
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+      <div class="pa-modal-body">
+        <div class="pa-form-group">
+          <label>名称</label>
+          <input type="text" class="pa-form-input" id="itemName" placeholder="如：短剧创作平台">
+        </div>
+        <div class="pa-form-group">
+          <label>网址</label>
+          <input type="url" class="pa-form-input" id="itemUrl" placeholder="https://...">
+        </div>
+        <div class="pa-form-group">
+          <label>Cookie/Token（可选）</label>
+          <textarea class="pa-form-input" id="itemToken" rows="3" placeholder="用于访问需要登录的页面"></textarea>
+        </div>
+      </div>
+      <div class="pa-modal-footer">
+        <button class="pa-btn" id="addItemCancel">取消</button>
+        <button class="pa-btn pa-btn--primary" id="addItemConfirm">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/sidebar.js"></script>
+  <script src="js/product-assistant.js"></script>
+</body>
+</html>

@@ -285,6 +285,10 @@ a {
   color: #e6162d;
 }
 
+.platform-card--assistant .platform-icon {
+  color: var(--accent);
+}
+
 .platform-info {
   flex: 1;
 }
