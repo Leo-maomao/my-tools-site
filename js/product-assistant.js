@@ -17,7 +17,15 @@
     competitors: [],
     messages: [],
     pendingImages: [],
-    currentPrototypeHtml: null
+    currentPrototypeHtml: null,
+    canvas: {
+      zoom: 1,
+      panX: 0,
+      panY: 0,
+      isDragging: false,
+      startX: 0,
+      startY: 0
+    }
   };
 
   function init() {
@@ -101,8 +109,12 @@
     var downloadBtn = document.getElementById('downloadBtn');
     if (downloadBtn) downloadBtn.addEventListener('click', handleDownload);
 
-    var previewScale = document.getElementById('previewScale');
-    if (previewScale) previewScale.addEventListener('change', function() { applyPreviewScale(); });
+    var zoomInBtn = document.getElementById('zoomInBtn');
+    var zoomOutBtn = document.getElementById('zoomOutBtn');
+    var zoomFitBtn = document.getElementById('zoomFitBtn');
+    if (zoomInBtn) zoomInBtn.addEventListener('click', function() { changeZoom(0.25); });
+    if (zoomOutBtn) zoomOutBtn.addEventListener('click', function() { changeZoom(-0.25); });
+    if (zoomFitBtn) zoomFitBtn.addEventListener('click', fitToViewport);
 
     var fullscreenBtn = document.getElementById('fullscreenBtn');
     if (fullscreenBtn) fullscreenBtn.addEventListener('click', openFullscreen);
@@ -119,6 +131,8 @@
         if (e.key === 'Escape') closeFullscreen();
       });
     }
+
+    initCanvasInteraction();
 
     var imageBtn = document.getElementById('imageBtn');
     var imageInput = document.getElementById('imageInput');
@@ -226,18 +240,22 @@
       var div = document.createElement('div');
       div.className = 'pa-conv-item' + (conv.id === state.currentConversationId ? ' is-active' : '');
       div.innerHTML = '<i class="ri-message-3-line"></i>' +
-        '<span class="pa-conv-item-title" data-id="' + conv.id + '" title="双击编辑标题">' + escapeHtml(conv.title || '未命名对话') + '</span>' +
-        '<button class="pa-conv-item-delete" data-id="' + conv.id + '" title="删除"><i class="ri-delete-bin-line"></i></button>';
+        '<span class="pa-conv-item-title" data-id="' + conv.id + '">' + escapeHtml(conv.title || '未命名对话') + '</span>' +
+        '<div class="pa-conv-item-actions">' +
+          '<button class="pa-conv-item-btn pa-conv-item-edit" data-id="' + conv.id + '" title="编辑标题"><i class="ri-edit-line"></i></button>' +
+          '<button class="pa-conv-item-btn pa-conv-item-delete" data-id="' + conv.id + '" title="删除"><i class="ri-delete-bin-line"></i></button>' +
+        '</div>';
 
       div.addEventListener('click', function(e) {
-        if (e.target.closest('.pa-conv-item-delete')) return;
+        if (e.target.closest('.pa-conv-item-btn')) return;
         if (e.target.closest('.pa-conv-item-title.is-editing')) return;
         selectConversation(conv.id);
       });
 
-      var titleSpan = div.querySelector('.pa-conv-item-title');
-      titleSpan.addEventListener('dblclick', function(e) {
+      var editBtn = div.querySelector('.pa-conv-item-edit');
+      editBtn.addEventListener('click', function(e) {
         e.stopPropagation();
+        var titleSpan = div.querySelector('.pa-conv-item-title');
         startEditTitle(conv.id, titleSpan);
       });
 
@@ -576,50 +594,109 @@
 
     var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
     iframeDoc.open();
-    iframeDoc.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}</style></head><body>' + html + '</body></html>');
+    iframeDoc.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{margin:0;padding:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;min-width:max-content;}</style></head><body>' + html + '</body></html>');
     iframeDoc.close();
 
     iframe.onload = function() {
       try {
         var body = iframe.contentDocument.body;
-        var contentHeight = body.scrollHeight;
-        var contentWidth = body.scrollWidth;
+        var contentWidth = Math.max(body.scrollWidth, 300);
+        var contentHeight = Math.max(body.scrollHeight, 200);
+        iframe.style.width = contentWidth + 'px';
         iframe.style.height = contentHeight + 'px';
-        iframe.dataset.originalWidth = contentWidth;
-        iframe.dataset.originalHeight = contentHeight;
-        applyPreviewScale();
+        container.style.width = contentWidth + 'px';
+        container.style.height = contentHeight + 'px';
+
+        state.canvas.zoom = 1;
+        state.canvas.panX = 0;
+        state.canvas.panY = 0;
+        fitToViewport();
       } catch (e) {}
     };
 
-    document.getElementById('downloadBtn').disabled = false;
-    document.getElementById('fullscreenBtn').disabled = false;
+    enableCanvasControls(true);
   }
 
-  function applyPreviewScale() {
-    var container = document.getElementById('previewContent');
-    var iframe = container && container.querySelector('iframe');
-    if (!iframe) return;
+  function enableCanvasControls(enabled) {
+    var btns = ['zoomInBtn', 'zoomOutBtn', 'zoomFitBtn', 'fullscreenBtn', 'downloadBtn'];
+    btns.forEach(function(id) {
+      var btn = document.getElementById(id);
+      if (btn) btn.disabled = !enabled;
+    });
+  }
 
-    var viewport = document.getElementById('previewViewport');
-    var scaleSelect = document.getElementById('previewScale');
-    var scaleValue = scaleSelect ? scaleSelect.value : 'fit';
+  function initCanvasInteraction() {
+    var viewport = document.getElementById('canvasViewport');
+    var canvas = document.getElementById('previewCanvas');
+    if (!viewport || !canvas) return;
 
-    var viewportWidth = viewport.clientWidth - 32;
-    var originalWidth = parseInt(iframe.dataset.originalWidth) || 800;
+    viewport.addEventListener('mousedown', function(e) {
+      if (e.button !== 0) return;
+      state.canvas.isDragging = true;
+      state.canvas.startX = e.clientX - state.canvas.panX;
+      state.canvas.startY = e.clientY - state.canvas.panY;
+      viewport.style.cursor = 'grabbing';
+    });
 
-    var scale;
-    if (scaleValue === 'fit') {
-      scale = Math.min(1, viewportWidth / originalWidth);
-    } else {
-      scale = parseFloat(scaleValue);
+    document.addEventListener('mousemove', function(e) {
+      if (!state.canvas.isDragging) return;
+      state.canvas.panX = e.clientX - state.canvas.startX;
+      state.canvas.panY = e.clientY - state.canvas.startY;
+      applyCanvasTransform();
+    });
+
+    document.addEventListener('mouseup', function() {
+      if (state.canvas.isDragging) {
+        state.canvas.isDragging = false;
+        viewport.style.cursor = 'grab';
+      }
+    });
+
+    viewport.addEventListener('wheel', function(e) {
+      if (!state.currentPrototypeHtml) return;
+      e.preventDefault();
+      var delta = e.deltaY > 0 ? -0.1 : 0.1;
+      changeZoom(delta);
+    }, { passive: false });
+  }
+
+  function changeZoom(delta) {
+    var newZoom = Math.max(0.1, Math.min(3, state.canvas.zoom + delta));
+    state.canvas.zoom = Math.round(newZoom * 100) / 100;
+    applyCanvasTransform();
+    updateZoomLevel();
+  }
+
+  function fitToViewport() {
+    var viewport = document.getElementById('canvasViewport');
+    var content = document.getElementById('previewContent');
+    if (!viewport || !content) return;
+
+    var vw = viewport.clientWidth - 40;
+    var vh = viewport.clientHeight - 40;
+    var cw = content.offsetWidth || 300;
+    var ch = content.offsetHeight || 200;
+
+    var scale = Math.min(vw / cw, vh / ch, 1);
+    state.canvas.zoom = Math.round(scale * 100) / 100;
+    state.canvas.panX = (viewport.clientWidth - cw * state.canvas.zoom) / 2;
+    state.canvas.panY = (viewport.clientHeight - ch * state.canvas.zoom) / 2;
+
+    applyCanvasTransform();
+    updateZoomLevel();
+  }
+
+  function applyCanvasTransform() {
+    var canvas = document.getElementById('previewCanvas');
+    if (!canvas) return;
+    canvas.style.transform = 'translate(' + state.canvas.panX + 'px, ' + state.canvas.panY + 'px) scale(' + state.canvas.zoom + ')';
+  }
+
+  function updateZoomLevel() {
+    var zoomLevel = document.getElementById('zoomLevel');
+    if (zoomLevel) {
+      zoomLevel.textContent = Math.round(state.canvas.zoom * 100) + '%';
     }
-
-    iframe.style.transform = 'scale(' + scale + ')';
-    iframe.style.transformOrigin = 'top left';
-    iframe.style.width = originalWidth + 'px';
-
-    container.style.height = (parseInt(iframe.dataset.originalHeight) || 600) * scale + 'px';
-    container.style.overflow = 'visible';
   }
 
   function openFullscreen() {
@@ -692,14 +769,22 @@
 
   function clearPreview() {
     state.currentPrototypeHtml = null;
+    state.canvas.zoom = 1;
+    state.canvas.panX = 0;
+    state.canvas.panY = 0;
+
     var container = document.getElementById('previewContent');
-    if (!container) return;
-    container.innerHTML = '<div class="pa-preview-empty"><i class="ri-layout-line"></i><p>原型将在这里显示</p></div>';
-    container.style.height = '';
-    var downloadBtn = document.getElementById('downloadBtn');
-    var fullscreenBtn = document.getElementById('fullscreenBtn');
-    if (downloadBtn) downloadBtn.disabled = true;
-    if (fullscreenBtn) fullscreenBtn.disabled = true;
+    if (container) {
+      container.innerHTML = '<div class="pa-preview-empty"><i class="ri-layout-line"></i><p>原型将在这里显示</p></div>';
+      container.style.width = '';
+      container.style.height = '';
+    }
+
+    var canvas = document.getElementById('previewCanvas');
+    if (canvas) canvas.style.transform = '';
+
+    updateZoomLevel();
+    enableCanvasControls(false);
   }
 
   async function handleDownload() {

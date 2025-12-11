@@ -83,10 +83,21 @@
   text-overflow: ellipsis;
 }
 
-.pa-conv-item-delete {
+/* 对话项操作按钮组 */
+.pa-conv-item-actions {
+  display: flex;
+  gap: 2px;
   opacity: 0;
-  width: 24px;
-  height: 24px;
+  flex-shrink: 0;
+}
+
+.pa-conv-item:hover .pa-conv-item-actions {
+  opacity: 1;
+}
+
+.pa-conv-item-btn {
+  width: 22px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -95,12 +106,12 @@
   color: var(--text-muted);
   cursor: pointer;
   border-radius: 4px;
-  font-size: 14px;
-  flex-shrink: 0;
+  font-size: 13px;
 }
 
-.pa-conv-item:hover .pa-conv-item-delete {
-  opacity: 1;
+.pa-conv-item-edit:hover {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--accent);
 }
 
 .pa-conv-item-delete:hover {
@@ -485,46 +496,51 @@
   gap: 8px;
 }
 
-.pa-preview-scale {
-  padding: 4px 8px;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+.pa-zoom-level {
   font-size: 12px;
-  background: var(--card-bg);
-  cursor: pointer;
+  color: var(--text-sub);
+  min-width: 40px;
+  text-align: center;
 }
 
-.pa-preview-scale:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-.pa-preview-viewport {
+/* 画布视口 */
+.pa-canvas-viewport {
   flex: 1;
-  overflow: auto;
-  background: #f0f0f0;
+  overflow: hidden;
+  position: relative;
+  background: #e8e8e8;
   background-image:
-    linear-gradient(45deg, #e0e0e0 25%, transparent 25%),
-    linear-gradient(-45deg, #e0e0e0 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #e0e0e0 75%),
-    linear-gradient(-45deg, transparent 75%, #e0e0e0 75%);
-  background-size: 20px 20px;
-  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    linear-gradient(45deg, #ddd 25%, transparent 25%),
+    linear-gradient(-45deg, #ddd 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #ddd 75%),
+    linear-gradient(-45deg, transparent 75%, #ddd 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+  cursor: grab;
+}
+
+.pa-canvas-viewport:active {
+  cursor: grabbing;
+}
+
+.pa-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
 }
 
 .pa-preview-content {
-  padding: 16px;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  margin: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
   border-radius: var(--radius-sm);
-  min-height: 200px;
+  overflow: hidden;
 }
 
 .pa-preview-iframe {
-  width: 100%;
-  border: none;
   display: block;
+  border: none;
 }
 
 .pa-preview-empty {
@@ -532,8 +548,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 200px;
+  padding: 60px 40px;
   color: var(--text-muted);
+  background: var(--card-bg);
 }
 
 .pa-preview-empty i {

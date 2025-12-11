@@ -114,31 +114,36 @@
           </div>
         </div>
 
-        <!-- 右侧：预览区 -->
+        <!-- 右侧：预览区（画布模式） -->
         <div class="pa-preview">
           <div class="pa-preview-header">
             <span>原型预览</span>
             <div class="pa-preview-controls">
-              <select class="pa-preview-scale" id="previewScale" title="缩放比例">
-                <option value="fit">适应宽度</option>
-                <option value="0.5">50%</option>
-                <option value="0.75">75%</option>
-                <option value="1">100%</option>
-              </select>
+              <button class="pa-btn pa-btn--icon" id="zoomOutBtn" title="缩小" disabled>
+                <i class="ri-subtract-line"></i>
+              </button>
+              <span class="pa-zoom-level" id="zoomLevel">100%</span>
+              <button class="pa-btn pa-btn--icon" id="zoomInBtn" title="放大" disabled>
+                <i class="ri-add-line"></i>
+              </button>
+              <button class="pa-btn pa-btn--icon" id="zoomFitBtn" title="适应窗口" disabled>
+                <i class="ri-aspect-ratio-line"></i>
+              </button>
               <button class="pa-btn pa-btn--icon" id="fullscreenBtn" title="全屏预览" disabled>
                 <i class="ri-fullscreen-line"></i>
               </button>
               <button class="pa-btn pa-btn--small" id="downloadBtn" disabled>
                 <i class="ri-download-line"></i>
-                <span>下载</span>
               </button>
             </div>
           </div>
-          <div class="pa-preview-viewport" id="previewViewport">
-            <div class="pa-preview-content" id="previewContent">
-              <div class="pa-preview-empty">
-                <i class="ri-layout-line"></i>
-                <p>原型将在这里显示</p>
+          <div class="pa-canvas-viewport" id="canvasViewport">
+            <div class="pa-canvas" id="previewCanvas">
+              <div class="pa-preview-content" id="previewContent">
+                <div class="pa-preview-empty">
+                  <i class="ri-layout-line"></i>
+                  <p>原型将在这里显示</p>
+                </div>
               </div>
             </div>
           </div>
