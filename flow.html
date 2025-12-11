@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flow | 毛毛的工具箱</title>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/flow.css">
+</head>
+<body>
+  <div class="flow-app">
+    <!-- 顶部导航 -->
+    <header class="flow-header">
+      <div class="flow-logo">
+        <i class="ri-flow-chart"></i>
+        <span>Flow</span>
+      </div>
+      <div class="flow-header-right">
+        <div class="flow-credits">
+          <i class="ri-vip-diamond-fill"></i>
+          <span>1000</span>
+        </div>
+        <div class="flow-user">
+          <i class="ri-user-3-fill"></i>
+        </div>
+      </div>
+    </header>
+
+    <!-- 左侧边栏 -->
+    <aside class="flow-sidebar">
+      <button class="flow-sidebar-btn flow-sidebar-btn--primary" title="新建项目">
+        <i class="ri-add-line"></i>
+      </button>
+      <button class="flow-sidebar-btn is-active" title="首页">
+        <i class="ri-home-4-line"></i>
+      </button>
+      <button class="flow-sidebar-btn" title="模板库">
+        <i class="ri-apps-line"></i>
+      </button>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="flow-main">
+      <!-- 欢迎区域 -->
+      <section class="flow-welcome">
+        <h1 class="flow-title">今天我们设计些什么，毛毛？</h1>
+
+        <!-- 输入框 -->
+        <div class="flow-input-box">
+          <div class="flow-input-wrapper">
+            <button class="flow-input-btn">
+              <i class="ri-add-line"></i>
+            </button>
+            <input type="text" class="flow-input" placeholder="告诉 Flow 你的设计想法">
+            <button class="flow-input-btn flow-input-submit">
+              <i class="ri-arrow-up-line"></i>
+            </button>
+          </div>
+
+          <!-- 快捷标签 -->
+          <div class="flow-quick-tags">
+            <div class="flow-tag">
+              <span>产品海报</span>
+              <div class="flow-tag-img" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+            </div>
+            <div class="flow-tag">
+              <span>人物写真</span>
+              <div class="flow-tag-img" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div>
+            </div>
+            <div class="flow-tag">
+              <span>电商主图</span>
+              <div class="flow-tag-img" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"></div>
+            </div>
+            <div class="flow-tag">
+              <span>插画设计</span>
+              <div class="flow-tag-img" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 推荐模板 -->
+      <section class="flow-templates">
+        <div class="flow-template-card">
+          <div class="flow-template-cover" style="background: linear-gradient(135deg, #434343 0%, #000000 100%);"></div>
+          <div class="flow-template-info">
+            <span class="flow-template-name">产品精修</span>
+          </div>
+        </div>
+        <div class="flow-template-card">
+          <div class="flow-template-cover" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+          <div class="flow-template-info">
+            <span class="flow-template-name">人像美化</span>
+          </div>
+        </div>
+        <div class="flow-template-card">
+          <div class="flow-template-cover" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div>
+          <div class="flow-template-info">
+            <span class="flow-template-name">创意合成</span>
+          </div>
+        </div>
+        <div class="flow-template-card">
+          <div class="flow-template-cover" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"></div>
+          <div class="flow-template-info">
+            <span class="flow-template-name">证件照</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 最近项目 -->
+      <section class="flow-recent">
+        <div class="flow-section-header">
+          <h2>最近项目</h2>
+          <a href="#" class="flow-view-all">查看全部 <i class="ri-arrow-right-s-line"></i></a>
+        </div>
+        <div class="flow-recent-grid">
+          <!-- 新建项目卡片 -->
+          <div class="flow-project-card flow-project-card--new">
+            <button class="flow-new-btn">
+              <i class="ri-add-line"></i>
+            </button>
+          </div>
+          <!-- 项目卡片 -->
+          <div class="flow-project-card">
+            <div class="flow-project-cover"></div>
+            <div class="flow-project-info">
+              <span class="flow-project-name">Untitled</span>
+              <span class="flow-project-date">更新于 2025-12-10</span>
+            </div>
+          </div>
+          <div class="flow-project-card">
+            <div class="flow-project-cover"></div>
+            <div class="flow-project-info">
+              <span class="flow-project-name">Untitled</span>
+              <span class="flow-project-date">更新于 2025-12-09</span>
+            </div>
+          </div>
+          <div class="flow-project-card">
+            <div class="flow-project-cover"></div>
+            <div class="flow-project-info">
+              <span class="flow-project-name">Untitled</span>
+              <span class="flow-project-date">更新于 2025-12-08</span>
+            </div>
+          </div>
+          <div class="flow-project-card">
+            <div class="flow-project-cover"></div>
+            <div class="flow-project-info">
+              <span class="flow-project-name">Untitled</span>
+              <span class="flow-project-date">更新于 2025-12-07</span>
+            </div>
+          </div>
+          <div class="flow-project-card">
+            <div class="flow-project-cover"></div>
+            <div class="flow-project-info">
+              <span class="flow-project-name">Untitled</span>
+              <span class="flow-project-date">更新于 2025-12-06</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
