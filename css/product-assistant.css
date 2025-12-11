@@ -240,6 +240,10 @@
   font-size: 16px;
   color: var(--warning);
   flex-shrink: 0;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  height: 16px;
 }
 
 /* 消息样式 */
