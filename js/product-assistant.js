@@ -372,14 +372,29 @@
   }
 
   var currentAddType = 'product';
+  var currentEditId = null;
+
   function openAddItemModal(type) {
     currentAddType = type;
+    currentEditId = null;
     var modal = document.getElementById('addItemModal');
     var title = document.getElementById('addItemTitle');
     if (title) title.textContent = type === 'product' ? '添加产品' : '添加竞品';
     document.getElementById('itemName').value = '';
     document.getElementById('itemUrl').value = '';
     document.getElementById('itemToken').value = '';
+    modal.classList.add('is-active');
+  }
+
+  function openEditItemModal(type, item) {
+    currentAddType = type;
+    currentEditId = item.id;
+    var modal = document.getElementById('addItemModal');
+    var title = document.getElementById('addItemTitle');
+    if (title) title.textContent = type === 'product' ? '编辑产品' : '编辑竞品';
+    document.getElementById('itemName').value = item.name || '';
+    document.getElementById('itemUrl').value = item.url || '';
+    document.getElementById('itemToken').value = item.token || '';
     modal.classList.add('is-active');
   }
 
@@ -391,11 +406,22 @@
       alert('请填写名称和网址');
       return;
     }
-    var item = { id: Date.now().toString(), name: name, url: url, token: token };
-    if (currentAddType === 'product') {
-      state.products.push(item);
+
+    if (currentEditId) {
+      var list = currentAddType === 'product' ? state.products : state.competitors;
+      var item = list.find(function(i) { return i.id === currentEditId; });
+      if (item) {
+        item.name = name;
+        item.url = url;
+        item.token = token;
+      }
     } else {
-      state.competitors.push(item);
+      var item = { id: Date.now().toString(), name: name, url: url, token: token };
+      if (currentAddType === 'product') {
+        state.products.push(item);
+      } else {
+        state.competitors.push(item);
+      }
     }
     saveLocalData();
     renderSettingsList();
@@ -419,8 +445,17 @@
       var div = document.createElement('div');
       div.className = 'pa-settings-item';
       div.innerHTML = '<div class="pa-settings-item-info"><div class="pa-settings-item-name">' + escapeHtml(item.name) + '</div><div class="pa-settings-item-url">' + escapeHtml(item.url) + '</div></div>' +
-        '<div class="pa-settings-item-actions"><button class="pa-settings-item-btn pa-settings-item-btn--delete" data-id="' + item.id + '" data-type="' + type + '"><i class="ri-delete-bin-line"></i></button></div>';
+        '<div class="pa-settings-item-actions"><button class="pa-settings-item-btn pa-settings-item-btn--edit" data-id="' + item.id + '" data-type="' + type + '" title="编辑"><i class="ri-edit-line"></i></button><button class="pa-settings-item-btn pa-settings-item-btn--delete" data-id="' + item.id + '" data-type="' + type + '" title="删除"><i class="ri-delete-bin-line"></i></button></div>';
       container.appendChild(div);
+    });
+    container.querySelectorAll('.pa-settings-item-btn--edit').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var id = this.getAttribute('data-id');
+        var t = this.getAttribute('data-type');
+        var list = t === 'product' ? state.products : state.competitors;
+        var item = list.find(function(i) { return i.id === id; });
+        if (item) openEditItemModal(t, item);
+      });
     });
     container.querySelectorAll('.pa-settings-item-btn--delete').forEach(function(btn) {
       btn.addEventListener('click', function() {

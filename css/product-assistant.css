@@ -225,13 +225,14 @@
 
 .pa-tip {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: center;
   gap: 8px;
   padding: 12px 16px;
   background: var(--card-bg);
   border-radius: var(--radius-sm);
   font-size: 13px;
-  text-align: left;
+  text-align: center;
   color: var(--text-sub);
 }
 
@@ -535,6 +536,10 @@
   color: var(--text-main);
 }
 
+.pa-settings-item-btn--edit:hover {
+  color: var(--accent);
+}
+
 .pa-settings-item-btn--delete:hover {
   color: var(--error);
 }
@@ -572,6 +577,31 @@
 .pa-info-note {
   color: var(--warning);
   font-size: 12px;
+}
+
+.pa-info-steps {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.pa-info-steps li {
+  margin-bottom: 4px;
+}
+
+.pa-info-box kbd {
+  background: var(--bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  border: 1px solid var(--border-subtle);
+}
+
+.pa-info-box code {
+  background: rgba(37, 99, 235, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--accent);
 }
 
 /* 表单样式 */
