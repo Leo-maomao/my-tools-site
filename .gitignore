@@ -1,2 +1,29 @@
-*.png
-templates/
+# macOS
+.DS_Store
+._*
+
+# Claude Code
+.claude/
+
+# Environment
+.env
+.env.local
+
+# Editor
+.idea
+.vscode
+.cursor
+
+# Node
+node_modules/
+
+# Build
+dist/
+build/
+
+# Logs
+*.log
+
+# Temp
+*.tmp
+*.temp
