@@ -289,6 +289,10 @@ a {
   color: var(--accent);
 }
 
+.platform-card--report .platform-icon {
+  color: #8b5cf6;
+}
+
 .platform-info {
   flex: 1;
 }
