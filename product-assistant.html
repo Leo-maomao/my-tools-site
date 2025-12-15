@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>毛毛的产品助理 | 毛毛的工具箱</title>
+  <title>产品助理 | 毛毛的工具箱</title>
   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/product-assistant.css">
+  <link rel="stylesheet" href="css/product-assistant.css?v=13">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
 <body>
   <div class="app">
@@ -40,12 +39,16 @@
           <i class="ri-file-text-line"></i>
           <span>报告小助手</span>
         </a>
+        <a href="drama-workshop.html" class="nav-item">
+          <i class="ri-movie-2-line"></i>
+          <span>短剧工坊</span>
+        </a>
       </nav>
     </aside>
 
     <!-- 主内容区 -->
     <main class="main-content pa-main">
-      <!-- 三栏布局：对话列表 + 对话 + 预览 -->
+      <!-- 两栏布局：对话列表 + 对话区 -->
       <div class="pa-layout">
         <!-- 左侧：对话列表 -->
         <div class="pa-conversations">
@@ -58,12 +61,6 @@
           <div class="pa-conversations-list" id="conversationList">
             <!-- 动态渲染 -->
           </div>
-          <div class="pa-conversations-footer">
-            <button class="pa-btn pa-btn--full" id="settingsBtn">
-              <i class="ri-settings-3-line"></i>
-              <span>产品设置</span>
-            </button>
-          </div>
         </div>
 
         <!-- 中间：对话区 -->
@@ -72,68 +69,50 @@
             <div class="pa-welcome">
               <i class="ri-robot-line"></i>
               <h3>毛毛的产品助理</h3>
-              <p>描述你的需求，我帮你生成原型图</p>
+              <p>我可以帮你分析PRD、回答产品问题</p>
               <div class="pa-welcome-tips">
                 <div class="pa-tip">
-                  <i class="ri-lightbulb-line"></i>
-                  <span>例如：帮我设计一个登录页面，包含手机号和验证码登录</span>
+                  <i class="ri-image-add-line"></i>
+                  <span>粘贴或上传图片，帮你分析界面</span>
+                </div>
+                <div class="pa-tip">
+                  <i class="ri-file-code-line"></i>
+                  <span>上传 Axure HTML 文件，帮你 Review PRD</span>
+                </div>
+                <div class="pa-tip">
+                  <i class="ri-chat-3-line"></i>
+                  <span>直接提问产品相关问题</span>
                 </div>
               </div>
             </div>
           </div>
           <div class="pa-input-area">
             <div class="pa-input-wrapper">
+              <!-- 引用预览区 -->
+              <div class="pa-quote-preview" id="quotePreview"></div>
+              <!-- 图片预览区 -->
               <div class="pa-image-preview" id="imagePreview"></div>
+              <!-- 文件预览区 -->
+              <div class="pa-file-preview" id="filePreview"></div>
               <textarea
                 class="pa-input"
                 id="userInput"
-                placeholder="描述你想要的功能或原型...（支持粘贴图片）"
+                placeholder="输入问题，或粘贴图片/上传文件..."
                 rows="3"
               ></textarea>
             </div>
             <div class="pa-input-actions">
-              <button class="pa-btn pa-btn--icon" id="imageBtn" title="添加图片">
+              <button class="pa-btn pa-btn--icon" id="imageBtn" title="上传图片">
                 <i class="ri-image-add-line"></i>
               </button>
-              <input type="file" id="imageInput" accept="image/*" style="display:none">
+              <input type="file" id="imageInput" accept="image/*" multiple style="display:none">
+              <button class="pa-btn pa-btn--icon" id="fileBtn" title="上传HTML文件">
+                <i class="ri-file-code-line"></i>
+              </button>
+              <input type="file" id="fileInput" accept=".html" multiple style="display:none">
               <button class="pa-btn pa-btn--primary" id="sendBtn">
                 <i class="ri-send-plane-fill"></i>
               </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- 右侧：预览区（画布模式） -->
-        <div class="pa-preview">
-          <div class="pa-preview-header">
-            <span>原型预览</span>
-            <div class="pa-preview-controls">
-              <button class="pa-btn pa-btn--icon" id="zoomOutBtn" title="缩小" disabled>
-                <i class="ri-subtract-line"></i>
-              </button>
-              <span class="pa-zoom-level" id="zoomLevel">100%</span>
-              <button class="pa-btn pa-btn--icon" id="zoomInBtn" title="放大" disabled>
-                <i class="ri-add-line"></i>
-              </button>
-              <button class="pa-btn pa-btn--icon" id="zoomFitBtn" title="适应窗口" disabled>
-                <i class="ri-aspect-ratio-line"></i>
-              </button>
-              <button class="pa-btn pa-btn--icon" id="fullscreenBtn" title="全屏预览" disabled>
-                <i class="ri-fullscreen-line"></i>
-              </button>
-              <button class="pa-btn pa-btn--small" id="downloadBtn" disabled>
-                <i class="ri-download-line"></i>
-              </button>
-            </div>
-          </div>
-          <div class="pa-canvas-viewport" id="canvasViewport">
-            <div class="pa-canvas" id="previewCanvas">
-              <div class="pa-preview-content" id="previewContent">
-                <div class="pa-preview-empty">
-                  <i class="ri-layout-line"></i>
-                  <p>原型将在这里显示</p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -141,118 +120,7 @@
     </main>
   </div>
 
-  <!-- 设置弹窗 -->
-  <div class="pa-modal" id="settingsModal">
-    <div class="pa-modal-overlay"></div>
-    <div class="pa-modal-content">
-      <div class="pa-modal-header">
-        <h3>产品设置</h3>
-        <button class="pa-modal-close" id="settingsClose">
-          <i class="ri-close-line"></i>
-        </button>
-      </div>
-      <div class="pa-modal-body">
-        <!-- 使用说明 -->
-        <div class="pa-settings-section">
-          <div class="pa-settings-title">
-            <span>如何获取 Cookie/Token</span>
-          </div>
-          <div class="pa-info-box">
-            <p><strong>获取步骤：</strong></p>
-            <ol class="pa-info-steps">
-              <li>打开 Chrome 浏览器，登录你的产品网站</li>
-              <li>按 <kbd>F12</kbd> 打开开发者工具</li>
-              <li>切换到 <strong>Network</strong>（网络）标签</li>
-              <li>刷新页面，点击任意一个请求</li>
-              <li>在右侧找到 <strong>Request Headers</strong>（请求头）</li>
-              <li>复制 <code>Cookie</code> 或 <code>Authorization</code> 的值</li>
-            </ol>
-            <p class="pa-info-note">当前版本暂不支持自动读取产品信息，配置仅作记录用途。后续版本将支持。</p>
-          </div>
-        </div>
-
-        <!-- 我的产品 -->
-        <div class="pa-settings-section">
-          <div class="pa-settings-title">
-            <span>我的产品</span>
-            <button class="pa-btn pa-btn--small" id="addProductBtn">
-              <i class="ri-add-line"></i> 添加
-            </button>
-          </div>
-          <div class="pa-settings-list" id="productList"></div>
-        </div>
-
-        <!-- 竞品 -->
-        <div class="pa-settings-section">
-          <div class="pa-settings-title">
-            <span>竞品</span>
-            <button class="pa-btn pa-btn--small" id="addCompetitorBtn">
-              <i class="ri-add-line"></i> 添加
-            </button>
-          </div>
-          <div class="pa-settings-list" id="competitorList"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 添加产品/竞品弹窗 -->
-  <div class="pa-modal" id="addItemModal">
-    <div class="pa-modal-overlay"></div>
-    <div class="pa-modal-content pa-modal-content--small">
-      <div class="pa-modal-header">
-        <h3 id="addItemTitle">添加产品</h3>
-        <button class="pa-modal-close" id="addItemClose">
-          <i class="ri-close-line"></i>
-        </button>
-      </div>
-      <div class="pa-modal-body">
-        <div class="pa-form-group">
-          <label>名称 <span class="pa-required">*</span></label>
-          <input type="text" class="pa-form-input" id="itemName" placeholder="如：短剧创作平台">
-        </div>
-        <div class="pa-form-group">
-          <label>网址 <span class="pa-required">*</span></label>
-          <input type="url" class="pa-form-input" id="itemUrl" placeholder="https://...">
-        </div>
-        <div class="pa-form-group">
-          <label>
-            Cookie/Token
-            <span class="pa-optional">（可选，暂不使用）</span>
-          </label>
-          <textarea class="pa-form-input" id="itemToken" rows="3" placeholder="后续版本将支持自动读取产品信息"></textarea>
-        </div>
-      </div>
-      <div class="pa-modal-footer">
-        <button class="pa-btn" id="addItemCancel">取消</button>
-        <button class="pa-btn pa-btn--primary" id="addItemConfirm">确定</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 全屏预览弹窗 -->
-  <div class="pa-fullscreen-modal" id="fullscreenModal">
-    <div class="pa-fullscreen-header">
-      <span>原型预览</span>
-      <div class="pa-fullscreen-controls">
-        <select class="pa-preview-scale" id="fullscreenScale">
-          <option value="fit">适应窗口</option>
-          <option value="0.5">50%</option>
-          <option value="0.75">75%</option>
-          <option value="1" selected>100%</option>
-          <option value="1.5">150%</option>
-        </select>
-        <button class="pa-btn pa-btn--icon" id="fullscreenClose" title="退出全屏">
-          <i class="ri-close-line"></i>
-        </button>
-      </div>
-    </div>
-    <div class="pa-fullscreen-viewport" id="fullscreenViewport">
-      <div class="pa-fullscreen-content" id="fullscreenContent"></div>
-    </div>
-  </div>
-
   <script src="js/sidebar.js"></script>
-  <script src="js/product-assistant.js"></script>
+  <script src="js/product-assistant.js?v=10"></script>
 </body>
 </html>

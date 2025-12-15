@@ -293,6 +293,10 @@ a {
   color: #8b5cf6;
 }
 
+.platform-card--drama .platform-icon {
+  color: #f43f5e;
+}
+
 .platform-info {
   flex: 1;
 }

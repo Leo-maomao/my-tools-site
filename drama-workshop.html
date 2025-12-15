@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>短剧工坊 | 毛毛的工具箱</title>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/drama-workshop.css">
+</head>
+<body>
+  <div class="app">
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <i class="ri-tools-line"></i>
+          <span>毛毛的工具箱</span>
+        </div>
+        <button class="sidebar-toggle" id="sidebarToggle" title="收起侧边栏">
+          <i class="ri-menu-fold-line"></i>
+        </button>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item">
+          <i class="ri-home-4-line"></i>
+          <span>首页</span>
+        </a>
+        <a href="xiaohongshu.html" class="nav-item">
+          <svg class="xhs-logo-icon" viewBox="0 0 200 120"><rect fill="#ff2442" rx="60" width="200" height="120"/><text x="100" y="82" text-anchor="middle" fill="#fff" font-size="52" font-weight="bold" font-family="sans-serif">小红书</text></svg>
+          <span>小红书</span>
+        </a>
+        <a href="product-assistant.html" class="nav-item">
+          <i class="ri-robot-line"></i>
+          <span>产品助理</span>
+        </a>
+        <a href="daily-report.html" class="nav-item">
+          <i class="ri-file-text-line"></i>
+          <span>报告小助手</span>
+        </a>
+        <a href="drama-workshop.html" class="nav-item is-active">
+          <i class="ri-movie-2-line"></i>
+          <span>短剧工坊</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="main-content dw-main">
+      <!-- 顶部Tab -->
+      <div class="dw-tabs">
+        <button class="dw-tab is-active" data-tab="characters">
+          <i class="ri-user-star-line"></i>
+          <span>角色库</span>
+        </button>
+        <button class="dw-tab" data-tab="script">
+          <i class="ri-draft-line"></i>
+          <span>剧本创作</span>
+        </button>
+      </div>
+
+      <!-- Tab内容：角色库 -->
+      <div class="dw-tab-content is-active" id="charactersTab">
+        <div class="dw-panel">
+          <div class="dw-panel-header">
+            <div class="dw-panel-title">
+              <h2><i class="ri-user-star-line"></i> 角色库</h2>
+              <span class="dw-count" id="characterCount">0 个角色</span>
+            </div>
+            <button class="dw-btn dw-btn--primary" id="addCharacterBtn">
+              <i class="ri-add-line"></i>
+              <span>添加角色</span>
+            </button>
+          </div>
+          <div class="dw-panel-body">
+            <!-- 角色网格 -->
+            <div class="dw-character-grid" id="characterGrid">
+              <!-- 角色卡片通过JS渲染 -->
+            </div>
+            <!-- 空状态 -->
+            <div class="dw-empty" id="characterEmpty">
+              <i class="ri-user-add-line"></i>
+              <p>还没有角色</p>
+              <span>点击「添加角色」创建你的第一个角色</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab内容：剧本创作 -->
+      <div class="dw-tab-content" id="scriptTab">
+        <!-- 步骤指示器 -->
+        <div class="dw-steps">
+          <div class="dw-step is-active" data-step="1">
+            <div class="dw-step-num">1</div>
+            <span class="dw-step-title">剧本构思</span>
+          </div>
+          <div class="dw-step-line"></div>
+          <div class="dw-step" data-step="2">
+            <div class="dw-step-num">2</div>
+            <span class="dw-step-title">分镜拆解</span>
+          </div>
+          <div class="dw-step-line"></div>
+          <div class="dw-step" data-step="3">
+            <div class="dw-step-num">3</div>
+            <span class="dw-step-title">视频生成</span>
+          </div>
+        </div>
+
+        <!-- 步骤1：剧本构思 -->
+        <div class="dw-panel" id="step1Panel">
+          <div class="dw-panel-header">
+            <h2><i class="ri-lightbulb-line"></i> 剧本构思</h2>
+            <p>用一句话描述你的故事，选择角色，AI 帮你扩写完整剧本</p>
+          </div>
+          <div class="dw-panel-body">
+            <!-- 选择角色 -->
+            <div class="dw-form-section">
+              <label class="dw-label">选择角色</label>
+              <div class="dw-character-select" id="characterSelect">
+                <!-- 角色选择chips通过JS渲染 -->
+                <div class="dw-select-empty">请先在「角色库」中添加角色</div>
+              </div>
+            </div>
+
+            <!-- 一句话描述 -->
+            <div class="dw-form-section">
+              <label class="dw-label">故事描述</label>
+              <textarea
+                id="storyIdea"
+                class="dw-textarea"
+                placeholder="用一句话描述你的故事创意，例如：&#10;&#10;「小明和小红在咖啡馆重逢，两人聊起了十年前的约定」&#10;「老板发现员工偷懒，一场有趣的职场博弈开始了」&#10;「外卖小哥送餐时遇到了自己的前女友」"
+                rows="4"
+              ></textarea>
+            </div>
+
+            <!-- AI扩写选项 -->
+            <div class="dw-form-section">
+              <label class="dw-label">剧本风格</label>
+              <div class="dw-style-options">
+                <label class="dw-radio-card">
+                  <input type="radio" name="scriptStyle" value="comedy" checked>
+                  <span class="dw-radio-content">
+                    <i class="ri-emotion-laugh-line"></i>
+                    <span>搞笑幽默</span>
+                  </span>
+                </label>
+                <label class="dw-radio-card">
+                  <input type="radio" name="scriptStyle" value="romance">
+                  <span class="dw-radio-content">
+                    <i class="ri-heart-line"></i>
+                    <span>甜蜜爱情</span>
+                  </span>
+                </label>
+                <label class="dw-radio-card">
+                  <input type="radio" name="scriptStyle" value="drama">
+                  <span class="dw-radio-content">
+                    <i class="ri-emotion-sad-line"></i>
+                    <span>情感剧情</span>
+                  </span>
+                </label>
+                <label class="dw-radio-card">
+                  <input type="radio" name="scriptStyle" value="suspense">
+                  <span class="dw-radio-content">
+                    <i class="ri-spy-line"></i>
+                    <span>悬疑反转</span>
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="dw-panel-footer">
+            <button class="dw-btn dw-btn--primary dw-btn--lg" id="generateScriptBtn">
+              <i class="ri-magic-line"></i>
+              <span>AI 扩写剧本</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 步骤1.5：剧本预览（扩写后显示） -->
+        <div class="dw-panel is-hidden" id="scriptPreviewPanel">
+          <div class="dw-panel-header">
+            <h2><i class="ri-file-text-line"></i> 剧本预览</h2>
+            <p>AI 根据你的创意扩写了以下剧本，可以编辑后继续</p>
+          </div>
+          <div class="dw-panel-body">
+            <textarea
+              id="scriptContent"
+              class="dw-textarea dw-textarea--lg"
+              rows="12"
+            ></textarea>
+          </div>
+          <div class="dw-panel-footer">
+            <button class="dw-btn" id="backToIdeaBtn">
+              <i class="ri-arrow-left-line"></i>
+              <span>重新构思</span>
+            </button>
+            <button class="dw-btn dw-btn--primary" id="toShotsBtn">
+              <i class="ri-film-line"></i>
+              <span>拆解分镜</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 步骤2：分镜拆解 -->
+        <div class="dw-panel is-hidden" id="step2Panel">
+          <div class="dw-panel-header">
+            <h2><i class="ri-film-line"></i> 分镜列表</h2>
+            <span class="dw-count" id="shotCount">0 个分镜</span>
+          </div>
+          <div class="dw-panel-body">
+            <div class="dw-shots-list" id="shotsList">
+              <!-- 分镜卡片通过JS渲染 -->
+            </div>
+          </div>
+          <div class="dw-panel-footer">
+            <button class="dw-btn" id="backToScriptBtn">
+              <i class="ri-arrow-left-line"></i>
+              <span>返回剧本</span>
+            </button>
+            <button class="dw-btn dw-btn--primary" id="toVideoBtn">
+              <i class="ri-video-line"></i>
+              <span>生成视频</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 步骤3：视频生成 -->
+        <div class="dw-panel is-hidden" id="step3Panel">
+          <div class="dw-panel-header">
+            <div class="dw-panel-title">
+              <h2><i class="ri-video-line"></i> 视频生成</h2>
+              <span class="dw-count" id="videoCount">0/0 已生成</span>
+            </div>
+            <div class="dw-header-actions">
+              <button class="dw-btn dw-btn--primary" id="generateAllBtn">
+                <i class="ri-play-circle-line"></i>
+                <span>一键生成全部</span>
+              </button>
+              <button class="dw-btn dw-btn--success" id="downloadAllBtn" disabled>
+                <i class="ri-download-line"></i>
+                <span>下载全部</span>
+              </button>
+            </div>
+          </div>
+          <div class="dw-panel-body">
+            <div class="dw-video-grid" id="videoGrid">
+              <!-- 视频卡片通过JS渲染 -->
+            </div>
+          </div>
+          <div class="dw-panel-footer">
+            <button class="dw-btn" id="backToShotsBtn">
+              <i class="ri-arrow-left-line"></i>
+              <span>返回分镜</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 添加/编辑角色弹窗 -->
+  <div class="dw-modal" id="characterModal">
+    <div class="dw-modal-backdrop"></div>
+    <div class="dw-modal-content dw-modal--lg">
+      <div class="dw-modal-header">
+        <h3 id="modalTitle">添加角色</h3>
+        <button class="dw-modal-close" id="closeModalBtn">
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+      <div class="dw-modal-body">
+        <div class="dw-form-row">
+          <div class="dw-form-group">
+            <label>角色名称 <span class="required">*</span></label>
+            <input type="text" id="characterName" class="dw-input" placeholder="例如：小明">
+          </div>
+          <div class="dw-form-group">
+            <label>角色性别</label>
+            <select id="characterGender" class="dw-select">
+              <option value="male">男</option>
+              <option value="female">女</option>
+              <option value="other">其他</option>
+            </select>
+          </div>
+        </div>
+        <div class="dw-form-group">
+          <label>角色描述</label>
+          <textarea id="characterDesc" class="dw-textarea" rows="2" placeholder="例如：25岁，阳光帅气的程序员，喜欢穿格子衫"></textarea>
+        </div>
+        <div class="dw-form-group">
+          <label>参考图片 <span class="required">*</span> <span class="dw-hint">（支持多张，建议上传不同角度/表情）</span></label>
+          <div class="dw-multi-upload" id="multiUploadArea">
+            <input type="file" id="characterImages" accept="image/*" multiple hidden>
+            <!-- 已上传图片预览 -->
+            <div class="dw-upload-previews" id="uploadPreviews">
+              <!-- 图片预览通过JS渲染 -->
+            </div>
+            <!-- 添加图片按钮 -->
+            <div class="dw-upload-add" id="uploadAddBtn">
+              <i class="ri-add-line"></i>
+              <span>添加图片</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="dw-modal-footer">
+        <button class="dw-btn" id="cancelModalBtn">取消</button>
+        <button class="dw-btn dw-btn--primary" id="saveCharacterBtn">保存角色</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast 提示（顶部居中） -->
+  <div id="toast" class="dw-toast"></div>
+
+  <script src="js/sidebar.js"></script>
+  <script src="js/drama-workshop.js"></script>
+</body>
+</html>
