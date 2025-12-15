@@ -49,18 +49,18 @@
     <main class="main-content dw-main">
       <!-- 顶部Tab -->
       <div class="dw-tabs">
-        <button class="dw-tab is-active" data-tab="characters">
-          <i class="ri-user-star-line"></i>
-          <span>角色库</span>
-        </button>
-        <button class="dw-tab" data-tab="script">
+        <button class="dw-tab is-active" data-tab="script">
           <i class="ri-draft-line"></i>
           <span>剧本创作</span>
+        </button>
+        <button class="dw-tab" data-tab="characters">
+          <i class="ri-user-star-line"></i>
+          <span>角色库</span>
         </button>
       </div>
 
       <!-- Tab内容：角色库 -->
-      <div class="dw-tab-content is-active" id="charactersTab">
+      <div class="dw-tab-content" id="charactersTab">
         <div class="dw-panel">
           <div class="dw-panel-header">
             <div class="dw-panel-title">
@@ -73,11 +73,7 @@
             </button>
           </div>
           <div class="dw-panel-body">
-            <!-- 角色网格 -->
-            <div class="dw-character-grid" id="characterGrid">
-              <!-- 角色卡片通过JS渲染 -->
-            </div>
-            <!-- 空状态 -->
+            <div class="dw-character-grid" id="characterGrid"></div>
             <div class="dw-empty" id="characterEmpty">
               <i class="ri-user-add-line"></i>
               <p>还没有角色</p>
@@ -88,152 +84,275 @@
       </div>
 
       <!-- Tab内容：剧本创作 -->
-      <div class="dw-tab-content" id="scriptTab">
-        <!-- 步骤指示器 -->
+      <div class="dw-tab-content is-active" id="scriptTab">
+        <!-- 步骤指示器（5步） -->
         <div class="dw-steps">
           <div class="dw-step is-active" data-step="1">
             <div class="dw-step-num">1</div>
-            <span class="dw-step-title">剧本构思</span>
+            <span class="dw-step-title">故事构思</span>
           </div>
           <div class="dw-step-line"></div>
           <div class="dw-step" data-step="2">
             <div class="dw-step-num">2</div>
-            <span class="dw-step-title">分镜拆解</span>
+            <span class="dw-step-title">分集剧本</span>
           </div>
           <div class="dw-step-line"></div>
           <div class="dw-step" data-step="3">
             <div class="dw-step-num">3</div>
+            <span class="dw-step-title">分镜拆解</span>
+          </div>
+          <div class="dw-step-line"></div>
+          <div class="dw-step" data-step="4">
+            <div class="dw-step-num">4</div>
+            <span class="dw-step-title">分镜图</span>
+          </div>
+          <div class="dw-step-line"></div>
+          <div class="dw-step" data-step="5">
+            <div class="dw-step-num">5</div>
             <span class="dw-step-title">视频生成</span>
           </div>
         </div>
 
-        <!-- 步骤1：剧本构思 -->
+        <!-- 步骤1：故事构思 -->
         <div class="dw-panel" id="step1Panel">
           <div class="dw-panel-header">
-            <h2><i class="ri-lightbulb-line"></i> 剧本构思</h2>
-            <p>用一句话描述你的故事，选择角色，AI 帮你扩写完整剧本</p>
+            <h2><i class="ri-lightbulb-line"></i> 故事构思</h2>
+            <p>用一句话描述你的故事创意，AI 帮你生成完整的剧集大纲</p>
           </div>
           <div class="dw-panel-body">
-            <!-- 选择角色 -->
+            <!-- 故事描述 -->
             <div class="dw-form-section">
-              <label class="dw-label">选择角色</label>
-              <div class="dw-character-select" id="characterSelect">
-                <!-- 角色选择chips通过JS渲染 -->
-                <div class="dw-select-empty">请先在「角色库」中添加角色</div>
+              <label class="dw-label">故事描述 <span class="dw-hint">（输入 @ 可引用角色库中的角色）</span></label>
+              <div class="dw-textarea-wrapper">
+                <textarea
+                  id="storyIdea"
+                  class="dw-textarea"
+                  placeholder="用一句话描述你的故事创意，输入 @ 引用角色，例如：&#10;&#10;@小明 和 @小红 在咖啡馆重逢，两人聊起了十年前的约定&#10;@老板 发现 @员工 偷懒，一场有趣的职场博弈开始了"
+                  rows="4"
+                ></textarea>
+                <div class="dw-mention-dropdown" id="mentionDropdown"></div>
               </div>
             </div>
 
-            <!-- 一句话描述 -->
-            <div class="dw-form-section">
-              <label class="dw-label">故事描述</label>
-              <textarea
-                id="storyIdea"
-                class="dw-textarea"
-                placeholder="用一句话描述你的故事创意，例如：&#10;&#10;「小明和小红在咖啡馆重逢，两人聊起了十年前的约定」&#10;「老板发现员工偷懒，一场有趣的职场博弈开始了」&#10;「外卖小哥送餐时遇到了自己的前女友」"
-                rows="4"
-              ></textarea>
-            </div>
-
-            <!-- AI扩写选项 -->
-            <div class="dw-form-section">
-              <label class="dw-label">剧本风格</label>
-              <div class="dw-style-options">
-                <label class="dw-radio-card">
-                  <input type="radio" name="scriptStyle" value="comedy" checked>
-                  <span class="dw-radio-content">
-                    <i class="ri-emotion-laugh-line"></i>
-                    <span>搞笑幽默</span>
-                  </span>
-                </label>
-                <label class="dw-radio-card">
-                  <input type="radio" name="scriptStyle" value="romance">
-                  <span class="dw-radio-content">
-                    <i class="ri-heart-line"></i>
-                    <span>甜蜜爱情</span>
-                  </span>
-                </label>
-                <label class="dw-radio-card">
-                  <input type="radio" name="scriptStyle" value="drama">
-                  <span class="dw-radio-content">
-                    <i class="ri-emotion-sad-line"></i>
-                    <span>情感剧情</span>
-                  </span>
-                </label>
-                <label class="dw-radio-card">
-                  <input type="radio" name="scriptStyle" value="suspense">
-                  <span class="dw-radio-content">
-                    <i class="ri-spy-line"></i>
-                    <span>悬疑反转</span>
-                  </span>
-                </label>
+            <!-- 剧本风格+集数 -->
+            <div class="dw-form-section dw-form-section--inline">
+              <div class="dw-inline-group">
+                <label class="dw-label">剧本风格</label>
+                <div class="dw-style-chips">
+                  <label class="dw-style-chip">
+                    <input type="radio" name="scriptStyle" value="comedy" checked>
+                    <span><i class="ri-emotion-laugh-line"></i> 搞笑</span>
+                  </label>
+                  <label class="dw-style-chip">
+                    <input type="radio" name="scriptStyle" value="romance">
+                    <span><i class="ri-heart-line"></i> 甜宠</span>
+                  </label>
+                  <label class="dw-style-chip">
+                    <input type="radio" name="scriptStyle" value="drama">
+                    <span><i class="ri-emotion-sad-line"></i> 虐心</span>
+                  </label>
+                  <label class="dw-style-chip">
+                    <input type="radio" name="scriptStyle" value="suspense">
+                    <span><i class="ri-spy-line"></i> 悬疑</span>
+                  </label>
+                  <label class="dw-style-chip">
+                    <input type="radio" name="scriptStyle" value="workplace">
+                    <span><i class="ri-briefcase-line"></i> 职场</span>
+                  </label>
+                  <label class="dw-style-chip">
+                    <input type="radio" name="scriptStyle" value="family">
+                    <span><i class="ri-home-heart-line"></i> 家庭</span>
+                  </label>
+                  <label class="dw-style-chip">
+                    <input type="radio" name="scriptStyle" value="revenge">
+                    <span><i class="ri-fire-line"></i> 逆袭</span>
+                  </label>
+                  <label class="dw-style-chip">
+                    <input type="radio" name="scriptStyle" value="ancient">
+                    <span><i class="ri-ancient-gate-line"></i> 古风</span>
+                  </label>
+                </div>
+              </div>
+              <div class="dw-inline-group dw-inline-group--episode">
+                <label class="dw-label">集数</label>
+                <div class="dw-episode-input">
+                  <input type="number" id="episodeCount" class="dw-input" value="5" min="1" max="20">
+                  <span>集</span>
+                </div>
               </div>
             </div>
           </div>
           <div class="dw-panel-footer">
-            <button class="dw-btn dw-btn--primary dw-btn--lg" id="generateScriptBtn">
+            <button class="dw-btn dw-btn--primary dw-btn--lg" id="generateOutlineBtn">
               <i class="ri-magic-line"></i>
-              <span>AI 扩写剧本</span>
+              <span>AI 生成大纲</span>
             </button>
           </div>
         </div>
 
-        <!-- 步骤1.5：剧本预览（扩写后显示） -->
-        <div class="dw-panel is-hidden" id="scriptPreviewPanel">
+        <!-- 步骤1.5：大纲预览 -->
+        <div class="dw-panel is-hidden" id="outlinePanel">
           <div class="dw-panel-header">
-            <h2><i class="ri-file-text-line"></i> 剧本预览</h2>
-            <p>AI 根据你的创意扩写了以下剧本，可以编辑后继续</p>
+            <div class="dw-panel-title">
+              <h2><i class="ri-list-ordered"></i> 剧集大纲</h2>
+              <span class="dw-count" id="outlineCount">0 集</span>
+            </div>
           </div>
           <div class="dw-panel-body">
-            <textarea
-              id="scriptContent"
-              class="dw-textarea dw-textarea--lg"
-              rows="12"
-            ></textarea>
+            <div class="dw-episode-list" id="episodeList"></div>
           </div>
           <div class="dw-panel-footer">
             <button class="dw-btn" id="backToIdeaBtn">
               <i class="ri-arrow-left-line"></i>
               <span>重新构思</span>
             </button>
-            <button class="dw-btn dw-btn--primary" id="toShotsBtn">
+            <button class="dw-btn dw-btn--primary" id="toEpisodeBtn">
+              <i class="ri-file-text-line"></i>
+              <span>生成剧本</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 步骤2：分集剧本 -->
+        <div class="dw-panel is-hidden" id="step2Panel">
+          <div class="dw-panel-header">
+            <div class="dw-panel-title">
+              <h2><i class="ri-file-text-line"></i> 分集剧本</h2>
+              <div class="dw-episode-selector">
+                <button class="dw-btn dw-btn--sm" id="prevEpisodeBtn" disabled>
+                  <i class="ri-arrow-left-s-line"></i>
+                </button>
+                <span id="currentEpisodeLabel">第 1 集</span>
+                <button class="dw-btn dw-btn--sm" id="nextEpisodeBtn">
+                  <i class="ri-arrow-right-s-line"></i>
+                </button>
+              </div>
+            </div>
+            <div class="dw-header-actions">
+              <button class="dw-btn" id="regenerateScriptBtn">
+                <i class="ri-refresh-line"></i>
+                <span>重新生成</span>
+              </button>
+            </div>
+          </div>
+          <div class="dw-panel-body">
+            <div class="dw-episode-summary" id="episodeSummary"></div>
+            <textarea
+              id="scriptContent"
+              class="dw-textarea dw-textarea--lg"
+              placeholder="点击「生成本集剧本」生成详细内容..."
+            ></textarea>
+          </div>
+          <div class="dw-panel-footer">
+            <button class="dw-btn" id="backToOutlineBtn">
+              <i class="ri-arrow-left-line"></i>
+              <span>返回大纲</span>
+            </button>
+            <button class="dw-btn dw-btn--primary" id="generateEpisodeBtn">
+              <i class="ri-magic-line"></i>
+              <span>生成本集剧本</span>
+            </button>
+            <button class="dw-btn dw-btn--primary" id="toShotsBtn" disabled>
               <i class="ri-film-line"></i>
               <span>拆解分镜</span>
             </button>
           </div>
         </div>
 
-        <!-- 步骤2：分镜拆解 -->
-        <div class="dw-panel is-hidden" id="step2Panel">
+        <!-- 步骤3：分镜拆解 -->
+        <div class="dw-panel is-hidden" id="step3Panel">
           <div class="dw-panel-header">
-            <h2><i class="ri-film-line"></i> 分镜列表</h2>
-            <span class="dw-count" id="shotCount">0 个分镜</span>
+            <div class="dw-panel-title">
+              <h2><i class="ri-film-line"></i> 分镜列表</h2>
+              <span class="dw-count" id="shotCount">0 个分镜</span>
+            </div>
+            <div class="dw-header-actions">
+              <!-- 画面比例选择 -->
+              <div class="dw-ratio-selector">
+                <label class="dw-ratio-chip">
+                  <input type="radio" name="aspectRatio" value="9:16" checked>
+                  <span><svg class="ratio-icon" viewBox="0 0 18 32"><rect x="1" y="1" width="16" height="30" rx="2" fill="currentColor"/></svg> 9:16</span>
+                </label>
+                <label class="dw-ratio-chip">
+                  <input type="radio" name="aspectRatio" value="16:9">
+                  <span><svg class="ratio-icon" viewBox="0 0 32 18"><rect x="1" y="1" width="30" height="16" rx="2" fill="currentColor"/></svg> 16:9</span>
+                </label>
+                <label class="dw-ratio-chip">
+                  <input type="radio" name="aspectRatio" value="1:1">
+                  <span><svg class="ratio-icon" viewBox="0 0 20 20"><rect x="1" y="1" width="18" height="18" rx="2" fill="currentColor"/></svg> 1:1</span>
+                </label>
+                <label class="dw-ratio-chip">
+                  <input type="radio" name="aspectRatio" value="4:3">
+                  <span><svg class="ratio-icon" viewBox="0 0 24 18"><rect x="1" y="1" width="22" height="16" rx="2" fill="currentColor"/></svg> 4:3</span>
+                </label>
+                <label class="dw-ratio-chip">
+                  <input type="radio" name="aspectRatio" value="3:4">
+                  <span><svg class="ratio-icon" viewBox="0 0 18 24"><rect x="1" y="1" width="16" height="22" rx="2" fill="currentColor"/></svg> 3:4</span>
+                </label>
+                <label class="dw-ratio-chip">
+                  <input type="radio" name="aspectRatio" value="21:9">
+                  <span><svg class="ratio-icon" viewBox="0 0 42 18"><rect x="1" y="1" width="40" height="16" rx="2" fill="currentColor"/></svg> 21:9</span>
+                </label>
+              </div>
+            </div>
           </div>
           <div class="dw-panel-body">
-            <div class="dw-shots-list" id="shotsList">
-              <!-- 分镜卡片通过JS渲染 -->
-            </div>
+            <div class="dw-shots-list" id="shotsList"></div>
           </div>
           <div class="dw-panel-footer">
             <button class="dw-btn" id="backToScriptBtn">
               <i class="ri-arrow-left-line"></i>
               <span>返回剧本</span>
             </button>
-            <button class="dw-btn dw-btn--primary" id="toVideoBtn">
+            <button class="dw-btn dw-btn--primary" id="toFramesBtn">
+              <i class="ri-image-line"></i>
+              <span>生成分镜图</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 步骤4：分镜图生成（首尾帧） -->
+        <div class="dw-panel is-hidden" id="step4Panel">
+          <div class="dw-panel-header">
+            <div class="dw-panel-title">
+              <h2><i class="ri-image-line"></i> 分镜图</h2>
+              <span class="dw-count" id="frameCount">0/0 已生成</span>
+            </div>
+            <div class="dw-header-actions">
+              <button class="dw-btn dw-btn--primary" id="generateAllFramesBtn">
+                <i class="ri-play-circle-line"></i>
+                <span>一键生成全部</span>
+              </button>
+            </div>
+          </div>
+          <div class="dw-panel-body">
+            <div class="dw-frame-tip">
+              <i class="ri-information-line"></i>
+              <span>每个分镜需要「首帧图」，尾帧图可选（默认使用下一分镜的首帧作为尾帧）</span>
+            </div>
+            <div class="dw-frames-list" id="framesList"></div>
+          </div>
+          <div class="dw-panel-footer">
+            <button class="dw-btn" id="backToShotsBtn">
+              <i class="ri-arrow-left-line"></i>
+              <span>返回分镜</span>
+            </button>
+            <button class="dw-btn dw-btn--primary" id="toVideoBtn" disabled>
               <i class="ri-video-line"></i>
               <span>生成视频</span>
             </button>
           </div>
         </div>
 
-        <!-- 步骤3：视频生成 -->
-        <div class="dw-panel is-hidden" id="step3Panel">
+        <!-- 步骤5：视频生成 -->
+        <div class="dw-panel is-hidden" id="step5Panel">
           <div class="dw-panel-header">
             <div class="dw-panel-title">
               <h2><i class="ri-video-line"></i> 视频生成</h2>
               <span class="dw-count" id="videoCount">0/0 已生成</span>
             </div>
             <div class="dw-header-actions">
-              <button class="dw-btn dw-btn--primary" id="generateAllBtn">
+              <button class="dw-btn dw-btn--primary" id="generateAllVideosBtn">
                 <i class="ri-play-circle-line"></i>
                 <span>一键生成全部</span>
               </button>
@@ -244,14 +363,12 @@
             </div>
           </div>
           <div class="dw-panel-body">
-            <div class="dw-video-grid" id="videoGrid">
-              <!-- 视频卡片通过JS渲染 -->
-            </div>
+            <div class="dw-video-grid" id="videoGrid"></div>
           </div>
           <div class="dw-panel-footer">
-            <button class="dw-btn" id="backToShotsBtn">
+            <button class="dw-btn" id="backToFramesBtn">
               <i class="ri-arrow-left-line"></i>
-              <span>返回分镜</span>
+              <span>返回分镜图</span>
             </button>
           </div>
         </div>
@@ -292,11 +409,7 @@
           <label>参考图片 <span class="required">*</span> <span class="dw-hint">（支持多张，建议上传不同角度/表情）</span></label>
           <div class="dw-multi-upload" id="multiUploadArea">
             <input type="file" id="characterImages" accept="image/*" multiple hidden>
-            <!-- 已上传图片预览 -->
-            <div class="dw-upload-previews" id="uploadPreviews">
-              <!-- 图片预览通过JS渲染 -->
-            </div>
-            <!-- 添加图片按钮 -->
+            <div class="dw-upload-previews" id="uploadPreviews"></div>
             <div class="dw-upload-add" id="uploadAddBtn">
               <i class="ri-add-line"></i>
               <span>添加图片</span>
@@ -311,7 +424,18 @@
     </div>
   </div>
 
-  <!-- Toast 提示（顶部居中） -->
+  <!-- 图片预览弹窗 -->
+  <div class="dw-modal" id="imagePreviewModal">
+    <div class="dw-modal-backdrop"></div>
+    <div class="dw-modal-content dw-modal--image">
+      <button class="dw-modal-close" id="closeImagePreviewBtn">
+        <i class="ri-close-line"></i>
+      </button>
+      <img id="previewImage" src="" alt="预览">
+    </div>
+  </div>
+
+  <!-- Toast 提示 -->
   <div id="toast" class="dw-toast"></div>
 
   <script src="js/sidebar.js"></script>
