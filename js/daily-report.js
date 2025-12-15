@@ -2,8 +2,8 @@
 
 (function() {
   var CONFIG = {
-    // Pages Function 代理地址
-    AI_API_URL: '/api/chat',
+    // AI API 代理
+    AI_API_URL: 'https://ai-api.leo-maomao.workers.dev/report',
     AI_MODEL: 'qwen-plus'
   };
 

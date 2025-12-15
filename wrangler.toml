@@ -1,0 +1,5 @@
+name = "my-tools-site"
+compatibility_date = "2024-12-09"
+
+[assets]
+directory = "./"
