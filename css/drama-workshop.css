@@ -783,7 +783,7 @@
 }
 
 .dw-step.is-active .dw-step-num {
-  background: var(--accent);
+  background: var(--success);
   color: #fff;
 }
 
@@ -799,7 +799,11 @@
 }
 
 .dw-step.is-active .dw-step-title {
-  color: var(--accent);
+  color: var(--success);
+}
+
+.dw-step.is-completed .dw-step-title {
+  color: var(--success);
 }
 
 .dw-step-line {
@@ -973,6 +977,28 @@
   line-height: 1.6;
   color: var(--text-main);
   margin-bottom: 10px;
+}
+
+.dw-shot-desc-edit {
+  width: 100%;
+  min-height: 60px;
+  padding: 10px 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-main);
+  background: #fff;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  margin-bottom: 10px;
+  resize: vertical;
+  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dw-shot-desc-edit:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .dw-shot-meta {
@@ -1414,6 +1440,7 @@
 .dw-frame-images {
   display: flex;
   gap: 16px;
+  align-items: center;
 }
 
 .dw-frame-slot {
@@ -1564,6 +1591,8 @@
   flex-direction: column;
   gap: 6px;
   padding: 8px;
+  min-width: 120px;
+  justify-content: center;
 }
 
 .dw-end-frame-btn {

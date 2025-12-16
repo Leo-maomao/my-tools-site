@@ -958,13 +958,21 @@ function renderShotsList() {
         </span>
         <span class="dw-shot-duration">${shot.duration}秒</span>
       </div>
-      <div class="dw-shot-desc">${shot.scene}</div>
+      <textarea class="dw-shot-desc-edit" data-shot-id="${shot.id}" onchange="updateShotScene('${shot.id}', this.value)">${shot.scene}</textarea>
       <div class="dw-shot-meta">
         <span class="dw-shot-tag"><i class="ri-camera-line"></i>${shot.shotType}</span>
         ${(shot.characters || []).map(c => `<span class="dw-shot-tag"><i class="ri-user-line"></i>${c}</span>`).join('')}
       </div>
     </div>
   `).join('');
+}
+
+// 更新分镜场景描述
+function updateShotScene(shotId, newScene) {
+  const shot = state.shots.find(s => s.id === shotId);
+  if (shot) {
+    shot.scene = newScene;
+  }
 }
 
 /**
@@ -974,6 +982,7 @@ function renderShotsList() {
 // ============ 视频模块初始化 ============
 function initVideoModule() {
   $('#generateAllVideosBtn').addEventListener('click', generateAllVideos);
+  $('#mergeVideosBtn').addEventListener('click', mergeAllVideos);
   $('#downloadAllBtn').addEventListener('click', downloadAllVideos);
 }
 
@@ -1099,19 +1108,17 @@ function renderEndFrameSlot(shot, frame, idx, ratioClass, nextFrame, isLast) {
     `;
   }
 
-  // 空白模式：显示三种选项
+  // 空白模式：显示三种选项（引用按钮始终显示，无对象时置灰）
   return `
     <div class="dw-end-frame-options">
       <button class="dw-end-frame-btn" onclick="generateFrame('${shot.id}', 'end')">
         <i class="ri-add-circle-line"></i>
         <span>生成</span>
       </button>
-      ${canRef ? `
-        <button class="dw-end-frame-btn dw-end-frame-btn--ref" onclick="setEndFrameRef('${shot.id}')">
-          <i class="ri-link"></i>
-          <span>引用</span>
-        </button>
-      ` : ''}
+      <button class="dw-end-frame-btn dw-end-frame-btn--ref" onclick="setEndFrameRef('${shot.id}')" ${canRef ? '' : 'disabled'}>
+        <i class="ri-link"></i>
+        <span>引用</span>
+      </button>
       <button class="dw-end-frame-btn dw-end-frame-btn--empty" disabled>
         <i class="ri-subtract-line"></i>
         <span>空白</span>
@@ -1198,8 +1205,10 @@ function initImagePreviewModal() {
 function renderVideoCards() {
   const grid = $('#videoGrid');
   const doneCount = state.shots.filter(s => s.videoStatus === 'done').length;
+  const allDone = doneCount === state.shots.length && state.shots.length > 0;
   $('#videoCount').textContent = `${doneCount}/${state.shots.length} 已生成`;
   $('#downloadAllBtn').disabled = doneCount === 0;
+  $('#mergeVideosBtn').disabled = !allDone;
 
   if (state.shots.length === 0) {
     grid.innerHTML = '<div class="dw-empty"><i class="ri-video-line"></i><p>暂无分镜</p></div>';
@@ -1315,4 +1324,34 @@ function downloadAllVideos() {
   });
 
   showToast(`正在下载 ${done.length} 个视频`, 'success');
+}
+
+// ============ 合成完整视频 ============
+async function mergeAllVideos() {
+  const done = state.shots.filter(s => s.videoStatus === 'done' && s.videoUrl);
+
+  if (done.length !== state.shots.length) {
+    showToast('请先生成所有分镜视频', 'error');
+    return;
+  }
+
+  const btn = $('#mergeVideosBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i><span>合成中...</span>';
+
+  // TODO: 接入视频合成API
+  showToast('视频合成中（模拟）...', 'info');
+  await new Promise(r => setTimeout(r, 3000));
+
+  // 模拟合成完成
+  showToast('视频合成完成！', 'success');
+
+  // 下载合成后的视频（模拟）
+  const a = document.createElement('a');
+  a.href = 'https://www.w3schools.com/html/mov_bbb.mp4';
+  a.download = `第${state.currentEpisode + 1}集_完整视频.mp4`;
+  a.click();
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="ri-movie-2-line"></i><span>合成完整视频</span>';
 }
