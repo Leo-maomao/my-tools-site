@@ -1000,53 +1000,36 @@ function renderFramesList() {
     const frame = state.frames[idx] || {};
     const isLast = idx === state.shots.length - 1;
     const nextFrame = state.frames[idx + 1];
-    // endMode: 'empty' | 'ref' | 'custom'
-    const endMode = frame.endMode || 'empty';
 
     return `
-      <div class="dw-frame-card" data-id="${shot.id}">
-        <div class="dw-frame-info">
-          <div class="dw-frame-title">
-            <i class="ri-film-line"></i>
-            分镜 ${shot.index}
-          </div>
-          <div class="dw-frame-desc">${shot.scene}</div>
-          <div class="dw-frame-meta">
-            <span class="dw-shot-tag"><i class="ri-camera-line"></i>${shot.shotType}</span>
-            <span class="dw-shot-tag"><i class="ri-time-line"></i>${shot.duration}秒</span>
-          </div>
+      <div class="dw-frame-card-compact" data-id="${shot.id}">
+        <div class="dw-frame-header-compact">
+          <span class="dw-frame-num">分镜 ${shot.index}</span>
+          <span class="dw-frame-tags">
+            <span class="dw-tag-mini">${shot.shotType}</span>
+            <span class="dw-tag-mini">${shot.duration}秒</span>
+          </span>
         </div>
-        <div class="dw-frame-images">
-          <div class="dw-frame-slot">
-            <span class="dw-frame-slot-label">首帧图</span>
-            <div class="dw-frame-preview ${ratioClass} ${frame.startFrame ? 'has-image' : ''}"
+        <div class="dw-frame-desc-compact" title="${shot.scene}">${shot.scene}</div>
+        <div class="dw-frame-previews">
+          <div class="dw-frame-preview-item">
+            <span class="dw-frame-label">首帧</span>
+            <div class="dw-frame-thumb ${ratioClass} ${frame.startFrame ? 'has-image' : ''}"
                  onclick="generateFrame('${shot.id}', 'start')">
               ${frame.startStatus === 'generating' ? `
-                <div class="dw-frame-loading">
-                  <div class="dw-video-spinner"></div>
-                </div>
+                <div class="dw-thumb-loading"><div class="dw-video-spinner"></div></div>
               ` : frame.startFrame ? `
                 <img src="${frame.startFrame}" alt="首帧">
-                <div class="dw-frame-preview-actions">
-                  <button onclick="event.stopPropagation(); previewImage('${frame.startFrame}')">
-                    <i class="ri-eye-line"></i>
-                  </button>
-                  <button onclick="event.stopPropagation(); generateFrame('${shot.id}', 'start')">
-                    <i class="ri-refresh-line"></i>
-                  </button>
+                <div class="dw-thumb-actions">
+                  <button onclick="event.stopPropagation(); previewImage('${frame.startFrame}')" title="查看"><i class="ri-eye-line"></i></button>
+                  <button onclick="event.stopPropagation(); generateFrame('${shot.id}', 'start')" title="重新生成"><i class="ri-refresh-line"></i></button>
                 </div>
-              ` : `
-                <i class="ri-add-line"></i>
-                <span>生成</span>
-              `}
+              ` : `<i class="ri-add-line"></i>`}
             </div>
           </div>
-          <div class="dw-frame-link">
-            <i class="ri-arrow-right-line"></i>
-          </div>
-          <div class="dw-frame-slot">
-            <span class="dw-frame-slot-label is-optional">尾帧图（可选）</span>
-            ${renderEndFrameSlot(shot, frame, idx, ratioClass, nextFrame, isLast)}
+          <div class="dw-frame-preview-item">
+            <span class="dw-frame-label">尾帧</span>
+            ${renderEndFrameSlotCompact(shot, frame, idx, ratioClass, state.frames[idx + 1], isLast)}
           </div>
         </div>
       </div>
@@ -1144,6 +1127,52 @@ function clearEndFrame(shotId) {
   state.frames[idx].endFrame = null;
   state.frames[idx].endStatus = 'pending';
   renderFramesList();
+}
+
+// 紧凑版尾帧渲染
+function renderEndFrameSlotCompact(shot, frame, idx, ratioClass, nextFrame, isLast) {
+  const endMode = frame.endMode || 'empty';
+  const canRef = !isLast && nextFrame && nextFrame.startFrame;
+
+  // 正在生成
+  if (frame.endStatus === 'generating') {
+    return `<div class="dw-frame-thumb ${ratioClass}"><div class="dw-thumb-loading"><div class="dw-video-spinner"></div></div></div>`;
+  }
+
+  // 有自定义尾帧
+  if (frame.endFrame && endMode === 'custom') {
+    return `
+      <div class="dw-frame-thumb ${ratioClass} has-image">
+        <img src="${frame.endFrame}" alt="尾帧">
+        <div class="dw-thumb-actions">
+          <button onclick="previewImage('${frame.endFrame}')" title="查看"><i class="ri-eye-line"></i></button>
+          <button onclick="generateFrame('${shot.id}', 'end')" title="重新生成"><i class="ri-refresh-line"></i></button>
+          <button onclick="clearEndFrame('${shot.id}')" title="清除"><i class="ri-close-line"></i></button>
+        </div>
+      </div>
+    `;
+  }
+
+  // 引用模式
+  if (endMode === 'ref' && canRef) {
+    return `
+      <div class="dw-frame-thumb ${ratioClass} has-image is-ref">
+        <img src="${nextFrame.startFrame}" alt="引用" style="opacity:0.7">
+        <span class="dw-ref-badge">引用</span>
+        <div class="dw-thumb-actions">
+          <button onclick="clearEndFrame('${shot.id}')" title="取消引用"><i class="ri-close-line"></i></button>
+        </div>
+      </div>
+    `;
+  }
+
+  // 空白模式：显示操作按钮
+  return `
+    <div class="dw-frame-thumb-empty ${ratioClass}">
+      <button class="dw-thumb-btn" onclick="generateFrame('${shot.id}', 'end')" title="生成尾帧"><i class="ri-add-line"></i></button>
+      <button class="dw-thumb-btn" onclick="setEndFrameRef('${shot.id}')" title="引用下一首帧" ${canRef ? '' : 'disabled'}><i class="ri-link"></i></button>
+    </div>
+  `;
 }
 
 // ============ 生成单个分镜图（模拟） ============
