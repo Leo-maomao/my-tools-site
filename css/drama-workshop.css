@@ -1896,6 +1896,71 @@
 }
 
 /* ========================================
+   合成视频结果面板
+   ======================================== */
+
+.dw-merge-result {
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  border: 2px solid var(--success);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.dw-merge-result.is-hidden {
+  display: none;
+}
+
+.dw-merge-result-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.dw-merge-result-header i {
+  font-size: 48px;
+  color: var(--success);
+}
+
+.dw-merge-result-header h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.dw-merge-result-video {
+  width: 100%;
+  max-width: 640px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  background: #000;
+}
+
+.dw-merge-result-video video {
+  width: 100%;
+  display: block;
+}
+
+.dw-merge-result-info {
+  color: var(--text-sub);
+  font-size: 14px;
+}
+
+.dw-merge-result-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ========================================
    响应式
    ======================================== */
 

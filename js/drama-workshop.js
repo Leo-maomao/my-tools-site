@@ -112,10 +112,15 @@ function goToStep(step) {
   // 更新步骤指示器
   $$('.dw-step').forEach((el, idx) => {
     el.classList.remove('is-active', 'is-completed');
-    if (idx + 1 === step) {
-      el.classList.add('is-active');
-    } else if (idx + 1 < state.maxCompletedStep || idx + 1 < step) {
+    const stepNum = idx + 1;
+    const isCompleted = stepNum <= state.maxCompletedStep || stepNum < step;
+    const isActive = stepNum === step;
+
+    if (isCompleted) {
       el.classList.add('is-completed');
+    }
+    if (isActive) {
+      el.classList.add('is-active');
     }
   });
 
@@ -208,10 +213,15 @@ function navigateToStep(step) {
   // 更新步骤指示器
   $$('.dw-step').forEach((el, idx) => {
     el.classList.remove('is-active', 'is-completed');
-    if (idx + 1 === step) {
-      el.classList.add('is-active');
-    } else if (idx + 1 <= state.maxCompletedStep && idx + 1 !== step) {
+    const stepNum = idx + 1;
+    const isCompleted = stepNum <= state.maxCompletedStep;
+    const isActive = stepNum === step;
+
+    if (isCompleted) {
       el.classList.add('is-completed');
+    }
+    if (isActive) {
+      el.classList.add('is-active');
     }
   });
 
@@ -984,6 +994,10 @@ function initVideoModule() {
   $('#generateAllVideosBtn').addEventListener('click', generateAllVideos);
   $('#mergeVideosBtn').addEventListener('click', mergeAllVideos);
   $('#downloadAllBtn').addEventListener('click', downloadAllVideos);
+
+  // 合成结果面板按钮
+  $('#downloadMergedBtn').addEventListener('click', downloadMergedVideo);
+  $('#closeMergeResultBtn').addEventListener('click', closeMergeResult);
 }
 
 // ============ 分镜图渲染 ============
@@ -1373,14 +1387,60 @@ async function mergeAllVideos() {
   await new Promise(r => setTimeout(r, 3000));
 
   // 模拟合成完成
-  showToast('视频合成完成！', 'success');
+  const mergedVideoUrl = 'https://www.w3schools.com/html/mov_bbb.mp4';
+  const videoName = `第${state.currentEpisode + 1}集_完整视频.mp4`;
 
-  // 下载合成后的视频（模拟）
-  const a = document.createElement('a');
-  a.href = 'https://www.w3schools.com/html/mov_bbb.mp4';
-  a.download = `第${state.currentEpisode + 1}集_完整视频.mp4`;
-  a.click();
+  // 保存到state
+  state.mergedVideoUrl = mergedVideoUrl;
+  state.mergedVideoName = videoName;
+
+  // 显示结果面板
+  showMergeResult(mergedVideoUrl, videoName);
 
   btn.disabled = false;
   btn.innerHTML = '<i class="ri-movie-2-line"></i><span>合成完整视频</span>';
+}
+
+// 显示合成结果面板
+function showMergeResult(videoUrl, videoName) {
+  const resultPanel = $('#mergeResult');
+  const videoGrid = $('#videoGrid');
+
+  // 设置视频源
+  $('#mergedVideo').src = videoUrl;
+  $('#mergedVideoName').textContent = videoName;
+
+  // 隐藏视频列表，显示结果面板
+  videoGrid.classList.add('is-hidden');
+  resultPanel.classList.remove('is-hidden');
+
+  showToast('视频合成完成！', 'success');
+}
+
+// 关闭合成结果面板
+function closeMergeResult() {
+  const resultPanel = $('#mergeResult');
+  const videoGrid = $('#videoGrid');
+
+  // 暂停视频
+  $('#mergedVideo').pause();
+
+  // 显示视频列表，隐藏结果面板
+  resultPanel.classList.add('is-hidden');
+  videoGrid.classList.remove('is-hidden');
+}
+
+// 下载合成后的视频
+function downloadMergedVideo() {
+  if (!state.mergedVideoUrl) {
+    showToast('没有可下载的视频', 'error');
+    return;
+  }
+
+  const a = document.createElement('a');
+  a.href = state.mergedVideoUrl;
+  a.download = state.mergedVideoName || '完整视频.mp4';
+  a.click();
+
+  showToast('开始下载...', 'success');
 }

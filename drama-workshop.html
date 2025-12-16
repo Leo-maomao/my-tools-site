@@ -368,6 +368,29 @@
           </div>
           <div class="dw-panel-body">
             <div class="dw-video-grid" id="videoGrid"></div>
+            <!-- 合成结果面板 -->
+            <div class="dw-merge-result is-hidden" id="mergeResult">
+              <div class="dw-merge-result-header">
+                <i class="ri-checkbox-circle-fill"></i>
+                <h3>视频合成完成</h3>
+              </div>
+              <div class="dw-merge-result-video">
+                <video id="mergedVideo" controls></video>
+              </div>
+              <div class="dw-merge-result-info">
+                <span id="mergedVideoName">第1集_完整视频.mp4</span>
+              </div>
+              <div class="dw-merge-result-actions">
+                <button class="dw-btn dw-btn--primary dw-btn--lg" id="downloadMergedBtn">
+                  <i class="ri-download-line"></i>
+                  <span>下载视频</span>
+                </button>
+                <button class="dw-btn" id="closeMergeResultBtn">
+                  <i class="ri-close-line"></i>
+                  <span>关闭</span>
+                </button>
+              </div>
+            </div>
           </div>
           <div class="dw-panel-footer">
             <button class="dw-btn" id="backToFramesBtn">
