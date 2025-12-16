@@ -782,14 +782,23 @@
   transition: all 0.2s ease;
 }
 
+/* 未完成但选中：蓝色 + 选中样式 */
 .dw-step.is-active .dw-step-num {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+}
+
+/* 已完成：绿色 */
+.dw-step.is-completed .dw-step-num {
   background: var(--success);
   color: #fff;
 }
 
-.dw-step.is-completed .dw-step-num {
+/* 已完成且选中：绿色 + 选中样式 */
+.dw-step.is-completed.is-active .dw-step-num {
   background: var(--success);
-  color: #fff;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
 }
 
 .dw-step-title {
@@ -798,11 +807,18 @@
   color: var(--text-sub);
 }
 
+/* 未完成但选中：蓝色 */
 .dw-step.is-active .dw-step-title {
+  color: var(--accent);
+}
+
+/* 已完成：绿色 */
+.dw-step.is-completed .dw-step-title {
   color: var(--success);
 }
 
-.dw-step.is-completed .dw-step-title {
+/* 已完成且选中：绿色 */
+.dw-step.is-completed.is-active .dw-step-title {
   color: var(--success);
 }
 
