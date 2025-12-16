@@ -6,7 +6,7 @@
 // ============ 状态管理 ============
 const state = {
   currentTab: 'script',      // script | characters
-  currentStep: 1,            // 1-5
+  currentStep: 1,            // 1-6
   maxCompletedStep: 0,       // 最高已完成步骤
   characters: [],            // 角色列表
   selectedCharacters: [],    // 选中的角色ID
@@ -17,11 +17,23 @@ const state = {
   frames: [],                // 分镜图（首尾帧）
   aspectRatio: '9:16',       // 画面比例
   editingCharacterId: null,
-  tempImages: []
+  tempImages: [],
+  // 多集合成结果
+  mergedVideos: {},          // {episodeIndex: {url, name, shotCount, timestamp}}
+  selectedMergedEpisode: 0,  // 当前选中查看的合成集数
+  // 生成设置
+  settings: {
+    textModel: 'qwen-plus',
+    imageModel: 'wanx-v1',
+    videoModel: 'wanx-video',
+    videoResolution: '1080p',
+    videoFps: '30'
+  }
 };
 
 // ============ 本地存储 ============
 const STORAGE_KEY = 'drama_workshop_characters';
+const PROJECT_STORAGE_KEY = 'drama_workshop_project';
 
 function saveCharactersToStorage() {
   try {
@@ -40,6 +52,107 @@ function loadCharactersFromStorage() {
   } catch (e) {
     console.warn('加载角色库失败', e);
   }
+}
+
+// 保存项目数据（剧本、分镜、视频等）
+function saveProjectToStorage() {
+  try {
+    const projectData = {
+      episodes: state.episodes,
+      currentEpisode: state.currentEpisode,
+      episodeScripts: state.episodeScripts,
+      shots: state.shots,
+      frames: state.frames,
+      aspectRatio: state.aspectRatio,
+      mergedVideos: state.mergedVideos,
+      maxCompletedStep: state.maxCompletedStep,
+      storyIdea: $('#storyIdea')?.value || '',
+      scriptStyle: $('input[name="scriptStyle"]:checked')?.value || 'comedy',
+      episodeCount: $('#episodeCount')?.value || '5',
+      settings: state.settings
+    };
+    localStorage.setItem(PROJECT_STORAGE_KEY, JSON.stringify(projectData));
+  } catch (e) {
+    console.warn('保存项目数据失败', e);
+  }
+}
+
+// 加载项目数据
+function loadProjectFromStorage() {
+  try {
+    const data = localStorage.getItem(PROJECT_STORAGE_KEY);
+    if (data) {
+      const project = JSON.parse(data);
+      state.episodes = project.episodes || [];
+      state.currentEpisode = project.currentEpisode || 0;
+      state.episodeScripts = project.episodeScripts || {};
+      state.shots = project.shots || [];
+      state.frames = project.frames || [];
+      state.aspectRatio = project.aspectRatio || '9:16';
+      state.mergedVideos = project.mergedVideos || {};
+      state.maxCompletedStep = project.maxCompletedStep || 0;
+      if (project.settings) {
+        state.settings = { ...state.settings, ...project.settings };
+      }
+
+      // 恢复表单值
+      if (project.storyIdea && $('#storyIdea')) {
+        $('#storyIdea').value = project.storyIdea;
+      }
+      if (project.scriptStyle) {
+        const radio = $(`input[name="scriptStyle"][value="${project.scriptStyle}"]`);
+        if (radio) radio.checked = true;
+      }
+      if (project.episodeCount && $('#episodeCount')) {
+        $('#episodeCount').value = project.episodeCount;
+      }
+
+      return true;
+    }
+  } catch (e) {
+    console.warn('加载项目数据失败', e);
+  }
+  return false;
+}
+
+// 清空项目数据（初始化）
+function resetProject() {
+  if (!confirm('确定要初始化吗？将清空所有已生成的剧本、分镜和视频数据。')) return;
+
+  // 清空state
+  state.episodes = [];
+  state.currentEpisode = 0;
+  state.episodeScripts = {};
+  state.shots = [];
+  state.frames = [];
+  state.mergedVideos = {};
+  state.maxCompletedStep = 0;
+  state.selectedMergedEpisode = 0;
+
+  // 清空表单
+  if ($('#storyIdea')) $('#storyIdea').value = '';
+  if ($('#episodeCount')) $('#episodeCount').value = '5';
+  const defaultStyle = $('input[name="scriptStyle"][value="comedy"]');
+  if (defaultStyle) defaultStyle.checked = true;
+
+  // 清空localStorage
+  localStorage.removeItem(PROJECT_STORAGE_KEY);
+
+  // 回到步骤1
+  state.currentStep = 1;
+  goToStep(1);
+
+  // 显示构思面板
+  $('#step1Panel').classList.remove('is-hidden');
+  $('#outlinePanel').classList.add('is-hidden');
+
+  // 重置步骤指示器
+  $$('.dw-step').forEach((el, idx) => {
+    el.classList.remove('is-active', 'is-completed');
+    if (idx === 0) el.classList.add('is-active');
+  });
+
+  showToast('已初始化，数据已清空', 'success');
 }
 
 // ============ DOM 工具 ============
@@ -131,6 +244,7 @@ function goToStep(step) {
   $('#step3Panel').classList.add('is-hidden');
   $('#step4Panel').classList.add('is-hidden');
   $('#step5Panel').classList.add('is-hidden');
+  $('#step6Panel').classList.add('is-hidden');
 
   // 显示对应面板
   if (step === 1) {
@@ -153,6 +267,9 @@ function goToStep(step) {
   } else if (step === 5) {
     $('#step5Panel').classList.remove('is-hidden');
     renderVideoCards();
+  } else if (step === 6) {
+    $('#step6Panel').classList.remove('is-hidden');
+    renderMergeResult();
   }
 }
 
@@ -232,6 +349,7 @@ function navigateToStep(step) {
   $('#step3Panel').classList.add('is-hidden');
   $('#step4Panel').classList.add('is-hidden');
   $('#step5Panel').classList.add('is-hidden');
+  $('#step6Panel').classList.add('is-hidden');
 
   // 显示对应面板
   if (step === 1) {
@@ -254,7 +372,13 @@ function navigateToStep(step) {
   } else if (step === 5) {
     $('#step5Panel').classList.remove('is-hidden');
     renderVideoCards();
+  } else if (step === 6) {
+    $('#step6Panel').classList.remove('is-hidden');
+    renderMergeResult();
   }
+
+  // 保存项目数据
+  saveProjectToStorage();
 }
 
 // ============ 初始化入口 ============
@@ -273,8 +397,46 @@ function init() {
   renderCharacterGrid();
   updateCharacterCount();
 
-  // 初始显示步骤1
-  $('#step1Panel').classList.remove('is-hidden');
+  // 加载项目数据并恢复状态
+  const hasProject = loadProjectFromStorage();
+  if (hasProject && state.episodes.length > 0) {
+    // 恢复到之前的步骤
+    if (state.maxCompletedStep > 0) {
+      navigateToStep(Math.min(state.maxCompletedStep, state.currentStep || 1));
+    } else {
+      showOutlinePanel();
+    }
+    showToast('已恢复上次的项目数据', 'info');
+  } else {
+    // 初始显示步骤1
+    $('#step1Panel').classList.remove('is-hidden');
+  }
+
+  // 初始化按钮
+  $('#resetProjectBtn')?.addEventListener('click', resetProject);
+
+  // 内联设置绑定
+  initInlineSettings();
+}
+
+// ============ 内联设置绑定 ============
+function initInlineSettings() {
+  // 绑定内联选择器的change事件，自动保存设置
+  const selectors = ['textModel', 'imageModel', 'videoModel', 'videoResolution', 'videoFps'];
+  selectors.forEach(id => {
+    const el = $('#' + id);
+    if (el) {
+      // 初始化时恢复已保存的值
+      if (state.settings[id]) {
+        el.value = state.settings[id];
+      }
+      // 监听变化自动保存
+      el.addEventListener('change', () => {
+        state.settings[id] = el.value;
+        saveProjectToStorage();
+      });
+    }
+  });
 }
 
 document.addEventListener('DOMContentLoaded', init);
@@ -699,7 +861,9 @@ async function generateOutline() {
   const styleMap = {
     comedy: '搞笑幽默', romance: '甜蜜爱情', drama: '虐心催泪',
     suspense: '悬疑反转', workplace: '职场风云', family: '家庭伦理',
-    revenge: '逆袭爽文', ancient: '古风仙侠'
+    revenge: '逆袭爽文', ancient: '古风仙侠', urban: '都市情感',
+    campus: '青春校园', fantasy: '玄幻奇幻', scifi: '科幻未来',
+    horror: '惊悚悬疑', rebirth: '重生逆袭', spy: '谍战风云', war: '战争史诗'
   };
 
   const btn = $('#generateOutlineBtn');
@@ -995,9 +1159,9 @@ function initVideoModule() {
   $('#mergeVideosBtn').addEventListener('click', mergeAllVideos);
   $('#downloadAllBtn').addEventListener('click', downloadAllVideos);
 
-  // 合成结果面板按钮
+  // 步骤6：合成结果面板按钮
   $('#downloadMergedBtn').addEventListener('click', downloadMergedVideo);
-  $('#closeMergeResultBtn').addEventListener('click', closeMergeResult);
+  $('#backToVideoBtn').addEventListener('click', () => goToStep(5));
 }
 
 // ============ 分镜图渲染 ============
@@ -1158,10 +1322,10 @@ function renderEndFrameSlotCompact(shot, frame, idx, ratioClass, nextFrame, isLa
     return `
       <div class="dw-frame-thumb ${ratioClass} has-image">
         <img src="${frame.endFrame}" alt="尾帧">
+        <button class="dw-thumb-delete" onclick="event.stopPropagation(); clearEndFrame('${shot.id}')" title="删除"><i class="ri-close-line"></i></button>
         <div class="dw-thumb-actions">
-          <button onclick="previewImage('${frame.endFrame}')" title="查看"><i class="ri-eye-line"></i></button>
-          <button onclick="generateFrame('${shot.id}', 'end')" title="重新生成"><i class="ri-refresh-line"></i></button>
-          <button onclick="clearEndFrame('${shot.id}')" title="清除"><i class="ri-close-line"></i></button>
+          <button onclick="event.stopPropagation(); previewImage('${frame.endFrame}')" title="查看"><i class="ri-eye-line"></i></button>
+          <button onclick="event.stopPropagation(); generateFrame('${shot.id}', 'end')" title="重新生成"><i class="ri-refresh-line"></i></button>
         </div>
       </div>
     `;
@@ -1173,9 +1337,7 @@ function renderEndFrameSlotCompact(shot, frame, idx, ratioClass, nextFrame, isLa
       <div class="dw-frame-thumb ${ratioClass} has-image is-ref">
         <img src="${nextFrame.startFrame}" alt="引用" style="opacity:0.7">
         <span class="dw-ref-badge">引用</span>
-        <div class="dw-thumb-actions">
-          <button onclick="clearEndFrame('${shot.id}')" title="取消引用"><i class="ri-close-line"></i></button>
-        </div>
+        <button class="dw-thumb-delete" onclick="event.stopPropagation(); clearEndFrame('${shot.id}')" title="取消引用"><i class="ri-close-line"></i></button>
       </div>
     `;
   }
@@ -1390,56 +1552,86 @@ async function mergeAllVideos() {
   const mergedVideoUrl = 'https://www.w3schools.com/html/mov_bbb.mp4';
   const videoName = `第${state.currentEpisode + 1}集_完整视频.mp4`;
 
-  // 保存到state
-  state.mergedVideoUrl = mergedVideoUrl;
-  state.mergedVideoName = videoName;
-
-  // 显示结果面板
-  showMergeResult(mergedVideoUrl, videoName);
+  // 保存到多集合成结果
+  state.mergedVideos[state.currentEpisode] = {
+    url: mergedVideoUrl,
+    name: videoName,
+    shotCount: state.shots.length,
+    timestamp: Date.now()
+  };
+  state.selectedMergedEpisode = state.currentEpisode;
 
   btn.disabled = false;
   btn.innerHTML = '<i class="ri-movie-2-line"></i><span>合成完整视频</span>';
-}
 
-// 显示合成结果面板
-function showMergeResult(videoUrl, videoName) {
-  const resultPanel = $('#mergeResult');
-  const videoGrid = $('#videoGrid');
-
-  // 设置视频源
-  $('#mergedVideo').src = videoUrl;
-  $('#mergedVideoName').textContent = videoName;
-
-  // 隐藏视频列表，显示结果面板
-  videoGrid.classList.add('is-hidden');
-  resultPanel.classList.remove('is-hidden');
-
+  // 跳转到第6步显示结果
+  goToStep(6);
   showToast('视频合成完成！', 'success');
 }
 
-// 关闭合成结果面板
-function closeMergeResult() {
-  const resultPanel = $('#mergeResult');
-  const videoGrid = $('#videoGrid');
+// 渲染合成结果页面（多集列表）
+function renderMergeResult() {
+  const mergedList = $('#mergedList');
+  const resultDetail = $('#mergeResultDetail');
+  const mergedCount = Object.keys(state.mergedVideos).length;
+  const totalEpisodes = state.episodes.length;
 
-  // 暂停视频
-  $('#mergedVideo').pause();
+  $('#mergedCountLabel').textContent = `${mergedCount}/${totalEpisodes} 已合成`;
 
-  // 显示视频列表，隐藏结果面板
-  resultPanel.classList.add('is-hidden');
-  videoGrid.classList.remove('is-hidden');
+  // 渲染多集列表
+  if (totalEpisodes > 0) {
+    mergedList.innerHTML = state.episodes.map((ep, idx) => {
+      const merged = state.mergedVideos[idx];
+      const isSelected = idx === state.selectedMergedEpisode;
+      return `
+        <div class="dw-merged-item ${merged ? 'is-done' : ''} ${isSelected ? 'is-selected' : ''}"
+             onclick="selectMergedEpisode(${idx})">
+          <div class="dw-merged-item-num">${idx + 1}</div>
+          <div class="dw-merged-item-info">
+            <div class="dw-merged-item-title">${ep.title}</div>
+            <div class="dw-merged-item-status">
+              ${merged ? `<i class="ri-checkbox-circle-fill"></i> 已合成` : `<i class="ri-time-line"></i> 未合成`}
+            </div>
+          </div>
+          ${merged ? `<i class="ri-play-circle-line dw-merged-item-play"></i>` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  // 显示选中的视频详情
+  const selectedVideo = state.mergedVideos[state.selectedMergedEpisode];
+  if (selectedVideo) {
+    resultDetail.classList.remove('is-hidden');
+    $('#mergedVideo').src = selectedVideo.url;
+    $('#mergedVideoName').textContent = selectedVideo.name;
+    $('#mergedShotCount').textContent = selectedVideo.shotCount;
+  } else {
+    resultDetail.classList.add('is-hidden');
+  }
+}
+
+// 选择查看某集的合成结果
+function selectMergedEpisode(idx) {
+  if (!state.mergedVideos[idx]) {
+    showToast('该集尚未合成', 'info');
+    return;
+  }
+  state.selectedMergedEpisode = idx;
+  renderMergeResult();
 }
 
 // 下载合成后的视频
 function downloadMergedVideo() {
-  if (!state.mergedVideoUrl) {
+  const video = state.mergedVideos[state.selectedMergedEpisode];
+  if (!video) {
     showToast('没有可下载的视频', 'error');
     return;
   }
 
   const a = document.createElement('a');
-  a.href = state.mergedVideoUrl;
-  a.download = state.mergedVideoName || '完整视频.mp4';
+  a.href = video.url;
+  a.download = video.name || '完整视频.mp4';
   a.click();
 
   showToast('开始下载...', 'success');

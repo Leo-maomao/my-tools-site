@@ -23,6 +23,20 @@
   flex-direction: column;
 }
 
+/* ========== 顶部栏 ========== */
+.dw-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.dw-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* ========== Tab 切换 ========== */
 .dw-tabs {
   display: flex;
@@ -207,6 +221,17 @@
 .dw-btn--danger:hover:not(:disabled) {
   background: var(--error);
   color: #fff;
+}
+
+.dw-btn--ghost {
+  color: var(--text-muted);
+  border-color: transparent;
+  background: transparent;
+}
+
+.dw-btn--ghost:hover:not(:disabled) {
+  color: var(--text-sub);
+  background: rgba(0,0,0,0.05);
 }
 
 .dw-btn--lg {
@@ -1421,6 +1446,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  height: 220px; /* 固定高度保持一致 */
 }
 
 .dw-frame-header-compact {
@@ -1456,6 +1482,8 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  height: 40px; /* 固定2行高度 */
+  flex-shrink: 0;
 }
 
 .dw-frame-previews {
@@ -1526,6 +1554,37 @@
   border-color: var(--accent);
 }
 
+/* 右上角删除按钮 */
+.dw-thumb-delete {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.9);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s ease;
+  z-index: 5;
+}
+
+.dw-frame-thumb:hover .dw-thumb-delete {
+  opacity: 1;
+}
+
+.dw-thumb-delete:hover {
+  background: var(--error);
+  transform: scale(1.1);
+}
+
+/* 底部操作按钮 */
 .dw-thumb-actions {
   position: absolute;
   bottom: 0;
@@ -1542,12 +1601,13 @@
 
 .dw-thumb-actions button {
   flex: 1;
-  padding: 4px;
+  padding: 6px;
   border: none;
   background: rgba(0,0,0,0.7);
   color: #fff;
   font-size: 12px;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 
 .dw-thumb-actions button:hover {
@@ -1871,72 +1931,231 @@
 
 /* 图片预览弹窗 */
 .dw-modal--image {
-  max-width: 90vw;
-  max-height: 90vh;
+  max-width: none;
+  max-height: none;
+  width: auto;
+  height: auto;
   background: transparent;
   box-shadow: none;
-  position: relative;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dw-modal.is-visible .dw-modal--image {
+  transform: translate(-50%, -50%) scale(1);
 }
 
 .dw-modal--image img {
-  max-width: 100%;
+  max-width: 90vw;
   max-height: 85vh;
   border-radius: var(--radius-md);
+  display: block;
 }
 
 .dw-modal--image .dw-modal-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 36px;
-  height: 36px;
-  background: rgba(0,0,0,0.7);
-  z-index: 10;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  background: rgba(0,0,0,0.8);
+  z-index: 1001;
   color: #fff;
+  border-radius: 50%;
+  font-size: 20px;
+}
+
+.dw-modal--image .dw-modal-close:hover {
+  background: rgba(0,0,0,0.95);
 }
 
 /* ========================================
-   合成视频结果面板
+   设置弹窗
    ======================================== */
 
+.dw-settings-section {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.dw-settings-section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.dw-settings-section:first-child {
+  padding-top: 0;
+}
+
+.dw-settings-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 14px;
+}
+
+.dw-settings-title i {
+  font-size: 18px;
+  color: var(--accent);
+}
+
+.dw-form-hint {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+/* ========================================
+   步骤6：合成视频结果面板
+   ======================================== */
+
+/* 多集列表 */
+.dw-merged-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.dw-merged-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #f8fafc;
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dw-merged-item:hover {
+  border-color: var(--accent);
+  background: #fff;
+}
+
+.dw-merged-item.is-selected {
+  border-color: var(--accent);
+  background: rgba(37, 99, 235, 0.05);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.dw-merged-item.is-done {
+  background: #f0fdf4;
+  border-color: var(--success);
+}
+
+.dw-merged-item.is-done.is-selected {
+  background: rgba(16, 185, 129, 0.08);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+.dw-merged-item-num {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--border-subtle);
+  color: var(--text-sub);
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dw-merged-item.is-done .dw-merged-item-num {
+  background: var(--success);
+  color: #fff;
+}
+
+.dw-merged-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.dw-merged-item-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dw-merged-item-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.dw-merged-item.is-done .dw-merged-item-status {
+  color: var(--success);
+}
+
+.dw-merged-item-status i {
+  font-size: 14px;
+}
+
+.dw-merged-item-play {
+  font-size: 24px;
+  color: var(--success);
+  flex-shrink: 0;
+}
+
+/* 视频详情区域 */
 .dw-merge-result {
   background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
   border: 2px solid var(--success);
   border-radius: var(--radius-lg);
-  padding: 32px;
+  padding: 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
-}
-
-.dw-merge-result.is-hidden {
-  display: none;
+  gap: 28px;
 }
 
 .dw-merge-result-header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   text-align: center;
 }
 
 .dw-merge-result-header i {
-  font-size: 48px;
+  font-size: 56px;
   color: var(--success);
 }
 
 .dw-merge-result-header h3 {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
   color: var(--text-main);
   margin: 0;
 }
 
+.dw-merge-result-subtitle {
+  color: var(--text-sub);
+  font-size: 14px;
+  margin: 0;
+}
+
 .dw-merge-result-video {
   width: 100%;
-  max-width: 640px;
+  max-width: 720px;
   border-radius: var(--radius-md);
   overflow: hidden;
   box-shadow: var(--shadow-soft);
@@ -1953,9 +2172,27 @@
   font-size: 14px;
 }
 
+.dw-merge-result-meta {
+  display: flex;
+  gap: 24px;
+  color: var(--text-sub);
+  font-size: 14px;
+}
+
+.dw-merge-result-meta span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dw-merge-result-meta i {
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
 .dw-merge-result-actions {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   flex-wrap: wrap;
   justify-content: center;
 }
@@ -2008,4 +2245,60 @@
   .dw-video-grid {
     grid-template-columns: 1fr;
   }
+
+  .dw-inline-options {
+    flex-wrap: wrap;
+  }
+}
+
+/* ========================================
+   内联选项样式
+   ======================================== */
+.dw-inline-options {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.dw-inline-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-sub);
+}
+
+.dw-inline-label span {
+  white-space: nowrap;
+}
+
+.dw-select--sm {
+  padding: 6px 28px 6px 10px;
+  font-size: 13px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--card-bg);
+  color: var(--text-main);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  transition: border-color 0.2s ease;
+}
+
+.dw-select--sm:hover {
+  border-color: var(--accent);
+}
+
+.dw-select--sm:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.dw-footer-options {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }

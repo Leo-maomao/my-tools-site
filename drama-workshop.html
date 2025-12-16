@@ -48,14 +48,20 @@
     <!-- 主内容区 -->
     <main class="main-content dw-main">
       <!-- 顶部Tab -->
-      <div class="dw-tabs">
-        <button class="dw-tab is-active" data-tab="script">
-          <i class="ri-draft-line"></i>
-          <span>剧本创作</span>
-        </button>
-        <button class="dw-tab" data-tab="characters">
-          <i class="ri-user-star-line"></i>
-          <span>角色库</span>
+      <div class="dw-top-bar">
+        <div class="dw-tabs">
+          <button class="dw-tab is-active" data-tab="script">
+            <i class="ri-draft-line"></i>
+            <span>剧本创作</span>
+          </button>
+          <button class="dw-tab" data-tab="characters">
+            <i class="ri-user-star-line"></i>
+            <span>角色库</span>
+          </button>
+        </div>
+        <button class="dw-btn dw-btn--sm dw-btn--ghost" id="resetProjectBtn" title="清空所有数据，重新开始">
+          <i class="ri-refresh-line"></i>
+          <span>初始化</span>
         </button>
       </div>
 
@@ -85,7 +91,7 @@
 
       <!-- Tab内容：剧本创作 -->
       <div class="dw-tab-content is-active" id="scriptTab">
-        <!-- 步骤指示器（5步） -->
+        <!-- 步骤指示器（6步） -->
         <div class="dw-steps">
           <div class="dw-step is-active" data-step="1">
             <div class="dw-step-num">1</div>
@@ -110,6 +116,11 @@
           <div class="dw-step" data-step="5">
             <div class="dw-step-num">5</div>
             <span class="dw-step-title">视频生成</span>
+          </div>
+          <div class="dw-step-line"></div>
+          <div class="dw-step" data-step="6">
+            <div class="dw-step-num">6</div>
+            <span class="dw-step-title">合成结果</span>
           </div>
         </div>
 
@@ -171,6 +182,38 @@
                     <input type="radio" name="scriptStyle" value="ancient">
                     <span><i class="ri-ancient-gate-line"></i> 古风</span>
                   </label>
+                  <label class="dw-style-chip">
+                    <input type="radio" name="scriptStyle" value="urban">
+                    <span><i class="ri-building-line"></i> 都市</span>
+                  </label>
+                  <label class="dw-style-chip">
+                    <input type="radio" name="scriptStyle" value="campus">
+                    <span><i class="ri-book-open-line"></i> 校园</span>
+                  </label>
+                  <label class="dw-style-chip">
+                    <input type="radio" name="scriptStyle" value="fantasy">
+                    <span><i class="ri-sword-line"></i> 玄幻</span>
+                  </label>
+                  <label class="dw-style-chip">
+                    <input type="radio" name="scriptStyle" value="scifi">
+                    <span><i class="ri-rocket-line"></i> 科幻</span>
+                  </label>
+                  <label class="dw-style-chip">
+                    <input type="radio" name="scriptStyle" value="horror">
+                    <span><i class="ri-ghost-line"></i> 惊悚</span>
+                  </label>
+                  <label class="dw-style-chip">
+                    <input type="radio" name="scriptStyle" value="rebirth">
+                    <span><i class="ri-loop-left-line"></i> 重生</span>
+                  </label>
+                  <label class="dw-style-chip">
+                    <input type="radio" name="scriptStyle" value="spy">
+                    <span><i class="ri-user-search-line"></i> 谍战</span>
+                  </label>
+                  <label class="dw-style-chip">
+                    <input type="radio" name="scriptStyle" value="war">
+                    <span><i class="ri-shield-cross-line"></i> 战争</span>
+                  </label>
                 </div>
               </div>
               <div class="dw-inline-group dw-inline-group--episode">
@@ -183,6 +226,18 @@
             </div>
           </div>
           <div class="dw-panel-footer">
+            <div class="dw-footer-options">
+              <label class="dw-inline-label">
+                <span>文本模型</span>
+                <select id="textModel" class="dw-select dw-select--sm">
+                  <option value="qwen-plus">通义千问 Plus</option>
+                  <option value="qwen-max">通义千问 Max</option>
+                  <option value="qwen-turbo">通义千问 Turbo</option>
+                  <option value="deepseek-chat">DeepSeek</option>
+                  <option value="glm-4">智谱 GLM-4</option>
+                </select>
+              </label>
+            </div>
             <button class="dw-btn dw-btn--primary dw-btn--lg" id="generateOutlineBtn">
               <i class="ri-magic-line"></i>
               <span>AI 生成大纲</span>
@@ -319,6 +374,15 @@
               <span class="dw-count" id="frameCount">0/0 已生成</span>
             </div>
             <div class="dw-header-actions">
+              <label class="dw-inline-label">
+                <span>图像模型</span>
+                <select id="imageModel" class="dw-select dw-select--sm">
+                  <option value="wanx-v1">通义万相</option>
+                  <option value="stable-diffusion">Stable Diffusion</option>
+                  <option value="midjourney">Midjourney</option>
+                  <option value="dall-e-3">DALL·E 3</option>
+                </select>
+              </label>
               <button class="dw-btn dw-btn--primary" id="generateAllFramesBtn">
                 <i class="ri-play-circle-line"></i>
                 <span>一键生成全部</span>
@@ -352,13 +416,38 @@
               <span class="dw-count" id="videoCount">0/0 已生成</span>
             </div>
             <div class="dw-header-actions">
+              <div class="dw-inline-options">
+                <label class="dw-inline-label">
+                  <span>视频模型</span>
+                  <select id="videoModel" class="dw-select dw-select--sm">
+                    <option value="wanx-video">通义万相视频</option>
+                    <option value="runway-gen3">Runway Gen-3</option>
+                    <option value="pika-labs">Pika Labs</option>
+                    <option value="kling">可灵 Kling</option>
+                    <option value="sora">Sora</option>
+                  </select>
+                </label>
+                <label class="dw-inline-label">
+                  <span>分辨率</span>
+                  <select id="videoResolution" class="dw-select dw-select--sm">
+                    <option value="720p">720p</option>
+                    <option value="1080p" selected>1080p</option>
+                    <option value="2k">2K</option>
+                    <option value="4k">4K</option>
+                  </select>
+                </label>
+                <label class="dw-inline-label">
+                  <span>帧率</span>
+                  <select id="videoFps" class="dw-select dw-select--sm">
+                    <option value="24">24fps</option>
+                    <option value="30" selected>30fps</option>
+                    <option value="60">60fps</option>
+                  </select>
+                </label>
+              </div>
               <button class="dw-btn dw-btn--primary" id="generateAllVideosBtn">
                 <i class="ri-play-circle-line"></i>
                 <span>一键生成全部</span>
-              </button>
-              <button class="dw-btn dw-btn--success" id="mergeVideosBtn" disabled>
-                <i class="ri-movie-2-line"></i>
-                <span>合成完整视频</span>
               </button>
               <button class="dw-btn" id="downloadAllBtn" disabled>
                 <i class="ri-download-line"></i>
@@ -368,34 +457,58 @@
           </div>
           <div class="dw-panel-body">
             <div class="dw-video-grid" id="videoGrid"></div>
-            <!-- 合成结果面板 -->
-            <div class="dw-merge-result is-hidden" id="mergeResult">
+          </div>
+          <div class="dw-panel-footer">
+            <button class="dw-btn" id="backToFramesBtn">
+              <i class="ri-arrow-left-line"></i>
+              <span>返回分镜图</span>
+            </button>
+            <button class="dw-btn dw-btn--success" id="mergeVideosBtn" disabled>
+              <i class="ri-movie-2-line"></i>
+              <span>合成完整视频</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 步骤6：合成结果 -->
+        <div class="dw-panel is-hidden" id="step6Panel">
+          <div class="dw-panel-header">
+            <div class="dw-panel-title">
+              <h2><i class="ri-film-line"></i> 合成结果</h2>
+              <span class="dw-count" id="mergedCountLabel">0/0 已合成</span>
+            </div>
+          </div>
+          <div class="dw-panel-body">
+            <!-- 多集切换列表 -->
+            <div class="dw-merged-list" id="mergedList"></div>
+            <!-- 当前选中的视频预览 -->
+            <div class="dw-merge-result is-hidden" id="mergeResultDetail">
               <div class="dw-merge-result-header">
                 <i class="ri-checkbox-circle-fill"></i>
                 <h3>视频合成完成</h3>
+                <p class="dw-merge-result-subtitle">您的短剧已成功合成，可以预览和下载</p>
               </div>
               <div class="dw-merge-result-video">
                 <video id="mergedVideo" controls></video>
               </div>
               <div class="dw-merge-result-info">
-                <span id="mergedVideoName">第1集_完整视频.mp4</span>
+                <div class="dw-merge-result-meta">
+                  <span><i class="ri-file-video-line"></i> <span id="mergedVideoName">第1集_完整视频.mp4</span></span>
+                  <span><i class="ri-film-line"></i> <span id="mergedShotCount">0</span> 个分镜</span>
+                </div>
               </div>
               <div class="dw-merge-result-actions">
                 <button class="dw-btn dw-btn--primary dw-btn--lg" id="downloadMergedBtn">
                   <i class="ri-download-line"></i>
                   <span>下载视频</span>
                 </button>
-                <button class="dw-btn" id="closeMergeResultBtn">
-                  <i class="ri-close-line"></i>
-                  <span>关闭</span>
-                </button>
               </div>
             </div>
           </div>
           <div class="dw-panel-footer">
-            <button class="dw-btn" id="backToFramesBtn">
+            <button class="dw-btn" id="backToVideoBtn">
               <i class="ri-arrow-left-line"></i>
-              <span>返回分镜图</span>
+              <span>返回视频生成</span>
             </button>
           </div>
         </div>
