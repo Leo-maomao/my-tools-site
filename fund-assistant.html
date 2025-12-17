@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>基金助手 | 毛毛的工具箱</title>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/fund-assistant.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="app">
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <i class="ri-tools-line"></i>
+          <span>毛毛的工具箱</span>
+        </div>
+        <button class="sidebar-toggle" id="sidebarToggle" title="收起侧边栏">
+          <i class="ri-menu-fold-line"></i>
+        </button>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item">
+          <i class="ri-home-4-line"></i>
+          <span>首页</span>
+        </a>
+        <a href="xiaohongshu.html" class="nav-item">
+          <svg class="xhs-logo-icon" viewBox="0 0 200 120"><rect fill="#ff2442" rx="60" width="200" height="120"/><text x="100" y="82" text-anchor="middle" fill="#fff" font-size="52" font-weight="bold" font-family="sans-serif">小红书</text></svg>
+          <span>小红书</span>
+        </a>
+        <a href="product-assistant.html" class="nav-item">
+          <i class="ri-robot-line"></i>
+          <span>产品助理</span>
+        </a>
+        <a href="daily-report.html" class="nav-item">
+          <i class="ri-file-text-line"></i>
+          <span>报告小助手</span>
+        </a>
+        <a href="drama-workshop.html" class="nav-item">
+          <i class="ri-movie-2-line"></i>
+          <span>短剧工坊</span>
+        </a>
+        <a href="fund-assistant.html" class="nav-item is-active">
+          <i class="ri-funds-line"></i>
+          <span>基金助手</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="main-content fund-main">
+      <!-- 顶部市场概览 -->
+      <div class="fund-header">
+        <div class="market-section">
+          <div class="market-indices" id="marketIndices">
+            <!-- 动态渲染 -->
+          </div>
+          <div class="market-update">
+            <span id="updateTime">--</span>
+            <button id="refreshBtn" title="刷新数据"><i class="ri-refresh-line"></i></button>
+          </div>
+        </div>
+        <div class="fund-search">
+          <input type="text" id="searchInput" placeholder="搜索基金代码或名称...">
+          <button id="searchBtn"><i class="ri-search-line"></i></button>
+        </div>
+      </div>
+
+      <!-- Tab 导航 -->
+      <div class="fund-tabs">
+        <button class="fund-tab is-active" data-tab="watchlist">
+          <i class="ri-star-line"></i> 自选基金
+        </button>
+        <button class="fund-tab" data-tab="ranking">
+          <i class="ri-bar-chart-line"></i> 基金排行
+        </button>
+      </div>
+
+      <!-- 自选基金 -->
+      <div class="fund-panel is-active" id="watchlistPanel">
+        <div class="fund-table-wrapper">
+          <table class="fund-table" id="watchlistTable">
+            <thead>
+              <tr>
+                <th class="col-name">基金名称</th>
+                <th class="col-code">代码</th>
+                <th class="col-nav">最新净值</th>
+                <th class="col-change">日涨幅</th>
+                <th class="col-m1">近1月</th>
+                <th class="col-m3">近3月</th>
+                <th class="col-y1">近1年</th>
+                <th class="col-action">操作</th>
+              </tr>
+            </thead>
+            <tbody id="watchlistBody">
+              <!-- 动态渲染 -->
+            </tbody>
+          </table>
+          <div class="empty-state" id="watchlistEmpty">
+            <i class="ri-star-line"></i>
+            <p>暂无自选基金</p>
+            <span>搜索基金代码或名称添加</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 基金排行 -->
+      <div class="fund-panel" id="rankingPanel">
+        <div class="panel-header">
+          <div class="filter-group">
+            <select id="fundType">
+              <option value="all">全部类型</option>
+              <option value="gp">股票型</option>
+              <option value="hh">混合型</option>
+              <option value="zq">债券型</option>
+              <option value="zs">指数型</option>
+              <option value="qdii">QDII</option>
+              <option value="fof">FOF</option>
+            </select>
+            <select id="sortBy">
+              <option value="zzf">日涨幅</option>
+              <option value="1yzf">近1月</option>
+              <option value="3yzf">近3月</option>
+              <option value="6yzf">近6月</option>
+              <option value="1nzf">近1年</option>
+              <option value="jnzf">今年来</option>
+            </select>
+            <select id="sortOrder">
+              <option value="desc">降序</option>
+              <option value="asc">升序</option>
+            </select>
+          </div>
+          <span class="fund-count" id="fundCount">共 0 只</span>
+        </div>
+        <div class="fund-table-wrapper" id="rankingWrapper">
+          <table class="fund-table" id="rankingTable">
+            <thead>
+              <tr>
+                <th class="col-name">基金名称</th>
+                <th class="col-code">代码</th>
+                <th class="col-type">类型</th>
+                <th class="col-nav">最新净值</th>
+                <th class="col-change">日涨幅</th>
+                <th class="col-m1">近1月</th>
+                <th class="col-m3">近3月</th>
+                <th class="col-m6">近6月</th>
+                <th class="col-y1">近1年</th>
+                <th class="col-action">操作</th>
+              </tr>
+            </thead>
+            <tbody id="rankingBody">
+              <!-- 动态渲染 -->
+            </tbody>
+          </table>
+          <div class="loading-state" id="rankingLoading">
+            <i class="ri-loader-4-line ri-spin"></i>
+            <p>加载中...</p>
+          </div>
+          <div class="load-more-indicator" id="loadMoreIndicator">
+            <i class="ri-loader-4-line ri-spin"></i>
+            <span>加载更多...</span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/sidebar.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/fund-assistant.js"></script>
+</body>
+</html>

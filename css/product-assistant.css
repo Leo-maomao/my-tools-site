@@ -153,25 +153,10 @@
   font-size: 13px;
 }
 
-/* 按钮样式 */
+/* 按钮样式 - 继承全局 button，只覆盖特殊属性 */
 .pa-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   gap: 6px;
   padding: 8px 16px;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  background: var(--card-bg);
-  color: var(--text-main);
-  font-size: 14px;
-  cursor: pointer;
-  transition: all var(--transition-base);
-}
-
-.pa-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
 }
 
 .pa-btn--primary {
@@ -527,21 +512,15 @@
   line-height: 1.4;
 }
 
+/* 输入框 - 继承全局 textarea 样式 */
 .pa-input {
   flex: 1;
   padding: 12px;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  font-size: 14px;
   resize: none;
-  font-family: inherit;
   background: var(--bg);
-  transition: all var(--transition-base);
 }
 
 .pa-input:focus {
-  outline: none;
-  border-color: var(--accent);
   background: var(--card-bg);
 }
 

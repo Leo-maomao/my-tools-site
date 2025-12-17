@@ -141,7 +141,7 @@
 .content-editor:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(255, 71, 87, 0.1);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
 }
 
 .content-editor:empty::before {
@@ -158,10 +158,18 @@
   display: block;
 }
 
+/* 正文描述区域自动填充剩余空间 */
+.input-card .form-group:nth-child(4) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 .input-card #xhsDesc {
-  height: 150px;
-  min-height: 150px;
-  max-height: 150px;
+  flex: 1;
+  min-height: 80px;
+  resize: none;
 }
 
 .form-row {
@@ -174,7 +182,8 @@
 }
 
 .input-card .btn-generate {
-  margin-top: auto;
+  margin-top: 16px;
+  flex-shrink: 0;
 }
 
 /* 旧布局兼容 */
@@ -241,24 +250,15 @@
   color: var(--text-muted);
 }
 
+/* 表单输入框和文本域 - 继承全局样式 */
 .form-group input[type="text"],
 .form-group textarea {
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  font-family: inherit;
   resize: vertical;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.form-group input[type="text"]:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(255, 71, 87, 0.1);
-}
+/* focus 样式继承全局蓝色风格 */
 
 .form-group textarea {
   min-height: 80px;
@@ -278,7 +278,7 @@
 
 .upload-area:hover {
   border-color: var(--accent);
-  background: rgba(255, 71, 87, 0.02);
+  background: rgba(37, 99, 235, 0.02);
 }
 
 .upload-area.has-image {
@@ -348,7 +348,7 @@
 
 .topic-tag {
   padding: 6px 12px;
-  background: rgba(255, 71, 87, 0.08);
+  background: rgba(37, 99, 235, 0.08);
   border: 1px solid transparent;
   border-radius: 20px;
   font-size: 13px;
@@ -358,7 +358,7 @@
 }
 
 .topic-tag:hover {
-  background: rgba(255, 71, 87, 0.15);
+  background: rgba(37, 99, 235, 0.15);
 }
 
 .topic-tag.is-selected {
@@ -370,7 +370,7 @@
 .btn-generate {
   width: 100%;
   padding: 16px 24px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-light));
+  background: var(--accent);
   color: #fff;
   border: none;
   border-radius: var(--radius-md);
@@ -382,12 +382,13 @@
   justify-content: center;
   gap: 8px;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 16px rgba(255, 71, 87, 0.3);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.25);
 }
 
 .btn-generate:hover {
+  background: #1d4ed8;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 71, 87, 0.4);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
 }
 
 .btn-generate:disabled {
@@ -622,7 +623,7 @@
 }
 
 .btn-mark-area:hover {
-  background: rgba(255, 71, 87, 0.05);
+  background: rgba(37, 99, 235, 0.05);
 }
 
 .btn-mark-area.is-marked {
@@ -716,7 +717,7 @@
 .area-marker-selection {
   position: absolute;
   border: 2px dashed var(--accent);
-  background: rgba(255, 71, 87, 0.1);
+  background: rgba(37, 99, 235, 0.1);
   display: none;
   cursor: move;
 }
