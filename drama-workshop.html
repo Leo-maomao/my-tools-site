@@ -27,7 +27,7 @@
           <span>首页</span>
         </a>
         <a href="xiaohongshu.html" class="nav-item">
-          <svg class="xhs-logo-icon" viewBox="0 0 200 120"><rect fill="#ff2442" rx="60" width="200" height="120"/><text x="100" y="82" text-anchor="middle" fill="#fff" font-size="52" font-weight="bold" font-family="sans-serif">小红书</text></svg>
+          <svg class="xhs-logo-icon" width="18" height="12" viewBox="0 0 200 120"><rect fill="#ff2442" rx="60" width="200" height="120"/><text x="100" y="82" text-anchor="middle" fill="#fff" font-size="52" font-weight="bold" font-family="sans-serif">小红书</text></svg>
           <span>小红书</span>
         </a>
         <a href="product-assistant.html" class="nav-item">
@@ -47,6 +47,10 @@
           <span>基金助手</span>
         </a>
       </nav>
+      
+      <button class="sidebar-footer-btn" id="apiConfigBtn" title="API 配置">
+        <i class="ri-settings-3-line"></i>
+      </button>
     </aside>
 
     <!-- 主内容区 -->
@@ -582,8 +586,175 @@
   <!-- Toast 提示 -->
   <div id="toast" class="dw-toast"></div>
 
+  <!-- 登录模态框 -->
+  <div id="loginModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3>管理员登录</h3>
+        <i class="ri-close-line modal-close" id="loginModalClose"></i>
+      </div>
+      <div class="modal-body">
+        <div class="modal-input-group">
+          <label>邮箱</label>
+          <input id="loginEmail" class="modal-input" placeholder="请输入管理员邮箱" type="email" />
+        </div>
+        <div class="modal-input-group">
+          <label>密码</label>
+          <input id="loginPassword" class="modal-input" placeholder="请输入密码" type="password" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn cancel" id="loginCancelBtn">取消</button>
+        <button class="modal-btn confirm" id="loginSubmitBtn">登录</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- API 配置模态框 -->
+  <div id="apiConfigModal" class="modal-overlay">
+    <div class="modal-box modal-box--fixed">
+      <div class="modal-header">
+        <h3 id="modalTitle">⚙️ API 配置</h3>
+        <i class="ri-close-line modal-close" id="apiConfigClose"></i>
+      </div>
+      <div class="modal-body">
+        <!-- 第一页：配置列表 -->
+        <div id="configListPage" class="config-page">
+          <div id="configuredProvidersList" class="configured-providers-list">
+            <!-- 将通过 JS 动态生成 -->
+          </div>
+          <div id="emptyState" class="config-list-empty" style="display: none;">
+            <i class="ri-inbox-line"></i>
+            <p>还没有配置任何 API 提供商</p>
+          </div>
+        </div>
+
+        <!-- 第二页：配置编辑 -->
+        <div id="configEditPage" class="config-page" style="display: none;">
+          <div class="config-edit-form">
+            <div class="modal-input-group">
+              <label>提供商 <span class="required">*</span></label>
+              <div id="providerSelect" class="ui-select">
+                <div class="ui-select-trigger" tabindex="0">
+                  <span class="ui-select-value is-placeholder">-- 请选择提供商 --</span>
+                </div>
+                <div class="ui-select-dropdown">
+                  <div class="ui-select-option" data-value="">-- 请选择提供商 --</div>
+                  <div class="ui-select-option" data-value="openai">OpenAI (GPT)</div>
+                  <div class="ui-select-option" data-value="qwen">阿里云通义千问</div>
+                  <div class="ui-select-option" data-value="claude">Anthropic Claude</div>
+                  <div class="ui-select-option" data-value="deepseek">DeepSeek</div>
+                  <div class="ui-select-option" data-value="moonshot">月之暗面 Kimi</div>
+                  <div class="ui-select-option" data-value="zhipu">智谱 GLM</div>
+                  <div class="ui-select-option" data-value="minimax">MiniMax</div>
+                  <div class="ui-select-option" data-value="baichuan">百川智能</div>
+                  <div class="ui-select-option" data-value="custom">自定义 API</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="modal-input-group">
+              <label>API Key <span class="required">*</span></label>
+              <input id="apiKey" class="modal-input" type="password" placeholder="请输入您的 API Key" />
+            </div>
+            
+            <!-- 自定义 API 额外字段 -->
+            <div id="customFields" style="display: none;">
+              <div class="modal-input-group">
+                <label>API 端点 <span class="required">*</span></label>
+                <input id="customEndpoint" class="modal-input" placeholder="https://api.example.com/v1/chat/completions" />
+              </div>
+            </div>
+
+            <div class="model-fetch-status" id="modelFetchStatus" style="display: none;">
+              <i class="ri-loader-4-line spin"></i>
+              <span>正在获取可用模型...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <p class="api-security-hint">
+          <i class="ri-shield-check-line"></i>
+          您的 API Key 仅存储在本地浏览器，不会上传到任何服务器
+        </p>
+        <div class="modal-actions" id="listPageActions">
+          <button id="addConfigBtn" class="modal-btn btn-primary">
+            <i class="ri-add-line"></i> 新增配置
+          </button>
+        </div>
+        <div class="modal-actions" id="editPageActions" style="display: none;">
+          <button id="cancelEditBtn" class="modal-btn btn-text">返回</button>
+          <button id="deleteConfigBtn" class="modal-btn btn-text" style="color: #ef4444; display: none;">删除</button>
+          <button id="saveConfigBtn" class="modal-btn btn-primary">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api-config.js"></script>
+  <script src="js/api-config-ui.js"></script>
+  <script src="js/guide.js"></script>
   <script src="js/sidebar.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/components.js"></script>
   <script src="js/drama-workshop.js"></script>
+  <script>
+    // 短剧工坊 多步骤新手引导
+    document.addEventListener('DOMContentLoaded', function() {
+      // 绑定 API 配置按钮
+      const apiConfigBtn = document.getElementById('apiConfigBtn');
+      if (apiConfigBtn && window.openAPIConfig) {
+        apiConfigBtn.addEventListener('click', function() {
+          window.openAPIConfig();
+        });
+      }
+      
+      // 立即显示引导
+      const needsConfig = !window.ToolsAPIConfig.isConfigured();
+        
+        window.ToolsGuide.show('drama-workshop', {
+          title: '短剧工坊使用指南',
+          steps: [
+            {
+              title: '🎬 欢迎使用短剧工坊',
+              content: `
+                <p>短剧工坊是一个<strong>AI 驱动的短剧创作工具</strong>，帮助您快速创作短剧剧本。</p>
+                <p>从灵感到成品剧本，只需 3 个步骤！</p>
+              `
+            },
+            {
+              title: '📋 创作流程',
+              content: `
+                <p><strong>完整的创作流程：</strong></p>
+                <ol>
+                  <li><strong>输入创意</strong> - 描述您的短剧主题、风格、人物设定</li>
+                  <li><strong>AI 生成大纲</strong> - 智能生成剧情框架和分集大纲</li>
+                  <li><strong>扩写剧本</strong> - 基于大纲扩写详细的分集剧本</li>
+                  <li><strong>导出分享</strong> - 支持导出为 Markdown 或图片</li>
+                </ol>
+              `
+            },
+            {
+              title: '✨ 功能亮点',
+              content: `
+                <p><strong>强大的创作能力：</strong></p>
+                <ul>
+                  <li>🎭 <strong>多风格支持</strong> - 爽文、虐文、悬疑、甜宠等</li>
+                  <li>🎬 <strong>分集创作</strong> - 支持多集短剧创作和管理</li>
+                  <li>🎨 <strong>视觉参考</strong> - 上传图片作为场景或人物参考</li>
+                  <li>📝 <strong>实时编辑</strong> - 生成后可随时编辑调整</li>
+                  <li>💾 <strong>自动保存</strong> - 所有内容自动保存到本地</li>
+                </ul>
+                <p style="margin-top: 16px; padding: 12px; background: rgba(251, 146, 60, 0.1); border-left: 3px solid #fb923c; border-radius: 6px; font-size: 14px;">
+                  💡 <strong>提示：</strong>创意描述越详细，AI 生成的内容越精准！
+                </p>
+              `,
+            needsConfig: needsConfig
+          }
+        ]
+      });
+    });
+  </script>
 </body>
 </html>
