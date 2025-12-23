@@ -24,7 +24,7 @@
 
   var els = {};
 
-  function init() {
+  async function init() {
     if (window.supabase) {
       state.supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
     }
@@ -44,7 +44,7 @@
       quotePreview: document.getElementById('quotePreview')
     };
 
-    loadConversations();
+    await loadConversations();
     bindEvents();
     renderConversationList();
 
@@ -53,6 +53,15 @@
     } else {
       loadConversation(state.conversations[0].id);
     }
+    
+    // 监听登录状态变化
+    window.addEventListener('toolsUserLoggedIn', async function() {
+      // 登录成功后，将本地数据同步到云端
+      await saveConversations();
+      // 重新加载云端数据
+      await loadConversations();
+      renderConversationList();
+    });
   }
 
   function bindEvents() {
@@ -1111,7 +1120,40 @@
     if (loading) loading.remove();
   }
 
-  function loadConversations() {
+  // 从云端或本地加载对话历史
+  async function loadConversations() {
+    // 优先从云端加载（如果已登录）
+    if (state.supabase && window.ToolsAuth) {
+      try {
+        var isLoggedIn = await window.ToolsAuth.isLoggedIn();
+        if (isLoggedIn) {
+          var { data, error } = await state.supabase
+            .from('tools_chat_history')
+            .select('*')
+            .order('updated_at', { ascending: false })
+            .limit(50);
+          
+          if (!error && data && data.length > 0) {
+            state.conversations = data.map(function(row) {
+              return {
+                id: row.id,
+                title: row.title || '新对话',
+                messages: row.messages || [],
+                products: row.products || null,
+                timestamp: new Date(row.updated_at).getTime()
+              };
+            });
+            // 同步到localStorage
+            localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(state.conversations));
+            return;
+          }
+        }
+      } catch (e) {
+        // 云端加载失败，降级到本地
+      }
+    }
+    
+    // 从localStorage加载
     try {
       state.conversations = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEY) || '[]');
     } catch (e) {
@@ -1119,8 +1161,36 @@
     }
   }
 
-  function saveConversations() {
-    localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(state.conversations.slice(0, 50)));
+  // 保存对话历史（本地 + 云端）
+  async function saveConversations() {
+    var dataToSave = state.conversations.slice(0, 50);
+    
+    // 1. 保存到localStorage
+    localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(dataToSave));
+    
+    // 2. 如果已登录，同步到云端
+    if (state.supabase && window.ToolsAuth) {
+      try {
+        var isLoggedIn = await window.ToolsAuth.isLoggedIn();
+        if (isLoggedIn) {
+          // 逐个upsert（基于id）
+          for (var i = 0; i < dataToSave.length; i++) {
+            var conv = dataToSave[i];
+            await state.supabase
+              .from('tools_chat_history')
+              .upsert({
+                id: conv.id,
+                title: conv.title,
+                messages: conv.messages,
+                products: conv.products,
+                updated_at: new Date().toISOString()
+              }, { onConflict: 'id' });
+          }
+        }
+      } catch (e) {
+        // 云端同步失败，静默失败
+      }
+    }
   }
 
   function escapeHtml(str) {

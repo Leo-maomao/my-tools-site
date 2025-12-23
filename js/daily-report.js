@@ -4,7 +4,10 @@
   var CONFIG = {
     // AI API 代理
     AI_API_URL: 'https://ai-api.leo-maomao.workers.dev/report',
-    AI_MODEL: 'qwen-plus'
+    AI_MODEL: 'qwen-plus',
+    // Supabase 配置
+    SUPABASE_URL: 'https://aexcnubowsarpxkohqvv.supabase.co',
+    SUPABASE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFleGNudWJvd3NhcnB4a29ocXZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyMjYyOTksImV4cCI6MjA3OTgwMjI5OX0.TCGkoBou99fui-cgcpod-b3BaSdq1mg7SFUtR2mIxms'
   };
 
   // 报告类型配置
@@ -195,12 +198,41 @@
       state.currentOutput = result;
       updateUI('success', result, formatKey, reportType.name);
       showToast(reportType.name + '生成成功');
+      
+      // 保存到云端（如果已登录）
+      await saveReportToCloud(workContent, reportTypeKey, templateKey, formatKey, result);
     } catch (e) {
       updateUI('error', '生成失败：' + e.message, null, reportType.name);
       showToast('生成失败，请重试', 'error');
     }
 
     state.isGenerating = false;
+  }
+  
+  // 保存报告到云端
+  async function saveReportToCloud(workContent, reportTypeKey, templateKey, formatKey, result) {
+    // 只有已登录时才保存
+    if (!window.toolsSupabase || !window.ToolsAuth) return;
+    
+    try {
+      var isLoggedIn = await window.ToolsAuth.isLoggedIn();
+      if (!isLoggedIn) return;
+      
+      var reportType = REPORT_TYPES[reportTypeKey] || REPORT_TYPES.daily;
+      
+      // 保存到数据库
+      await window.toolsSupabase
+        .from('tools_report_history')
+        .insert({
+          report_type: reportType.name,
+          template: TEMPLATES[templateKey].name,
+          output_format: FORMATS[formatKey].name,
+          content: result,
+          markdown_content: formatKey === 'markdown' ? result : null
+        });
+    } catch (e) {
+      // 静默失败，不影响用户体验
+    }
   }
 
   async function callAI(workContent, reportTypeKey, templateKey, formatKey) {

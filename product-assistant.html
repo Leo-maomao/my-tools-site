@@ -48,6 +48,13 @@
           <span>基金助手</span>
         </a>
       </nav>
+      
+      <!-- 管理员工具栏（登录后显示） -->
+      <div class="sidebar-footer" id="sidebarFooter" style="display: none;">
+        <button class="sidebar-footer-btn" id="logoutBtn" title="退出登录">
+          <i class="ri-logout-box-r-line"></i>
+        </button>
+      </div>
     </aside>
 
     <!-- 主内容区 -->
@@ -124,7 +131,32 @@
     </main>
   </div>
 
+  <!-- 登录模态框 -->
+  <div id="loginModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3>管理员登录</h3>
+        <i class="ri-close-line modal-close" id="loginModalClose"></i>
+      </div>
+      <div class="modal-body">
+        <div class="modal-input-group">
+          <label>邮箱</label>
+          <input id="loginEmail" class="modal-input" placeholder="请输入管理员邮箱" type="email" />
+        </div>
+        <div class="modal-input-group">
+          <label>密码</label>
+          <input id="loginPassword" class="modal-input" placeholder="请输入密码" type="password" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn cancel" id="loginCancelBtn">取消</button>
+        <button class="modal-btn confirm" id="loginSubmitBtn">登录</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/sidebar.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/components.js"></script>
   <script src="js/product-assistant.js?v=10"></script>
 </body>
