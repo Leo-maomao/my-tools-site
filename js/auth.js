@@ -22,7 +22,7 @@
   }
   
   // DOM 元素
-  let loginModal, loginEmail, loginPassword, loginSubmitBtn, loginCancelBtn, loginModalClose, sidebarFooter, logoutBtn;
+  let loginModal, loginEmail, loginPassword, loginSubmitBtn, loginCancelBtn, loginModalClose, logoutBtn;
   
   function initDOMElements() {
     loginModal = document.getElementById('loginModal');
@@ -31,7 +31,6 @@
     loginSubmitBtn = document.getElementById('loginSubmitBtn');
     loginCancelBtn = document.getElementById('loginCancelBtn');
     loginModalClose = document.getElementById('loginModalClose');
-    sidebarFooter = document.getElementById('sidebarFooter');
     logoutBtn = document.getElementById('logoutBtn');
   }
   
@@ -114,16 +113,16 @@
   
   // 登录成功后的操作
   function onLoginSuccess() {
-    if (sidebarFooter) {
-      sidebarFooter.style.display = 'flex';
+    if (logoutBtn) {
+      logoutBtn.style.display = 'flex';
     }
     window.dispatchEvent(new CustomEvent('toolsUserLoggedIn'));
   }
   
   // 退出成功后的操作
   function onLogoutSuccess() {
-    if (sidebarFooter) {
-      sidebarFooter.style.display = 'none';
+    if (logoutBtn) {
+      logoutBtn.style.display = 'none';
     }
     window.dispatchEvent(new CustomEvent('toolsUserLoggedOut'));
   }

@@ -1,108 +1,262 @@
-// API 配置管理模块
+// API 配置管理模块 - 多厂商版本
 (function() {
     'use strict';
     
-    const CONFIG_KEY = 'tools_api_config';
-    const GUIDE_KEY = 'tools_guide_status';
+    const CONFIG_KEY = 'tools_api_configs'; // 存储所有配置
+    const ACTIVE_PROVIDER_KEY = 'tools_active_provider'; // 存储当前使用的厂商
     
-    // 默认配置
-    const DEFAULT_CONFIG = {
-        api_endpoint: '',
-        default_model: 'qwen-plus',
-        models: [
-            { id: 'qwen-plus', name: '通义千问 Plus', provider: '阿里云' },
-            { id: 'qwen-turbo', name: '通义千问 Turbo', provider: '阿里云' },
-            { id: 'gpt-4', name: 'GPT-4', provider: 'OpenAI' },
-            { id: 'claude-3-sonnet', name: 'Claude 3 Sonnet', provider: 'Anthropic' }
-        ]
+    // 支持的提供商列表
+    const PROVIDERS = {
+        openai: { name: 'OpenAI (GPT)', icon: '🤖', endpoint: 'https://api.openai.com/v1' },
+        qwen: { name: '阿里云通义千问', icon: '☁️', endpoint: 'https://dashscope.aliyuncs.com/compatible-mode/v1' },
+        claude: { name: 'Anthropic Claude', icon: '🧠', endpoint: 'https://api.anthropic.com/v1' },
+        deepseek: { name: 'DeepSeek', icon: '🔍', endpoint: 'https://api.deepseek.com/v1' },
+        moonshot: { name: '月之暗面 Kimi', icon: '🌙', endpoint: 'https://api.moonshot.cn/v1' },
+        zhipu: { name: '智谱 GLM', icon: '💡', endpoint: 'https://open.bigmodel.cn/api/paas/v4' },
+        minimax: { name: 'MiniMax', icon: '⚡', endpoint: 'https://api.minimax.chat/v1' },
+        baichuan: { name: '百川智能', icon: '🏔️', endpoint: 'https://api.baichuan-ai.com/v1' },
+        custom: { name: '自定义 API', icon: '🔧', endpoint: '' }
     };
     
-    // API 配置管理
-    const APIConfig = {
-        // 获取配置
-        get: function() {
-            try {
-                const config = localStorage.getItem(CONFIG_KEY);
-                return config ? JSON.parse(config) : DEFAULT_CONFIG;
-            } catch (e) {
-                console.error('读取配置失败:', e);
-                return DEFAULT_CONFIG;
-            }
-        },
-        
-        // 保存配置
-        save: function(config) {
-            try {
-                localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
-                return true;
-            } catch (e) {
-                console.error('保存配置失败:', e);
-                return false;
-            }
-        },
-        
-        // 清除配置
-        clear: function() {
-            localStorage.removeItem(CONFIG_KEY);
-        },
-        
-        // 检查是否已配置
-        isConfigured: function() {
-            const config = this.get();
-            return !!config.api_endpoint;
-        },
-        
-        // 获取模型列表
-        getModels: function() {
-            return this.get().models || [];
-        },
-        
-        // 获取默认模型
-        getDefaultModel: function() {
-            return this.get().default_model || 'qwen-plus';
+    // 加载所有配置
+    function loadAllConfigs() {
+        try {
+            const data = localStorage.getItem(CONFIG_KEY);
+            return data ? JSON.parse(data) : {};
+        } catch (e) {
+            console.error('加载配置失败:', e);
+            return {};
         }
-    };
+    }
     
-    // 新手引导管理
-    const GuideManager = {
-        // 获取引导状态
-        getStatus: function(toolId) {
-            try {
-                const status = localStorage.getItem(GUIDE_KEY);
-                const guides = status ? JSON.parse(status) : {};
-                return guides[toolId] || { shown: false, dontShowAgain: false };
-            } catch (e) {
-                return { shown: false, dontShowAgain: false };
-            }
-        },
-        
-        // 保存引导状态
-        saveStatus: function(toolId, shown, dontShowAgain) {
-            try {
-                const status = localStorage.getItem(GUIDE_KEY);
-                const guides = status ? JSON.parse(status) : {};
-                guides[toolId] = { shown: shown, dontShowAgain: dontShowAgain };
-                localStorage.setItem(GUIDE_KEY, JSON.stringify(guides));
-            } catch (e) {
-                console.error('保存引导状态失败:', e);
-            }
-        },
-        
-        // 检查是否需要显示引导
-        shouldShow: function(toolId) {
-            const status = this.getStatus(toolId);
-            return !status.shown || !status.dontShowAgain;
-        },
-        
-        // 重置引导（用于"重新查看"功能）
-        reset: function(toolId) {
-            this.saveStatus(toolId, false, false);
+    // 保存所有配置
+    function saveAllConfigs(configs) {
+        try {
+            localStorage.setItem(CONFIG_KEY, JSON.stringify(configs));
+            return true;
+        } catch (e) {
+            console.error('保存配置失败:', e);
+            return false;
         }
-    };
+    }
+    
+    // 获取单个厂商配置
+    function getConfig(provider) {
+        const configs = loadAllConfigs();
+        return configs[provider] || null;
+    }
+    
+    // 保存单个厂商配置
+    function saveConfig(provider, apiKey, endpoint, models) {
+        const configs = loadAllConfigs();
+        
+        configs[provider] = {
+            provider: provider,
+            providerName: PROVIDERS[provider]?.name || provider,
+            apiKey: apiKey,
+            endpoint: endpoint || PROVIDERS[provider]?.endpoint || '',
+            models: models || [],
+            configuredAt: new Date().toISOString()
+        };
+        
+        return saveAllConfigs(configs);
+    }
+    
+    // 删除单个厂商配置
+    function deleteConfig(provider) {
+        const configs = loadAllConfigs();
+        delete configs[provider];
+        return saveAllConfigs(configs);
+    }
+    
+    // 获取所有已配置的厂商
+    function getConfiguredProviders() {
+        const configs = loadAllConfigs();
+        return Object.keys(configs);
+    }
+    
+    // 获取所有可用模型（从所有已配置的厂商）
+    function getAllAvailableModels() {
+        const configs = loadAllConfigs();
+        const models = [];
+        
+        for (const [provider, config] of Object.entries(configs)) {
+            if (config.models && config.models.length > 0) {
+                config.models.forEach(model => {
+                    models.push({
+                        provider: provider,
+                        providerName: config.providerName,
+                        modelId: model.id || model,
+                        modelName: model.name || model,
+                        displayName: `${model.name || model} (${config.providerName})`
+                    });
+                });
+            }
+        }
+        
+        return models;
+    }
+    
+    // 获取提供商信息
+    function getProviderInfo(provider) {
+        return PROVIDERS[provider] || null;
+    }
+    
+    // 获取所有提供商列表
+    function getAllProviders() {
+        return PROVIDERS;
+    }
+    
+    // 检查厂商是否已配置
+    function isConfigured(provider) {
+        const configs = loadAllConfigs();
+        return !!configs[provider];
+    }
+    
+    // 设置当前使用的厂商
+    function setActiveProvider(provider) {
+        try {
+            localStorage.setItem(ACTIVE_PROVIDER_KEY, provider);
+            return true;
+        } catch (e) {
+            console.error('设置当前厂商失败:', e);
+            return false;
+        }
+    }
+    
+    // 获取当前使用的厂商
+    function getActiveProvider() {
+        try {
+            return localStorage.getItem(ACTIVE_PROVIDER_KEY) || null;
+        } catch (e) {
+            console.error('获取当前厂商失败:', e);
+            return null;
+        }
+    }
+    
+    // 获取当前使用的配置
+    function getActiveConfig() {
+        const activeProvider = getActiveProvider();
+        if (!activeProvider) return null;
+        return getConfig(activeProvider);
+    }
+    
+    // 获取模型列表（调用API）
+    async function fetchModels(provider, apiKey, endpoint) {
+        try {
+            const providerInfo = PROVIDERS[provider];
+            if (!providerInfo) {
+                throw new Error('不支持的提供商');
+            }
+            
+            const apiEndpoint = endpoint || providerInfo.endpoint;
+            
+            // 不同厂商的模型列表接口
+            let url = '';
+            let headers = {};
+            
+            switch (provider) {
+                case 'openai':
+                case 'deepseek':
+                case 'moonshot':
+                    url = `${apiEndpoint}/models`;
+                    headers = {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    };
+                    break;
+                    
+                case 'qwen':
+                    // 通义千问使用固定模型列表
+                    return [
+                        { id: 'qwen-plus', name: '通义千问 Plus' },
+                        { id: 'qwen-turbo', name: '通义千问 Turbo' },
+                        { id: 'qwen-max', name: '通义千问 Max' }
+                    ];
+                    
+                case 'claude':
+                    // Anthropic Claude 使用固定模型列表
+                    return [
+                        { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet' },
+                        { id: 'claude-3-opus-20240229', name: 'Claude 3 Opus' },
+                        { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku' }
+                    ];
+                    
+                case 'zhipu':
+                    // 智谱 GLM 使用固定模型列表
+                    return [
+                        { id: 'glm-4', name: 'GLM-4' },
+                        { id: 'glm-4v', name: 'GLM-4V' },
+                        { id: 'glm-3-turbo', name: 'GLM-3-Turbo' }
+                    ];
+                    
+                case 'minimax':
+                    // MiniMax 使用固定模型列表
+                    return [
+                        { id: 'abab6-chat', name: 'MiniMax-6' },
+                        { id: 'abab5.5-chat', name: 'MiniMax-5.5' }
+                    ];
+                    
+                case 'baichuan':
+                    // 百川智能使用固定模型列表
+                    return [
+                        { id: 'Baichuan2-Turbo', name: 'Baichuan2 Turbo' },
+                        { id: 'Baichuan2-Turbo-192k', name: 'Baichuan2 Turbo 192K' }
+                    ];
+                    
+                case 'custom':
+                    // 自定义API尝试调用 /models 接口
+                    url = `${apiEndpoint}/models`;
+                    headers = {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    };
+                    break;
+                    
+                default:
+                    throw new Error('不支持的提供商');
+            }
+            
+            if (url) {
+                const response = await fetch(url, { headers });
+                if (!response.ok) {
+                    throw new Error(`API 请求失败: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // 解析响应，提取模型列表
+                if (data.data && Array.isArray(data.data)) {
+                    return data.data.map(model => ({
+                        id: model.id,
+                        name: model.id
+                    }));
+                }
+                
+                throw new Error('无法解析模型列表');
+            }
+            
+        } catch (error) {
+            console.error('获取模型列表失败:', error);
+            throw error;
+        }
+    }
     
     // 暴露到全局
-    window.ToolsAPIConfig = APIConfig;
-    window.ToolsGuideManager = GuideManager;
+    window.ToolsAPIConfig = {
+        loadAllConfigs,
+        getConfig,
+        saveConfig,
+        deleteConfig,
+        getConfiguredProviders,
+        getAllAvailableModels,
+        getProviderInfo,
+        getAllProviders,
+        isConfigured,
+        fetchModels,
+        setActiveProvider,
+        getActiveProvider,
+        getActiveConfig
+    };
     
 })();
-

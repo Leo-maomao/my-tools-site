@@ -564,3 +564,28 @@
   // 启动
   init();
 })();
+
+// 新手引导
+(function() {
+  'use strict';
+  
+  // 页面加载完成后显示引导
+  if (typeof window.ToolsGuide !== 'undefined') {
+    setTimeout(function() {
+      window.ToolsGuide.show('fund-assistant', {
+        steps: [
+          {
+            title: '欢迎使用基金助手',
+            content: '【占位内容】这里是基金助手的介绍，等待用户提供正确内容。',
+            needsConfig: false
+          },
+          {
+            title: '功能说明',
+            content: '【占位内容】这里是功能说明，等待用户提供正确内容。',
+            needsConfig: false
+          }
+        ]
+      });
+    }, 300);
+  }
+})();
