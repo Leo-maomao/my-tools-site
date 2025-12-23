@@ -71,6 +71,14 @@
         </a>
       </nav>
       
+      <!-- API 配置按钮 -->
+      <div class="sidebar-settings">
+        <button class="nav-item" id="apiConfigBtn">
+          <i class="ri-settings-3-line"></i>
+          <span>API 配置</span>
+        </button>
+      </div>
+      
       <!-- 管理员工具栏（登录后显示） -->
       <div class="sidebar-footer" id="sidebarFooter" style="display: none;">
         <button class="sidebar-footer-btn" id="logoutBtn" title="退出登录">
@@ -164,6 +172,41 @@
     </div>
   </div>
 
+  <!-- API 配置模态框 -->
+  <div id="apiConfigModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3>⚙️ API 配置</h3>
+        <i class="ri-close-line modal-close" id="apiConfigClose"></i>
+      </div>
+      <div class="modal-body">
+        <div class="modal-input-group">
+          <label>API 端点</label>
+          <input id="apiEndpoint" class="modal-input" placeholder="https://your-worker.workers.dev/api/chat" />
+        </div>
+        <div class="modal-input-group">
+          <label>默认模型</label>
+          <select id="defaultModel" class="modal-input">
+            <option value="qwen-plus">通义千问 Plus</option>
+            <option value="qwen-turbo">通义千问 Turbo</option>
+            <option value="gpt-4">GPT-4</option>
+            <option value="claude-3-sonnet">Claude 3 Sonnet</option>
+          </select>
+        </div>
+        <div class="modal-hint">
+          💡 您的配置仅存储在本地浏览器，不会上传到服务器
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn" id="apiConfigClear" style="margin-right: auto; background: #dc2626;">清除配置</button>
+        <button class="modal-btn cancel" id="apiConfigCancel">取消</button>
+        <button class="modal-btn confirm" id="apiConfigSave">保存配置</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api-config.js"></script>
+  <script src="js/api-config-ui.js"></script>
   <script src="js/sidebar.js"></script>
   <script src="js/auth.js"></script>
 </body>

@@ -196,6 +196,57 @@ a {
   transform: scale(0.95);
 }
 
+/* API 配置按钮区域 */
+.sidebar-settings {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.sidebar-settings .nav-item {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  color: var(--text-sub);
+}
+
+.sidebar-settings .nav-item:hover {
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--accent);
+}
+
+/* 对话区顶部工具栏 */
+.pa-chat-header {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+}
+
+.pa-chat-header .pa-btn {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pa-chat-header .pa-btn:hover {
+  background: var(--card-bg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 模态框提示信息 */
+.modal-hint {
+  margin-top: 12px;
+  padding: 12px;
+  background: rgba(37, 99, 235, 0.05);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--text-sub);
+  line-height: 1.5;
+}
+
 /* 小红书logo图标样式 */
 .xhs-logo-icon {
   display: inline-block;
@@ -1697,4 +1748,155 @@ select:disabled,
 .modal-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* === 新手引导 === */
+.guide-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.guide-modal-overlay.is-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.guide-modal {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 520px;
+  width: 90%;
+  max-height: 85vh;
+  overflow: hidden;
+  transform: scale(0.9) translateY(20px);
+  transition: transform 0.3s ease;
+}
+
+.guide-modal-overlay.is-visible .guide-modal {
+  transform: scale(1) translateY(0);
+}
+
+.guide-header {
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.guide-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.guide-body {
+  padding: 24px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.guide-image {
+  margin-bottom: 20px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.guide-image img {
+  width: 100%;
+  display: block;
+}
+
+.guide-content {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--text-sub);
+}
+
+.guide-content ul {
+  margin: 12px 0;
+  padding-left: 20px;
+}
+
+.guide-content li {
+  margin: 8px 0;
+}
+
+.guide-alert {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: rgba(245, 158, 11, 0.1);
+  border-left: 3px solid #f59e0b;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #b45309;
+  font-weight: 500;
+}
+
+.guide-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.guide-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-sub);
+  cursor: pointer;
+  user-select: none;
+}
+
+.guide-checkbox input[type="checkbox"] {
+  cursor: pointer;
+}
+
+.guide-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.guide-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-main);
+}
+
+.guide-btn.primary {
+  background: var(--accent);
+  color: white;
+}
+
+.guide-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.guide-btn.primary:hover {
+  background: var(--accent-light);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.guide-btn:active {
+  transform: translateY(0);
 }
