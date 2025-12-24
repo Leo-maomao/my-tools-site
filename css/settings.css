@@ -838,13 +838,15 @@
   overflow: visible;
 }
 
-/* API配置弹窗特殊处理 - 允许下拉菜单溢出 */
+/* API配置弹窗特殊处理 - 允许下拉菜单溢出，但限制高度 */
 #apiConfigModal .modal-box {
   overflow: visible;
 }
 
 #apiConfigModal .modal-body {
-  overflow: visible;
+  overflow-y: auto; /* 内容区域可滚动 */
+  overflow-x: visible; /* 横向允许溢出（下拉菜单） */
+  max-height: calc(90vh - 120px); /* 减去header和footer的高度 */
 }
 
 #apiConfigModal .settings-form {
@@ -915,6 +917,7 @@
   padding: 16px 24px;
   border-top: 1px solid var(--border-subtle);
   height: 60px;
+  flex-shrink: 0; /* 防止footer被压缩 */
 }
 
 .modal-btn {
@@ -976,10 +979,13 @@
 
 .guide-modal-compact .modal-body {
   padding: 16px 20px;
+  overflow-y: auto; /* 内容可滚动 */
+  max-height: calc(90vh - 200px); /* 限制高度，确保按钮可见 */
 }
 
 .guide-modal-compact .modal-footer {
   padding: 12px 20px;
+  flex-shrink: 0; /* 防止被压缩 */
 }
 
 .compact-form .form-group {

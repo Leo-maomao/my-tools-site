@@ -1,24 +1,23 @@
 /* 小红书页面专属样式 */
 
-/* 小红书主内容区减少padding */
+/* 小红书主容器不设置额外padding */
 .xhs-main {
-  padding: 20px 24px !important;
+  padding: 0 !important;
 }
 
-/* 新三列布局 */
+/* 新三列布局 - 固定高度占满视口 */
 .xhs-layout-new {
   display: grid;
   grid-template-columns: 200px 1fr 280px;
-  gap: 20px;
-  height: calc(100vh - 40px);
-  align-items: stretch;
+  gap: 8px; /* 精简间距 */
+  height: calc(100vh - 16px); /* 100vh - main-content的上下padding(8px*2) */
+  align-items: stretch; /* 子元素拉伸到父容器高度 */
 }
 
-/* 左侧和右侧填满高度 */
+/* 左侧和右侧固定高度，内部滚动 */
 .xhs-templates,
 .xhs-preview-panel {
   height: 100%;
-  max-height: calc(100vh - 40px);
   overflow-y: auto;
 }
 
@@ -105,9 +104,10 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   padding: 20px;
-  height: 100%;
+  height: 100%; /* 占满父容器高度 */
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* 不显示滚动条，让内部元素控制 */
 }
 
 .input-card .form-group {
@@ -123,11 +123,11 @@
   overflow-y: auto;
 }
 
-/* 可编辑内容区域（支持粘贴图片） */
+/* 可编辑内容区域（支持粘贴图片） - 占据剩余空间 */
 .content-editor {
   width: 100%;
-  min-height: 200px;
-  max-height: 300px;
+  flex: 1; /* 占据剩余空间 */
+  min-height: 0; /* 允许flex收缩 */
   padding: 12px 14px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
@@ -158,18 +158,26 @@
   display: block;
 }
 
-/* 正文描述区域自动填充剩余空间 */
-.input-card .form-group:nth-child(4) {
-  flex: 1;
+/* 正文内容区域 (第3个 form-group，包含 content-editor) */
+.input-card .form-group:nth-child(3) {
+  flex: 1; /* 占据剩余空间的一半 */
   display: flex;
   flex-direction: column;
-  min-height: 0;
+  min-height: 0; /* 允许flex收缩 */
+}
+
+/* 正文描述区域 (第4个 form-group，包含 textarea) */
+.input-card .form-group:nth-child(4) {
+  flex: 1; /* 占据剩余空间的另一半 */
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* 允许flex收缩 */
 }
 
 .input-card #xhsDesc {
-  flex: 1;
-  min-height: 80px;
-  resize: none;
+  flex: 1; /* 占据表单组剩余空间 */
+  min-height: 0; /* 允许flex收缩 */
+  resize: none; /* 禁止手动调整，自动占满 */
 }
 
 .form-row {
@@ -451,11 +459,11 @@
   cursor: not-allowed;
 }
 
-/* 预览容器 */
+/* 预览容器 - 占据剩余空间并内部滚动 */
 .preview-container {
-  min-height: 300px;
-  flex: 1;
-  overflow-y: auto;
+  flex: 1; /* 占据剩余空间 */
+  min-height: 0; /* 允许flex收缩 */
+  overflow-y: auto; /* 内部滚动 */
   display: flex;
   flex-direction: column;
   gap: 16px;

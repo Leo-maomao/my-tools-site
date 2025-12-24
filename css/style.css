@@ -690,6 +690,15 @@ a {
   transition: margin-left 0.2s ease;
 }
 
+/* 工具页面优化padding - 充分利用空间 */
+.main-content:has(.xhs-main),
+.main-content:has(.pa-main),
+.main-content:has(.dr-main),
+.main-content:has(.dw-main),
+.main-content:has(.fund-main) {
+  padding: 8px !important;
+}
+
 .page-header {
   margin-bottom: 32px;
 }

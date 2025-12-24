@@ -2,11 +2,11 @@
 
 /* 主内容区 */
 .pa-main {
-  padding: 0;
+  padding: 0 !important;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  overflow-y: auto; /* 允许垂直滚动 */
+  height: calc(100vh - 16px); /* 减去 main-content 的 8px * 2 */
+  overflow: hidden; /* 不显示滚动条，让内部区域滚动 */
   min-width: 600px;
 }
 

@@ -1,18 +1,18 @@
 /* 日报小助手样式 */
 
 .dr-main {
-  padding: 24px 32px;
-  height: 100vh;
-  max-height: 100vh;
-  overflow-y: auto; /* 允许垂直滚动 */
+  padding: 0 !important;
+  height: calc(100vh - 16px); /* 减去 main-content 的 8px * 2 */
+  max-height: calc(100vh - 16px);
+  overflow: hidden; /* 不显示滚动条，让内部区域滚动 */
 }
 
 .dr-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  height: calc(100vh - 48px);
-  max-height: calc(100vh - 48px);
+  gap: 8px; /* 减少间距 */
+  height: 100%;
+  padding: 8px; /* 添加内边距 */
 }
 
 /* 面板通用样式 */
