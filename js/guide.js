@@ -10,6 +10,11 @@
     
     const GUIDE_STATUS_KEY = 'tools_guide_status';
     
+    // 使用全局 Supabase 客户端（和 auth.js 共用同一个实例）
+    function getSupabase() {
+        return window.toolsSupabase;
+    }
+    
     // 引导状态管理
     const GuideManager = {
         // 获取所有引导状态
@@ -103,107 +108,40 @@
         const footerEl = modal.querySelector('#guideFooter');
         const dotsEl = modal.querySelector('#guideDots');
         
-        // 渲染内容
+        // 渲染内容 - 上图下文卡片样式
         let contentHTML = `
             <div class="guide-content-inner">
-                ${step.title ? `<h3 class="guide-title">${step.title}</h3>` : ''}
                 ${step.image ? `
                     <div class="guide-image">
                         <img src="${step.image}" alt="引导图片" loading="lazy" />
                     </div>
                 ` : ''}
-                <div class="guide-text">${step.content}</div>
+                ${step.title || step.content ? `
+                    <div class="guide-content-text">
+                        ${step.title ? `<h3 class="guide-title">${step.title}</h3>` : ''}
+                        ${step.content ? `<div class="guide-text">${step.content}</div>` : ''}
+                    </div>
+                ` : ''}
             </div>
         `;
         
         contentEl.innerHTML = contentHTML;
         
-        // 移除旧的切换按钮
-        const oldPrevBtn = modal.querySelector('#guideContentPrev');
-        const oldNextBtn = modal.querySelector('#guideContentNext');
-        if (oldPrevBtn) oldPrevBtn.remove();
-        if (oldNextBtn) oldNextBtn.remove();
-        
-        // 如果是多步引导，添加左右切换按钮到 .guide-card
-        if (totalSteps > 1) {
-            const cardEl = modal.querySelector('.guide-card');
-            
-            if (currentStep > 0) {
-                const prevBtn = document.createElement('button');
-                prevBtn.className = 'guide-content-nav prev';
-                prevBtn.id = 'guideContentPrev';
-                prevBtn.innerHTML = '<i class="ri-arrow-left-s-line"></i>';
-                cardEl.appendChild(prevBtn);
-            }
-            
-            if (currentStep < totalSteps - 1) {
-                const nextBtn = document.createElement('button');
-                nextBtn.className = 'guide-content-nav next';
-                nextBtn.id = 'guideContentNext';
-                nextBtn.innerHTML = '<i class="ri-arrow-right-s-line"></i>';
-                cardEl.appendChild(nextBtn);
-            }
-        }
-        
-        // 绑定切换按钮
-        const contentPrevBtn = modal.querySelector('#guideContentPrev');
-        const contentNextBtn = modal.querySelector('#guideContentNext');
-        
-        if (contentPrevBtn) {
-            contentPrevBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                if (currentStep > 0) {
-                    currentStep--;
-                    renderStep(modal, guideSteps[currentStep], currentStep === totalSteps - 1);
-                }
-            });
-        }
-        
-        if (contentNextBtn) {
-            contentNextBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                if (currentStep < totalSteps - 1) {
-                    currentStep++;
-                    renderStep(modal, guideSteps[currentStep], currentStep === totalSteps - 1);
-                }
-            });
-        }
-        
-        // 渲染页码指示器（可点击）
-        if (dotsEl) {
-            let dotsHTML = '';
-            for (let i = 0; i < totalSteps; i++) {
-                dotsHTML += `<button class="guide-dot ${i === currentStep ? 'active' : ''}" data-step="${i}" aria-label="第 ${i + 1} 步"></button>`;
-            }
-            dotsEl.innerHTML = dotsHTML;
-            
-            // 绑定点击事件
-            dotsEl.querySelectorAll('.guide-dot').forEach((dot, index) => {
-                dot.addEventListener('click', function() {
-                    currentStep = index;
-                    renderStep(modal, guideSteps[currentStep], currentStep === totalSteps - 1);
-                });
-            });
-        }
+        // 单页引导，不需要左右切换按钮和页码指示器
         
         // 渲染底部操作按钮
         let footerHTML = '';
         
-        // 如果需要配置，显示"去配置"按钮
+        // 如果需要配置，显示"配置API"和"知道了"两个按钮
         if (step.needsConfig && isLast) {
             footerHTML += `
-                <button class="guide-btn guide-btn-primary" id="guideGoConfig">
-                    <i class="ri-settings-3-line"></i>
-                    <span>去配置</span>
-                </button>
+                <button class="guide-btn guide-btn-default" id="guideGoConfig">配置API</button>
+                <button class="guide-btn guide-btn-primary" id="guideFinish">知道了</button>
             `;
         } else if (isLast) {
-            // 最后一页且不需要配置，显示"知道了"
+            // 最后一页且不需要配置，只显示"知道了"
             footerHTML += `
-                <button class="guide-btn guide-btn-primary" id="guideFinish">
-                    <i class="ri-check-line"></i>
-                    <span>知道了</span>
-                </button>
+                <button class="guide-btn guide-btn-primary" id="guideFinish">知道了</button>
             `;
         }
         
@@ -272,8 +210,54 @@
     }
     
     // 显示引导（立即显示，无延迟）
-    function showGuide(toolId, config) {
+    async function showGuide(toolId, config) {
         currentToolId = toolId;
+        
+        // 如果没有传入config，从Supabase加载
+        if (!config) {
+            const sb = getSupabase();
+            if (sb) {
+                try {
+                    const { data, error } = await sb
+                        .from('guide_configs')
+                        .select('*')
+                        .eq('tool_id', toolId)
+                        .single();
+                    
+                    if (error) throw error;
+                    
+                    if (data) {
+                        // 检查是否有有效内容（标题、内容、图片至少有一个）
+                        const hasTitle = data.title && data.title.trim();
+                        const hasContent = data.content && data.content.trim();
+                        const hasImage = data.image_url && data.image_url.trim();
+                        
+                        // 如果都没有填写，不显示引导卡片
+                        if (!hasTitle && !hasContent && !hasImage) {
+                            return;
+                        }
+                        
+                        config = {
+                            steps: [{
+                                title: hasTitle ? data.title : null,
+                                image: hasImage ? data.image_url : null,
+                                content: hasContent ? data.content : '',
+                                needsConfig: data.needs_config
+                            }]
+                        };
+                    } else {
+                        // 没有配置，不显示引导
+                        return;
+                    }
+                } catch (error) {
+                    console.error('加载引导配置失败:', error);
+                    return;
+                }
+            } else {
+                console.error('Supabase客户端未初始化');
+                return;
+            }
+        }
         
         // 单步引导才检查是否需要显示
         if (!Array.isArray(config.steps) && !GuideManager.shouldShow(toolId)) {

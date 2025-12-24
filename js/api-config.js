@@ -46,7 +46,7 @@
         return configs[provider] || null;
     }
     
-    // 保存单个厂商配置
+    // 保存单个厂商配置（旧版，兼容）
     function saveConfig(provider, apiKey, endpoint, models) {
         const configs = loadAllConfigs();
         
@@ -56,6 +56,20 @@
             apiKey: apiKey,
             endpoint: endpoint || PROVIDERS[provider]?.endpoint || '',
             models: models || [],
+            configuredAt: new Date().toISOString()
+        };
+        
+        return saveAllConfigs(configs);
+    }
+    
+    // 保存完整提供商配置（新版）
+    function saveProviderConfig(provider, configData) {
+        const configs = loadAllConfigs();
+        
+        configs[provider] = {
+            ...configData,
+            provider: provider,
+            providerName: PROVIDERS[provider]?.name || provider,
             configuredAt: new Date().toISOString()
         };
         
@@ -247,6 +261,7 @@
         loadAllConfigs,
         getConfig,
         saveConfig,
+        saveProviderConfig,
         deleteConfig,
         getConfiguredProviders,
         getAllAvailableModels,

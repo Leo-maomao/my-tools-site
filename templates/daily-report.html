@@ -1,0 +1,87 @@
+<div class="dr-main">
+<div class="dr-container">
+  <!-- 左侧：输入区 -->
+  <div class="dr-input-panel">
+    <div class="dr-panel-header">
+      <h2><i class="ri-edit-line"></i> 工作内容</h2>
+    </div>
+    <div class="dr-panel-body">
+      <div class="dr-form-group">
+        <label>内容描述</label>
+        <textarea
+          id="workContent"
+          class="dr-textarea"
+          placeholder="简单描述你的工作内容，例如：&#10;&#10;1. 完成了用户登录功能的开发&#10;2. 修复了首页加载慢的问题&#10;3. 参加了产品需求评审会议&#10;4. 整理了技术文档"
+          rows="10"
+          autocomplete="off"
+        ></textarea>
+      </div>
+      <div class="dr-form-row dr-form-row--3">
+        <div class="dr-form-group">
+          <label>报告类型</label>
+          <select id="reportTypeSelect" class="dr-select">
+            <option value="daily">日报</option>
+            <option value="weekly">周报</option>
+            <option value="quarterly">季报</option>
+            <option value="semiannual">半年报</option>
+            <option value="annual">年报</option>
+          </select>
+        </div>
+        <div class="dr-form-group">
+          <label>报告模板</label>
+          <select id="templateSelect" class="dr-select">
+            <option value="simple">简洁版</option>
+            <option value="detailed">详细版</option>
+            <option value="okr">OKR版</option>
+            <option value="standup">站会版</option>
+          </select>
+        </div>
+        <div class="dr-form-group">
+          <label>输出格式</label>
+          <select id="formatSelect" class="dr-select">
+            <option value="text">纯文本</option>
+            <option value="markdown">Markdown</option>
+            <option value="html">富文本</option>
+          </select>
+        </div>
+      </div>
+      <button id="generateBtn" class="dr-btn dr-btn--primary dr-btn--full">
+        <i class="ri-magic-line"></i>
+        <span>生成报告</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 右侧：输出区 -->
+  <div class="dr-output-panel">
+    <div class="dr-panel-header">
+      <h2><i class="ri-file-list-3-line"></i> 生成结果</h2>
+      <div class="dr-panel-actions">
+        <button id="copyBtn" class="dr-btn dr-btn--small" disabled>
+          <i class="ri-file-copy-line"></i>
+          <span>复制</span>
+        </button>
+      </div>
+    </div>
+    <div class="dr-panel-body">
+      <div class="dr-output-wrapper">
+        <div id="outputContent" class="dr-output-content" contenteditable="false">
+          <div class="dr-output-empty">
+            <i class="ri-file-text-line"></i>
+            <p>报告将在这里显示</p>
+            <span>填写工作内容后点击「生成报告」</span>
+          </div>
+        </div>
+        <div class="dr-output-tip" id="outputTip" style="display:none;">
+          <i class="ri-information-line"></i>
+          <span>可直接编辑上方内容</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast 提示 -->
+<div id="toast" class="dr-toast"></div>
+
+</div>

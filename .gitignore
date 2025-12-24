@@ -17,6 +17,11 @@
 # Node
 node_modules/
 
+# Wrangler / Cloudflare Workers
+.mf/
+.wrangler/
+wrangler.toml
+
 # Build
 dist/
 build/

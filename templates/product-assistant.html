@@ -1,0 +1,80 @@
+<div class="pa-main">
+<!-- 两栏布局：对话列表 + 对话区 -->
+<div class="pa-layout">
+  <!-- 左侧：对话列表 -->
+  <div class="pa-conversations">
+    <div class="pa-conversations-header">
+      <span>对话记录</span>
+      <button class="pa-btn pa-btn--icon" id="newChatBtn" title="新建对话">
+        <i class="ri-add-line"></i>
+      </button>
+    </div>
+    <div class="pa-conversations-list" id="conversationList">
+      <!-- 动态渲染 -->
+    </div>
+  </div>
+
+  <!-- 中间：对话区 -->
+  <div class="pa-chat">
+    <!-- 对话区顶部工具栏 -->
+    <div class="pa-chat-header">
+      <button class="pa-btn pa-btn--icon" id="showGuideBtn" title="查看使用指南">
+        <i class="ri-question-line"></i>
+      </button>
+    </div>
+    
+    <div class="pa-messages" id="messageList">
+      <div class="pa-welcome">
+        <i class="ri-robot-line"></i>
+        <h3>毛毛的产品助理</h3>
+        <p>我可以帮你分析PRD、回答产品问题</p>
+        <div class="pa-welcome-tips">
+          <div class="pa-tip">
+            <i class="ri-image-add-line"></i>
+            <span>粘贴或上传图片，帮你分析界面</span>
+          </div>
+          <div class="pa-tip">
+            <i class="ri-file-code-line"></i>
+            <span>上传 Axure HTML 文件，帮你 Review PRD</span>
+          </div>
+          <div class="pa-tip">
+            <i class="ri-chat-3-line"></i>
+            <span>直接提问产品相关问题</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pa-input-area">
+      <div class="pa-input-wrapper">
+        <!-- 引用预览区 -->
+        <div class="pa-quote-preview" id="quotePreview"></div>
+        <!-- 图片预览区 -->
+        <div class="pa-image-preview" id="imagePreview"></div>
+        <!-- 文件预览区 -->
+        <div class="pa-file-preview" id="filePreview"></div>
+        <textarea
+          class="pa-input"
+          id="userInput"
+          placeholder="输入问题，或粘贴图片/上传文件..."
+          rows="3"
+          autocomplete="off"
+        ></textarea>
+      </div>
+      <div class="pa-input-actions">
+        <button class="pa-btn pa-btn--icon" id="imageBtn" title="上传图片">
+          <i class="ri-image-add-line"></i>
+        </button>
+        <input type="file" id="imageInput" accept="image/*" multiple style="display:none">
+        <button class="pa-btn pa-btn--icon" id="fileBtn" title="上传HTML文件">
+          <i class="ri-file-code-line"></i>
+        </button>
+        <input type="file" id="fileInput" accept=".html" multiple style="display:none">
+        <button class="pa-btn pa-btn--primary" id="sendBtn">
+          <i class="ri-send-plane-fill"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>

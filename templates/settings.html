@@ -1,0 +1,66 @@
+<div class="settings-main">
+  <div class="settings-container">
+    <!-- 头部 -->
+    <div class="settings-header">
+      <h1 class="settings-title">设置</h1>
+    </div>
+
+    <!-- 标签页 -->
+    <div class="settings-tabs">
+      <button class="settings-tab is-active" data-tab="api">
+        <i class="ri-key-line"></i>
+        <span>API 配置</span>
+      </button>
+      <button class="settings-tab" data-tab="guide" id="settingsGuideTab" style="display: none;">
+        <i class="ri-guide-line"></i>
+        <span>引导管理</span>
+      </button>
+    </div>
+
+    <!-- 内容区域 -->
+    <div class="settings-content">
+      <!-- API 配置页面 -->
+      <div class="settings-panel is-active" id="apiPanel">
+        <div class="settings-panel-header">
+          <h2>API 配置</h2>
+          <button class="btn-primary" id="addApiBtn">
+            <i class="ri-add-line"></i>
+            <span>新增配置</span>
+          </button>
+        </div>
+        
+        <div class="settings-panel-body">
+          <div class="api-list" id="apiList"></div>
+          <div id="apiEmptyState" class="empty-state" style="display: none;">
+            <i class="ri-apps-line"></i>
+            <p>暂无 API 配置</p>
+            <span>点击右上角"新增配置"按钮添加</span>
+          </div>
+        </div>
+        
+        <div class="settings-panel-footer">
+          <div class="security-hint">
+            <i class="ri-shield-check-line"></i>
+            <span>您的 API Key 仅存储在本地浏览器，不会上传到任何服务器</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 引导管理页面 -->
+      <div class="settings-panel" id="guidePanel">
+        <div class="settings-panel-header">
+          <h2>引导管理</h2>
+        </div>
+        
+        <div class="settings-panel-body">
+          <div class="guide-grid" id="guideGrid">
+            <div class="empty-state">
+              <i class="ri-guide-line"></i>
+              <p>加载中...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

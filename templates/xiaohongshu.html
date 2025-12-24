@@ -1,0 +1,163 @@
+<div class="xhs-main">
+<div class="xhs-layout-new">
+  <!-- 左侧：模板上传 -->
+  <div class="xhs-templates">
+    <div class="template-card">
+      <div class="template-header">
+        <h3><i class="ri-image-line"></i> 封面模板</h3>
+      </div>
+      <div class="upload-area upload-area-sm" id="coverUploadArea">
+        <input type="file" id="coverTemplateInput" accept="image/*" hidden>
+        <div class="upload-placeholder" id="coverPlaceholder">
+          <i class="ri-upload-cloud-2-line"></i>
+          <span>上传封面</span>
+        </div>
+        <img id="coverPreviewImg" class="upload-preview" style="display:none;">
+        <button class="btn-delete-img" id="deleteCoverBtn" style="display:none;" title="删除图片">
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+      <button class="btn-mark-area btn-mark-sm" id="markCoverArea" style="display:none;">
+        <i class="ri-drag-move-line" id="coverMarkIcon"></i>
+        <span id="coverMarkText">标记区域</span>
+      </button>
+    </div>
+
+    <div class="template-card">
+      <div class="template-header">
+        <h3><i class="ri-file-text-line"></i> 正文模板</h3>
+      </div>
+      <div class="upload-area upload-area-sm" id="bgUploadArea">
+        <input type="file" id="bgTemplateInput" accept="image/*" hidden>
+        <div class="upload-placeholder" id="bgPlaceholder">
+          <i class="ri-upload-cloud-2-line"></i>
+          <span>上传背景</span>
+        </div>
+        <img id="bgPreviewImg" class="upload-preview" style="display:none;">
+        <button class="btn-delete-img" id="deleteBgBtn" style="display:none;" title="删除图片">
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+      <button class="btn-mark-area btn-mark-sm" id="markBgArea" style="display:none;">
+        <i class="ri-drag-move-line" id="bgMarkIcon"></i>
+        <span id="bgMarkText">标记区域</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 中间：内容输入 -->
+  <div class="xhs-content-input">
+    <div class="input-card">
+      <div class="form-group">
+        <label>封面标题</label>
+        <input type="text" id="coverTitle" placeholder="请输入封面标题" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>
+          正文内容 <span class="char-count" id="contentCharCount">0 字</span>
+        </label>
+        <div class="content-editor" id="contentEditor" contenteditable="true" data-placeholder="请输入正文内容，支持粘贴图片"></div>
+      </div>
+      <div class="form-group">
+        <label>发布标题</label>
+        <input type="text" id="xhsTitle" placeholder="请输入发布标题" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>正文描述 <span class="char-count" id="descCharCount">0 字</span></label>
+        <textarea id="xhsDesc" placeholder="请输入正文描述" rows="4" autocomplete="off"></textarea>
+      </div>
+      <button class="btn-generate" id="generateBtn">
+        <i class="ri-magic-line"></i> 生成图片
+      </button>
+    </div>
+  </div>
+
+  <!-- 右侧：预览区 -->
+  <div class="xhs-preview-panel">
+    <div class="preview-header">
+      <h3>预览</h3>
+      <button class="btn-action" id="downloadAllBtn" disabled>
+        <i class="ri-download-2-line"></i> 下载
+      </button>
+    </div>
+
+    <div class="preview-container" id="previewContainer">
+      <div class="preview-empty">
+        <i class="ri-image-2-line"></i>
+        <p>生成后预览</p>
+      </div>
+    </div>
+
+    <!-- 复制区域 -->
+    <div class="copy-section" id="copySection" style="display:none;">
+      <div class="copy-item">
+        <span class="copy-label">标题</span>
+        <div class="copy-content" id="copyTitle">-</div>
+        <button class="btn-copy" data-target="copyTitle">
+          <i class="ri-file-copy-line"></i>
+        </button>
+      </div>
+      <div class="copy-item">
+        <span class="copy-label">描述</span>
+        <div class="copy-content" id="copyDesc">-</div>
+        <button class="btn-copy" data-target="copyDesc">
+          <i class="ri-file-copy-line"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Canvas 用于图片生成（隐藏） -->
+<canvas id="renderCanvas" style="display:none;"></canvas>
+
+<!-- 区域标记模态框 -->
+<div class="area-marker-modal" id="areaMarkerModal">
+  <div class="area-marker-backdrop"></div>
+  <div class="area-marker-content">
+    <div class="area-marker-header">
+      <h3 id="areaMarkerTitle">标记标题区域</h3>
+      <p>在图片上拖动鼠标框选内容区域</p>
+    </div>
+    <div class="area-marker-canvas-wrap">
+      <canvas id="areaMarkerCanvas"></canvas>
+      <div class="area-marker-selection" id="areaSelection">
+        <div class="resize-handle resize-handle-nw" data-dir="nw"></div>
+        <div class="resize-handle resize-handle-n" data-dir="n"></div>
+        <div class="resize-handle resize-handle-ne" data-dir="ne"></div>
+        <div class="resize-handle resize-handle-e" data-dir="e"></div>
+        <div class="resize-handle resize-handle-se" data-dir="se"></div>
+        <div class="resize-handle resize-handle-s" data-dir="s"></div>
+        <div class="resize-handle resize-handle-sw" data-dir="sw"></div>
+        <div class="resize-handle resize-handle-w" data-dir="w"></div>
+      </div>
+    </div>
+    <div class="area-marker-footer">
+      <button class="btn-cancel" id="areaMarkerCancel">取消</button>
+      <button class="btn-center" id="areaMarkerCenter" disabled>
+        <i class="ri-align-center"></i> 水平居中
+      </button>
+      <button class="btn-confirm" id="areaMarkerConfirm">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- 全屏预览模态框 -->
+<div class="fullscreen-modal" id="fullscreenModal">
+  <div class="fullscreen-backdrop"></div>
+  <div class="fullscreen-content">
+    <button class="fullscreen-close" id="fullscreenClose">
+      <i class="ri-close-line"></i>
+    </button>
+    <button class="fullscreen-nav fullscreen-prev" id="fullscreenPrev">
+      <i class="ri-arrow-left-s-line"></i>
+    </button>
+    <img id="fullscreenImg" src="" alt="预览">
+    <button class="fullscreen-nav fullscreen-next" id="fullscreenNext">
+      <i class="ri-arrow-right-s-line"></i>
+    </button>
+    <div class="fullscreen-info" id="fullscreenInfo">1 / 3</div>
+  </div>
+</div>
+
+</div>
