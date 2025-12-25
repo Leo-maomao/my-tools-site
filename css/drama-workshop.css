@@ -17,12 +17,16 @@
   flex-direction: column;
   gap: 20px;
   flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .dw-tab-content.is-active > .dw-panel:not(.is-hidden) {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* ========== 顶部栏 ========== */
@@ -104,6 +108,7 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 .dw-panel-header h2 {
@@ -137,6 +142,7 @@
   flex: 1;
   padding: 24px;
   overflow-y: auto;
+  min-height: 0;
 }
 
 .dw-panel-footer {
@@ -148,6 +154,7 @@
   overflow: visible;
   position: relative;
   z-index: 100;
+  flex-shrink: 0;
 }
 
 .dw-header-actions {
@@ -459,6 +466,11 @@
 #step3Panel .dw-panel-body {
   display: flex;
   flex-direction: column;
+}
+
+/* 步骤2（分集剧本）不显示滚动条，内容填满一屏 */
+#step2Panel .dw-panel-body {
+  overflow: visible;
 }
 
 #step2Panel .dw-shots-list,
@@ -1154,10 +1166,36 @@
    新增：剧集大纲列表
    ======================================== */
 
+/* 大纲面板特殊处理：确保滚动条显示完整内容 */
+#outlinePanel:not(.is-hidden) {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  max-height: 100% !important;
+}
+
+#outlinePanel .dw-panel-body {
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  padding: 24px !important;
+}
+
+#outlinePanel .dw-panel-footer {
+  flex: 0 0 auto !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
 .dw-episode-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  overflow: visible;
 }
 
 .dw-episode-item {
@@ -1204,6 +1242,10 @@
   font-size: 14px;
   color: var(--text-sub);
   line-height: 1.6;
+  word-wrap: break-word;
+  word-break: normal;
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
 .dw-episode-actions {

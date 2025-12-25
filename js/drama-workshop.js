@@ -178,6 +178,22 @@ function resetProject() {
   const defaultStyle = $('input[name="scriptStyle"][value="comedy"]');
   if (defaultStyle) defaultStyle.checked = true;
 
+  // 清空模型选择
+  state.settings = {
+    textModel: '',
+    imageModel: '',
+    videoModel: '',
+    videoResolution: '720p',
+    videoFps: '24'
+  };
+  if ($('#textModel')) {
+    $('#textModel').value = '';
+    // 刷新 UI.Select 组件
+    if (window.UI && window.UI.Select) {
+      window.UI.Select.refresh($('#textModel'));
+    }
+  }
+
   // 清空localStorage
   localStorage.removeItem(PROJECT_STORAGE_KEY);
 
@@ -321,26 +337,92 @@ function showOutlinePanel() {
   $('#step1Panel').classList.add('is-hidden');
   $('#outlinePanel').classList.remove('is-hidden');
   renderEpisodeList();
+
+  // 强制刷新布局，确保滚动区域正确计算
+  setTimeout(function() {
+    var panel = $('#outlinePanel');
+    if (panel) {
+      panel.style.display = 'none';
+      panel.offsetHeight; // 强制重排
+      panel.style.display = '';
+    }
+  }, 0);
 }
 
 // 返回构思面板（重新构思会清空数据）
 function showIdeaPanel() {
+  console.log('=== 重新构思按钮被点击 ===');
+
   // 清空已有数据
   state.episodes = [];
   state.episodeScripts = {};
   state.currentEpisode = 0;
   state.shots = [];
   state.frames = [];
+  state.maxCompletedStep = 0;
 
-  $('#outlinePanel').classList.add('is-hidden');
-  $('#step1Panel').classList.remove('is-hidden');
+  // 清空表单内容
+  if ($('#storyIdea')) {
+    $('#storyIdea').value = '';
+    console.log('已清空故事构思');
+  }
+  if ($('#episodeCount')) {
+    $('#episodeCount').value = '5';
+  }
+  // 重置剧本风格为默认值
+  var defaultStyle = $('input[name="scriptStyle"][value="comedy"]');
+  if (defaultStyle) {
+    defaultStyle.checked = true;
+  }
+
+  // 清空模型选择（只清空，不删除整个settings对象）
+  state.settings.textModel = '';
+  state.settings.imageModel = '';
+  state.settings.videoModel = '';
+  if ($('#textModel')) {
+    $('#textModel').value = '';
+    // 刷新 UI.Select 组件
+    if (window.UI && window.UI.Select) {
+      window.UI.Select.refresh($('#textModel'));
+    }
+    console.log('已清空模型选择');
+  }
+
+  var outlinePanel = $('#outlinePanel');
+  var step1Panel = $('#step1Panel');
+
+  console.log('大纲面板:', outlinePanel);
+  console.log('步骤1面板:', step1Panel);
+
+  if (outlinePanel) {
+    outlinePanel.classList.add('is-hidden');
+    console.log('已隐藏大纲面板');
+  }
+  if (step1Panel) {
+    step1Panel.classList.remove('is-hidden');
+    console.log('已显示步骤1面板');
+  }
+
+  // 滚动到顶部
+  var mainContainer = document.querySelector('.dw-main');
+  if (mainContainer) {
+    mainContainer.scrollTop = 0;
+    console.log('已滚动主容器到顶部');
+  }
+  window.scrollTo(0, 0);
+  console.log('已滚动窗口到顶部');
 
   // 重置步骤指示器
   state.currentStep = 1;
-  $$('.dw-step').forEach((el, idx) => {
+  $$('.dw-step').forEach(function(el, idx) {
     el.classList.remove('is-active', 'is-completed');
     if (idx === 0) el.classList.add('is-active');
   });
+  console.log('已重置步骤指示器为步骤1');
+
+  // 保存状态
+  saveProjectToStorage();
+  console.log('重新构思完成，应该已切换到步骤1');
 }
 
 // 步骤点击事件
@@ -536,8 +618,218 @@ async function initModelSelect() {
   }
 }
 
+// ============ 初始化图片模型选择器 ============
+async function initImageModelSelect() {
+  const select = $('#imageModel');
+  if (!select) return;
+
+  // 检查 API 配置
+  if (!window.ToolsAPIConfig) {
+    select.innerHTML = '<option value="">请先在设置中配置API</option>';
+    return;
+  }
+
+  // 显示加载状态
+  select.innerHTML = '<option value="">加载模型中...</option>';
+  if (window.UI && window.UI.Select) {
+    window.UI.Select.refresh(select);
+  }
+
+  const configs = window.ToolsAPIConfig.loadAllConfigs();
+  const providers = window.ToolsAPIConfig.getAllProviders();
+  const configuredProviders = Object.keys(configs);
+
+  if (configuredProviders.length === 0) {
+    // 没有配置 API
+    select.innerHTML = '<option value="">请先在设置中配置API</option>';
+  } else {
+    // 动态获取图片模型列表
+    let allModels = [];
+
+    for (let i = 0; i < configuredProviders.length; i++) {
+      const providerKey = configuredProviders[i];
+      const config = configs[providerKey];
+      const providerInfo = providers[providerKey];
+
+      if (config.apiKey) {
+        try {
+          // 动态获取图片模型列表
+          const models = await window.ToolsAPIConfig.fetchImageModels(
+            providerKey,
+            config.apiKey,
+            config.baseUrl || config.endpoint
+          );
+
+          if (models && models.length > 0) {
+            models.forEach(function(model) {
+              allModels.push({
+                providerKey: providerKey,
+                providerName: providerInfo ? providerInfo.name : providerKey,
+                modelId: model.id,
+                modelName: model.name
+              });
+            });
+          }
+        } catch (error) {
+          console.warn('获取 ' + providerKey + ' 图片模型列表失败:', error.message);
+        }
+      }
+    }
+
+    if (allModels.length === 0) {
+      select.innerHTML = '<option value="">当前API不支持图片生成</option>';
+    } else {
+      // 渲染模型列表
+      select.innerHTML = '<option value="">选择图片模型</option>';
+
+      // 按厂商分组
+      const grouped = {};
+      allModels.forEach(function(model) {
+        if (!grouped[model.providerKey]) {
+          grouped[model.providerKey] = {
+            name: model.providerName,
+            models: []
+          };
+        }
+        grouped[model.providerKey].models.push(model);
+      });
+
+      Object.keys(grouped).forEach(function(providerKey) {
+        const group = grouped[providerKey];
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = group.name;
+
+        group.models.forEach(function(model) {
+          const option = document.createElement('option');
+          option.value = model.providerKey + '|' + model.modelId;
+          option.textContent = model.modelName;
+          optgroup.appendChild(option);
+        });
+
+        select.appendChild(optgroup);
+      });
+
+      // 恢复已保存的选择
+      if (state.settings.imageModel) {
+        select.value = state.settings.imageModel;
+      }
+    }
+  }
+
+  // 刷新 UI.Select
+  if (window.UI && window.UI.Select) {
+    window.UI.Select.refresh(select);
+  }
+}
+
+// ============ 初始化视频模型选择器 ============
+async function initVideoModelSelect() {
+  const select = $('#videoModel');
+  if (!select) return;
+
+  // 检查 API 配置
+  if (!window.ToolsAPIConfig) {
+    select.innerHTML = '<option value="">请先在设置中配置API</option>';
+    return;
+  }
+
+  // 显示加载状态
+  select.innerHTML = '<option value="">加载模型中...</option>';
+  if (window.UI && window.UI.Select) {
+    window.UI.Select.refresh(select);
+  }
+
+  const configs = window.ToolsAPIConfig.loadAllConfigs();
+  const providers = window.ToolsAPIConfig.getAllProviders();
+  const configuredProviders = Object.keys(configs);
+
+  if (configuredProviders.length === 0) {
+    // 没有配置 API
+    select.innerHTML = '<option value="">请先在设置中配置API</option>';
+  } else {
+    // 动态获取视频模型列表
+    let allModels = [];
+
+    for (let i = 0; i < configuredProviders.length; i++) {
+      const providerKey = configuredProviders[i];
+      const config = configs[providerKey];
+      const providerInfo = providers[providerKey];
+
+      if (config.apiKey) {
+        try {
+          // 动态获取视频模型列表
+          const models = await window.ToolsAPIConfig.fetchVideoModels(
+            providerKey,
+            config.apiKey,
+            config.baseUrl || config.endpoint
+          );
+
+          if (models && models.length > 0) {
+            models.forEach(function(model) {
+              allModels.push({
+                providerKey: providerKey,
+                providerName: providerInfo ? providerInfo.name : providerKey,
+                modelId: model.id,
+                modelName: model.name
+              });
+            });
+          }
+        } catch (error) {
+          console.warn('获取 ' + providerKey + ' 视频模型列表失败:', error.message);
+        }
+      }
+    }
+
+    if (allModels.length === 0) {
+      select.innerHTML = '<option value="">当前API不支持视频生成</option>';
+    } else {
+      // 渲染模型列表
+      select.innerHTML = '<option value="">选择视频模型</option>';
+
+      // 按厂商分组
+      const grouped = {};
+      allModels.forEach(function(model) {
+        if (!grouped[model.providerKey]) {
+          grouped[model.providerKey] = {
+            name: model.providerName,
+            models: []
+          };
+        }
+        grouped[model.providerKey].models.push(model);
+      });
+
+      Object.keys(grouped).forEach(function(providerKey) {
+        const group = grouped[providerKey];
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = group.name;
+
+        group.models.forEach(function(model) {
+          const option = document.createElement('option');
+          option.value = model.providerKey + '|' + model.modelId;
+          option.textContent = model.modelName;
+          optgroup.appendChild(option);
+        });
+
+        select.appendChild(optgroup);
+      });
+
+      // 恢复已保存的选择
+      if (state.settings.videoModel) {
+        select.value = state.settings.videoModel;
+      }
+    }
+  }
+
+  // 刷新 UI.Select
+  if (window.UI && window.UI.Select) {
+    window.UI.Select.refresh(select);
+  }
+}
+
 // ============ 初始化入口 ============
 async function init() {
+  console.log('短剧工坊 JS 版本: 2025-12-25 22:45 - 强制修复大纲面板滚动显示');
+
   // 初始化全局下拉组件（先初始化容器）
   if (window.UI && window.UI.Select) {
     window.UI.Select.init(document.querySelector('.dw-main'));
@@ -547,7 +839,9 @@ async function init() {
   
   // 异步加载模型选择器
   await initModelSelect();
-  
+  await initImageModelSelect();
+  await initVideoModelSelect();
+
   // 从本地存储加载角色库
   loadCharactersFromStorage();
 
@@ -1071,6 +1365,28 @@ async function generateOutline() {
     horror: '惊悚悬疑', rebirth: '重生逆袭', spy: '谍战风云', war: '战争史诗'
   };
 
+  // 检查是否选择了模型
+  const textModelSelect = $('#textModel');
+  if (!textModelSelect) {
+    showToast('模型选择器未找到', 'error');
+    return;
+  }
+
+  const selectedModel = textModelSelect.value;
+
+  if (!selectedModel || selectedModel === '') {
+    showToast('请先选择文本模型', 'error');
+    return;
+  }
+
+  // 解析模型值 (格式: providerKey|modelId)
+  const [providerKey, modelId] = selectedModel.split('|');
+
+  if (!modelId) {
+    showToast('模型格式错误，请重新选择', 'error');
+    return;
+  }
+
   const btn = $('#generateOutlineBtn');
   btn.disabled = true;
   btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i><span>生成中...</span>';
@@ -1080,7 +1396,7 @@ async function generateOutline() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'qwen-plus',
+        model: modelId,
         messages: [
           {
             role: 'system',
@@ -1558,6 +1874,34 @@ function renderEndFrameSlotCompact(shot, frame, idx, ratioClass, nextFrame, isLa
 
 // ============ 生成单个分镜图（模拟） ============
 async function generateFrame(shotId, type) {
+  // 检查是否选择了图片模型
+  const imageModelSelect = $('#imageModel');
+  if (!imageModelSelect) {
+    showToast('图片模型选择器未找到', 'error');
+    return;
+  }
+
+  const selectedModel = imageModelSelect.value;
+  if (!selectedModel || selectedModel === '') {
+    showToast('请先选择图片模型', 'error');
+    return;
+  }
+
+  // 解析模型值（格式：providerKey|modelId）
+  const parts = selectedModel.split('|');
+  let providerKey, modelId;
+
+  if (parts.length === 2) {
+    providerKey = parts[0];
+    modelId = parts[1];
+  } else {
+    // 兼容旧的硬编码格式（wanx-v1, stable-diffusion等）
+    modelId = selectedModel;
+    providerKey = 'unknown';
+  }
+
+  console.log('使用图片模型:', providerKey, modelId);
+
   const idx = state.shots.findIndex(s => s.id === shotId);
   if (idx === -1) return;
 
@@ -1858,3 +2202,4 @@ window.setEndFrameRef = setEndFrameRef;
 window.generateSingleVideo = generateSingleVideo;
 window.downloadVideo = downloadVideo;
 window.selectMergedEpisode = selectMergedEpisode;
+/* Last updated: 2025-12-25 21:45:57 */

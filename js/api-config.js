@@ -293,7 +293,197 @@
             throw error;
         }
     }
-    
+
+    // 获取图片生成模型列表
+    async function fetchImageModels(provider, apiKey, endpoint, forceRefresh = false) {
+        // 检查缓存
+        const cacheKey = `${provider}_image_${apiKey.substring(0, 8)}`;
+        if (!forceRefresh && modelsCache[cacheKey]) {
+            const cached = modelsCache[cacheKey];
+            if (Date.now() - cached.timestamp < CACHE_DURATION) {
+                return cached.models;
+            }
+        }
+
+        try {
+            const providerInfo = PROVIDERS[provider];
+            if (!providerInfo) {
+                throw new Error('不支持的提供商');
+            }
+
+            const apiEndpoint = endpoint || providerInfo.endpoint;
+
+            // 不同厂商的图片生成模型
+            switch (provider) {
+                case 'openai':
+                    // OpenAI DALL-E
+                    return [
+                        { id: 'dall-e-3', name: 'DALL-E 3' },
+                        { id: 'dall-e-2', name: 'DALL-E 2' }
+                    ];
+
+                case 'bailian':
+                case 'qwen':
+                    // 阿里百炼 - 通义万相
+                    return [
+                        { id: 'wanx-v1', name: '通义万相 v1' },
+                        { id: 'wanx-sketch-to-image-v1', name: '通义万相 草图生图' },
+                        { id: 'wanx-background-generation-v2', name: '通义万相 背景生成' }
+                    ];
+
+                case 'zhipu':
+                    // 智谱 CogView
+                    return [
+                        { id: 'cogview-3', name: 'CogView-3' },
+                        { id: 'cogview-3-plus', name: 'CogView-3 Plus' }
+                    ];
+
+                case 'custom':
+                    // 自定义API：尝试从 /models 接口获取图片模型
+                    try {
+                        const url = `${apiEndpoint}/models`;
+                        const headers = {
+                            'Authorization': `Bearer ${apiKey}`,
+                            'Content-Type': 'application/json'
+                        };
+
+                        const response = await fetch(url, { headers });
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.data && Array.isArray(data.data)) {
+                                // 只保留图片生成模型
+                                const imageModels = data.data.filter(model => {
+                                    const id = model.id.toLowerCase();
+                                    return id.includes('dall-e') ||
+                                           id.includes('image') ||
+                                           id.includes('wanx') ||
+                                           id.includes('cogview') ||
+                                           id.includes('stable-diffusion') ||
+                                           id.includes('midjourney');
+                                });
+
+                                const models = imageModels.map(model => ({
+                                    id: model.id,
+                                    name: formatModelName(model.id)
+                                }));
+
+                                // 缓存结果
+                                modelsCache[cacheKey] = {
+                                    models: models,
+                                    timestamp: Date.now()
+                                };
+
+                                return models;
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('自定义API获取图片模型失败，返回空列表');
+                    }
+                    return [];
+
+                default:
+                    // 其他厂商暂不支持图片生成
+                    return [];
+            }
+
+        } catch (error) {
+            console.error('获取图片模型列表失败:', error);
+            throw error;
+        }
+    }
+
+    // 获取视频生成模型列表
+    async function fetchVideoModels(provider, apiKey, endpoint, forceRefresh = false) {
+        // 检查缓存
+        const cacheKey = `${provider}_video_${apiKey.substring(0, 8)}`;
+        if (!forceRefresh && modelsCache[cacheKey]) {
+            const cached = modelsCache[cacheKey];
+            if (Date.now() - cached.timestamp < CACHE_DURATION) {
+                return cached.models;
+            }
+        }
+
+        try {
+            const providerInfo = PROVIDERS[provider];
+            if (!providerInfo) {
+                throw new Error('不支持的提供商');
+            }
+
+            const apiEndpoint = endpoint || providerInfo.endpoint;
+
+            // 不同厂商的视频生成模型
+            switch (provider) {
+                case 'bailian':
+                case 'qwen':
+                    // 阿里百炼 - 通义万相视频
+                    return [
+                        { id: 'wanx-video-v1', name: '通义万相视频 v1' },
+                        { id: 'wanx-animation-v1', name: '通义万相动画 v1' }
+                    ];
+
+                case 'zhipu':
+                    // 智谱 CogVideo
+                    return [
+                        { id: 'cogvideo-v1', name: 'CogVideo v1' }
+                    ];
+
+                case 'openai':
+                    // OpenAI 暂不支持视频生成
+                    return [];
+
+                case 'custom':
+                    // 自定义API：尝试从 /models 接口获取视频模型
+                    try {
+                        const url = `${apiEndpoint}/models`;
+                        const headers = {
+                            'Authorization': `Bearer ${apiKey}`,
+                            'Content-Type': 'application/json'
+                        };
+
+                        const response = await fetch(url, { headers });
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.data && Array.isArray(data.data)) {
+                                // 只保留视频生成模型
+                                const videoModels = data.data.filter(model => {
+                                    const id = model.id.toLowerCase();
+                                    return id.includes('video') ||
+                                           id.includes('animation') ||
+                                           id.includes('cogvideo') ||
+                                           id.includes('runway') ||
+                                           id.includes('pika');
+                                });
+
+                                const models = videoModels.map(model => ({
+                                    id: model.id,
+                                    name: formatModelName(model.id)
+                                }));
+
+                                // 缓存结果
+                                modelsCache[cacheKey] = {
+                                    models: models,
+                                    timestamp: Date.now()
+                                };
+
+                                return models;
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('自定义API获取视频模型失败，返回空列表');
+                    }
+                    return [];
+
+                default:
+                    // 其他厂商暂不支持视频生成
+                    return [];
+            }
+
+        } catch (error) {
+            console.error('获取视频模型列表失败:', error);
+            throw error;
+        }
+    }
+
     // 格式化模型名称，使其更易读
     function formatModelName(modelId) {
         // 常见模型名称映射
@@ -342,6 +532,8 @@
         getAllProviders,
         isConfigured,
         fetchModels,
+        fetchImageModels,
+        fetchVideoModels,
         setActiveProvider,
         getActiveProvider,
         getActiveConfig

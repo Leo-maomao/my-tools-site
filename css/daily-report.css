@@ -181,7 +181,7 @@
   line-height: 1.7;
   white-space: pre-wrap;
   word-break: break-word;
-  overflow-y: auto;
+  overflow: visible;
   min-height: 0;
 }
 
