@@ -2,12 +2,59 @@
 
 (function() {
   var CONFIG = {
-    // AI API 代理
-    AI_API_URL: 'https://ai-api.leo-maomao.workers.dev/report',
-    AI_MODEL: 'qwen-plus',
     // Supabase 配置
     SUPABASE_URL: 'https://aexcnubowsarpxkohqvv.supabase.co',
     SUPABASE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFleGNudWJvd3NhcnB4a29ocXZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyMjYyOTksImV4cCI6MjA3OTgwMjI5OX0.TCGkoBou99fui-cgcpod-b3BaSdq1mg7SFUtR2mIxms'
+  };
+
+  // 各厂商支持的模型列表
+  var PROVIDER_MODELS = {
+    openai: [
+      { id: 'gpt-4o', name: 'GPT-4o' },
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini' },
+      { id: 'gpt-4-turbo', name: 'GPT-4 Turbo' },
+      { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo' }
+    ],
+    qwen: [
+      { id: 'qwen-plus', name: '通义千问 Plus' },
+      { id: 'qwen-turbo', name: '通义千问 Turbo' },
+      { id: 'qwen-max', name: '通义千问 Max' }
+    ],
+    bailian: [
+      { id: 'qwen-plus', name: '通义千问 Plus' },
+      { id: 'qwen-turbo', name: '通义千问 Turbo' },
+      { id: 'qwen-max', name: '通义千问 Max' },
+      { id: 'qwen-long', name: '通义千问 Long' },
+      { id: 'deepseek-v3', name: 'DeepSeek V3' },
+      { id: 'deepseek-r1', name: 'DeepSeek R1' }
+    ],
+    claude: [
+      { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4' },
+      { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet' },
+      { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku' }
+    ],
+    deepseek: [
+      { id: 'deepseek-chat', name: 'DeepSeek Chat' },
+      { id: 'deepseek-coder', name: 'DeepSeek Coder' }
+    ],
+    moonshot: [
+      { id: 'moonshot-v1-8k', name: 'Moonshot 8K' },
+      { id: 'moonshot-v1-32k', name: 'Moonshot 32K' },
+      { id: 'moonshot-v1-128k', name: 'Moonshot 128K' }
+    ],
+    zhipu: [
+      { id: 'glm-4', name: 'GLM-4' },
+      { id: 'glm-4-flash', name: 'GLM-4 Flash' },
+      { id: 'glm-3-turbo', name: 'GLM-3 Turbo' }
+    ],
+    minimax: [
+      { id: 'abab6.5s-chat', name: 'MiniMax 6.5s' },
+      { id: 'abab5.5-chat', name: 'MiniMax 5.5' }
+    ],
+    baichuan: [
+      { id: 'Baichuan2-Turbo', name: 'Baichuan2 Turbo' },
+      { id: 'Baichuan2-Turbo-192k', name: 'Baichuan2 192K' }
+    ]
   };
 
   // 报告类型配置
@@ -110,17 +157,159 @@
 
   var state = {
     isGenerating: false,
-    currentOutput: ''
+    currentOutput: '',
+    selectedModel: null,
+    allModels: []
   };
 
   function init() {
     bindEvents();
     updateTemplateOptions();
+    loadModels();
+    
+    // 初始化全局 UI 组件
+    if (window.UI && window.UI.Select) {
+      window.UI.Select.init(document.querySelector('.dr-main'));
+    }
+    
+    // 监听 API 配置更新事件
+    window.addEventListener('apiConfigUpdated', function() {
+      loadModels();
+    });
+  }
+  
+  // 加载所有可用模型（异步获取）
+  async function loadModels() {
+    if (!window.ToolsAPIConfig) {
+      state.allModels = [];
+      renderModelSelect();
+      return;
+    }
+    
+    // 显示加载状态
+    var select = document.getElementById('modelSelect');
+    if (select) {
+      select.innerHTML = '<option value="">加载模型中...</option>';
+      if (window.UI && window.UI.Select) {
+        window.UI.Select.refresh(select);
+      }
+    }
+    
+    var configs = window.ToolsAPIConfig.loadAllConfigs();
+    var providers = window.ToolsAPIConfig.getAllProviders();
+    var models = [];
+    var providerIds = Object.keys(configs);
+    
+    // 动态获取模型列表
+    for (var i = 0; i < providerIds.length; i++) {
+      var providerId = providerIds[i];
+      var config = configs[providerId];
+      var providerInfo = providers[providerId];
+      
+      if (config.apiKey) {
+        try {
+          // 动态获取模型列表
+          var providerModels = await window.ToolsAPIConfig.fetchModels(
+            providerId,
+            config.apiKey,
+            config.baseUrl || config.endpoint
+          );
+          
+          providerModels.forEach(function(model) {
+            models.push({
+              id: providerId + ':' + model.id,
+              name: model.name,
+              providerId: providerId,
+              providerName: providerInfo ? providerInfo.name : providerId,
+              modelId: model.id
+            });
+          });
+        } catch (error) {
+          console.warn('获取 ' + providerId + ' 模型列表失败:', error.message);
+          // 回退到备用列表
+          var fallbackModels = PROVIDER_MODELS[providerId] || [];
+          fallbackModels.forEach(function(model) {
+            models.push({
+              id: providerId + ':' + model.id,
+              name: model.name + ' (离线)',
+              providerId: providerId,
+              providerName: providerInfo ? providerInfo.name : providerId,
+              modelId: model.id
+            });
+          });
+        }
+      }
+    }
+    
+    state.allModels = models;
+    renderModelSelect();
+  }
+  
+  // 渲染模型选择器
+  function renderModelSelect() {
+    var select = document.getElementById('modelSelect');
+    if (!select) return;
+    
+    if (state.allModels.length === 0) {
+      // 没有配置 API 时，显示提示
+      select.innerHTML = '<option value="">请先在设置中配置API</option>';
+    } else {
+      // 有可用模型时，显示选择提示
+      select.innerHTML = '<option value="">选择模型</option>';
+      // 按提供商分组
+      var grouped = {};
+      state.allModels.forEach(function(model) {
+        if (!grouped[model.providerId]) {
+          grouped[model.providerId] = [];
+        }
+        grouped[model.providerId].push(model);
+      });
+      
+      Object.keys(grouped).forEach(function(providerId) {
+        var providerInfo = window.ToolsAPIConfig.getProviderInfo(providerId);
+        var providerName = providerInfo ? providerInfo.name : providerId;
+        var optgroup = document.createElement('optgroup');
+        optgroup.label = providerName;
+        
+        grouped[providerId].forEach(function(model) {
+          var option = document.createElement('option');
+          option.value = model.id;
+          option.textContent = model.name;
+          optgroup.appendChild(option);
+        });
+        
+        select.appendChild(optgroup);
+      });
+    }
+    
+    // 默认不选择任何模型
+    select.value = '';
+    state.selectedModel = null;
+    
+    // 刷新 UI.Select 组件
+    if (window.UI && window.UI.Select) {
+      window.UI.Select.refresh(select);
+    }
+  }
+  
+  // 更新选中的模型
+  function updateSelectedModel(value) {
+    if (!value) {
+      state.selectedModel = null;
+      return;
+    }
+    
+    var model = state.allModels.find(function(m) {
+      return m.id === value;
+    });
+    
+    state.selectedModel = model || null;
   }
 
   function bindEvents() {
     var generateBtn = document.getElementById('generateBtn');
     var copyBtn = document.getElementById('copyBtn');
+    var modelSelect = document.getElementById('modelSelect');
 
     if (generateBtn) {
       generateBtn.addEventListener('click', handleGenerate);
@@ -128,6 +317,13 @@
 
     if (copyBtn) {
       copyBtn.addEventListener('click', handleCopy);
+    }
+    
+    // 模型选择监听
+    if (modelSelect) {
+      modelSelect.addEventListener('change', function() {
+        updateSelectedModel(modelSelect.value);
+      });
     }
 
     // 快捷键：Ctrl/Cmd + Enter 生成
@@ -177,6 +373,14 @@
 
   async function handleGenerate() {
     if (state.isGenerating) return;
+    
+    // 检查是否选择了模型
+    if (!state.selectedModel) {
+      showToast('请先选择 AI 模型', 'error');
+      var modelSelect = document.getElementById('modelSelect');
+      if (modelSelect) modelSelect.focus();
+      return;
+    }
 
     var workContent = document.getElementById('workContent').value.trim();
     if (!workContent) {
@@ -236,6 +440,16 @@
   }
 
   async function callAI(workContent, reportTypeKey, templateKey, formatKey) {
+    // 获取当前选中模型的配置
+    if (!state.selectedModel || !window.ToolsAPIConfig) {
+      throw new Error('未选择模型或配置不可用');
+    }
+    
+    var activeConfig = window.ToolsAPIConfig.getConfig(state.selectedModel.providerId);
+    if (!activeConfig || !activeConfig.apiKey) {
+      throw new Error('API 配置不完整');
+    }
+    
     var reportType = REPORT_TYPES[reportTypeKey] || REPORT_TYPES.daily;
     var template = TEMPLATES[templateKey] || TEMPLATES.simple;
     var format = FORMATS[formatKey] || FORMATS.text;
@@ -261,19 +475,32 @@
       { role: 'user', content: '我' + reportType.period + '的工作内容：\n\n' + workContent }
     ];
 
-    var response = await fetch(CONFIG.AI_API_URL, {
+    var providerInfo = window.ToolsAPIConfig.getProviderInfo(state.selectedModel.providerId);
+    var apiUrl = activeConfig.baseUrl || (providerInfo ? providerInfo.endpoint : '');
+    if (!apiUrl) {
+      throw new Error('API 地址配置不正确');
+    }
+    
+    // 确保 URL 以 /chat/completions 结尾
+    if (!apiUrl.endsWith('/chat/completions')) {
+      apiUrl = apiUrl.replace(/\/$/, '') + '/chat/completions';
+    }
+
+    var response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + activeConfig.apiKey
       },
       body: JSON.stringify({
-        model: CONFIG.AI_MODEL,
+        model: state.selectedModel.modelId,
         messages: messages
       })
     });
 
     if (!response.ok) {
-      throw new Error('AI 请求失败');
+      var errorText = await response.text();
+      throw new Error('AI 请求失败: ' + response.status);
     }
 
     var data = await response.json();
@@ -382,5 +609,12 @@
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
+  }
+  
+  // 页面加载完成后显示引导（从Supabase加载配置）
+  if (typeof window.ToolsGuide !== 'undefined') {
+    setTimeout(function() {
+      window.ToolsGuide.show('daily-report');
+    }, 300);
   }
 })();

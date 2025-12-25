@@ -3,14 +3,20 @@
 .settings-main {
   width: 100%;
   height: 100%;
-  overflow-y: auto;
+  overflow: hidden;
   background: var(--bg);
 }
 
 .settings-container {
   max-width: 1200px;
+  height: 100%;
+  min-height: 0; /* 允许内部滚动 */
   margin: 0 auto;
   padding: 24px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 /* 头部 */
@@ -72,18 +78,26 @@
 
 /* 内容面板 */
 .settings-content {
+  flex: 1;
+  min-height: 0; /* 允许内部滚动 */
+  max-height: 100%; /* 限制最大高度 */
   background: var(--card-bg);
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .settings-panel {
   display: none;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0; /* 允许内部滚动 */
 }
 
 .settings-panel.is-active {
-  display: block;
+  display: flex;
 }
 
 .settings-panel-header {
@@ -103,6 +117,9 @@
 
 .settings-panel-body {
   padding: 20px 24px;
+  flex: 1;
+  min-height: 0; /* 允许滚动 */
+  overflow-y: auto;
 }
 
 .settings-panel-footer {
@@ -128,9 +145,7 @@
 }
 
 .btn-primary:hover {
-  background: var(--accent-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
 }
 
 .btn-primary i {
@@ -153,9 +168,7 @@
 }
 
 .btn-secondary:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: var(--bg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .btn-text {
@@ -173,8 +186,7 @@
 }
 
 .btn-text:hover {
-  color: var(--accent);
-  background: var(--bg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .btn-icon {
@@ -192,14 +204,11 @@
 }
 
 .btn-icon:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: var(--bg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .btn-icon.btn-delete:hover {
-  border-color: #ef4444;
-  color: #ef4444;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.35);
 }
 
 /* 空状态 */
@@ -275,6 +284,13 @@
   justify-content: center;
   font-size: 24px;
   color: var(--accent);
+  overflow: hidden;
+}
+
+.api-item-icon img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
 }
 
 .api-item-details {
@@ -309,6 +325,7 @@
 .api-item-actions {
   display: flex;
   gap: 8px;
+  margin-left: 16px; /* 与"使用中"标签保持距离 */
 }
 
 /* 引导网格 */
@@ -540,123 +557,50 @@
   gap: 12px;
 }
 
-/* UI Select (复用原有样式) */
-.ui-select {
-  position: relative;
-}
-
-.ui-select-trigger {
+/* 设置页面 - 提供商选择器占满宽度 */
+#providerSelect {
   width: 100%;
-  padding: 10px 40px 10px 16px;
-  border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  background: var(--card-bg);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
-  display: flex;
-  align-items: center;
 }
 
-.ui-select-trigger:hover {
-  border-color: var(--accent);
+#providerSelect .ui-select-trigger {
+  width: 100%;
 }
 
-.ui-select-trigger::after {
-  content: '\ea4e';
-  font-family: 'remixicon';
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-muted);
-  transition: transform 0.2s ease;
-  font-size: 16px;
-  /* 覆盖全局样式中的border箭头 */
-  width: auto;
-  height: auto;
-  border: none;
-}
-
-.ui-select.is-open .ui-select-trigger::after {
-  transform: translateY(-50%) rotate(180deg);
-}
-
-.ui-select-value {
-  font-size: 14px;
-  color: var(--text-main);
-  flex: 1;
-  text-align: left;
-}
-
-.ui-select-value.is-placeholder {
-  color: var(--text-muted);
-}
-
-/* 内联ui-select样式（用于模型选择等） */
-.ui-select-inline {
-  position: relative;
-  z-index: 1;
-}
-
-.ui-select-inline.is-open {
-  z-index: 9999;
-}
-
-.ui-select-inline .ui-select-dropdown {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
-  max-height: 200px;
-  overflow-y: auto;
-  background: var(--card-bg);
-  border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  z-index: 9999;
-  display: none;
-  padding: 4px 0;
-}
-
-.ui-select-inline.is-open .ui-select-dropdown {
-  display: block;
-}
-
-.ui-select-inline .ui-select-option {
-  padding: 10px 16px;
-  font-size: 14px;
-  color: var(--text-main);
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.ui-select-inline .ui-select-option:hover {
-  background: var(--bg);
-}
-
-.ui-select-inline .ui-select-option.is-selected {
-  color: var(--accent);
-  background: rgba(37, 99, 235, 0.08);
-}
-
-/* 下拉菜单样式 - 移动到body下，不受弹窗影响 */
+/* 设置页面特殊的下拉菜单 - 固定定位，用于弹窗内 */
 #providerDropdown {
   position: fixed !important;
   max-height: 280px;
-  overflow-y: auto;
-  background: var(--card-bg);
-  border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  max-width: none !important; /* 覆盖全局 320px 限制，宽度由 JS 动态设置 */
   z-index: 10001 !important;
-  padding: 4px 0;
-  /* 覆盖 style.css 中的默认样式 */
   min-width: auto !important;
+  transform: none !important;
   opacity: 0;
   visibility: hidden;
-  transform: none !important;
-  transition: opacity 0.15s ease, visibility 0.15s ease !important;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+  /* 基础样式 */
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow-y: scroll; /* 始终显示滚动条区域 */
+  padding: 8px 12px; /* 统一间距 */
+}
+
+/* 滚动条样式 - 添加间距 */
+#providerDropdown::-webkit-scrollbar {
+  width: 18px; /* 滚动条区域宽度（包含间距） */
+}
+
+#providerDropdown::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 3px;
+  border: 6px solid transparent; /* 通过透明边框实现间距 */
+  background-clip: padding-box;
+}
+
+#providerDropdown::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 8px 0; /* 上下间距 */
 }
 
 #providerDropdown.is-visible {
@@ -664,27 +608,28 @@
   visibility: visible;
 }
 
-.ui-select-option {
-  padding: 10px 16px;
+#providerDropdown .ui-select-option {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 8px 6px; /* 上下 8px，左右 6px */
+  margin: 2px 0;
   font-size: 14px;
   color: var(--text-main);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background 0.15s ease;
   white-space: nowrap;
+  border-radius: var(--radius-sm);
 }
 
-.ui-select-option:hover {
+#providerDropdown .ui-select-option:hover {
   background: var(--bg);
 }
 
-.ui-select-option.is-selected {
-  background: rgba(37, 99, 235, 0.1);
+#providerDropdown .ui-select-option.is-selected {
+  background: var(--bg);
   color: var(--accent);
   font-weight: 500;
-}
-
-.ui-select-option:first-child {
-  color: var(--text-muted);
 }
 
 /* 图片上传 - 固定高度，切换时不改变弹窗大小 */
@@ -765,7 +710,7 @@
 }
 
 .image-delete-btn:hover {
-  background: #ef4444;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.35);
 }
 
 .image-delete-btn i {
@@ -939,7 +884,7 @@
 }
 
 .modal-btn.cancel:hover {
-  background: var(--bg-tertiary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .modal-btn.confirm {
@@ -948,18 +893,17 @@
 }
 
 .modal-btn.confirm:hover {
-  background: #1d4ed8;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
 }
 
 .modal-btn.btn-delete {
   background: transparent;
   color: #ef4444;
+  border: 1px solid #ef4444;
 }
 
 .modal-btn.btn-delete:hover {
-  background: rgba(239, 68, 68, 0.1);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.35);
 }
 
 .modal-btn:disabled {

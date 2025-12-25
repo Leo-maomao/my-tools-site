@@ -16,10 +16,16 @@
           autocomplete="off"
         ></textarea>
       </div>
-      <div class="dr-form-row dr-form-row--3">
+      <div class="dr-form-row dr-form-row--4">
+        <div class="dr-form-group">
+          <label>AI 模型</label>
+          <select id="modelSelect">
+            <option value="">选择模型</option>
+          </select>
+        </div>
         <div class="dr-form-group">
           <label>报告类型</label>
-          <select id="reportTypeSelect" class="dr-select">
+          <select id="reportTypeSelect">
             <option value="daily">日报</option>
             <option value="weekly">周报</option>
             <option value="quarterly">季报</option>
@@ -29,7 +35,7 @@
         </div>
         <div class="dr-form-group">
           <label>报告模板</label>
-          <select id="templateSelect" class="dr-select">
+          <select id="templateSelect">
             <option value="simple">简洁版</option>
             <option value="detailed">详细版</option>
             <option value="okr">OKR版</option>
@@ -38,7 +44,7 @@
         </div>
         <div class="dr-form-group">
           <label>输出格式</label>
-          <select id="formatSelect" class="dr-select">
+          <select id="formatSelect">
             <option value="text">纯文本</option>
             <option value="markdown">Markdown</option>
             <option value="html">富文本</option>

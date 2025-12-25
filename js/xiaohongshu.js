@@ -4,6 +4,43 @@
 (function() {
     'use strict';
 
+    // 各厂商支持的模型列表
+    var PROVIDER_MODELS = {
+        openai: [
+            { id: 'gpt-4o', name: 'GPT-4o' },
+            { id: 'gpt-4o-mini', name: 'GPT-4o Mini' },
+            { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo' }
+        ],
+        qwen: [
+            { id: 'qwen-plus', name: '通义千问 Plus' },
+            { id: 'qwen-turbo', name: '通义千问 Turbo' },
+            { id: 'qwen-max', name: '通义千问 Max' }
+        ],
+        bailian: [
+            { id: 'qwen-plus', name: '通义千问 Plus' },
+            { id: 'qwen-turbo', name: '通义千问 Turbo' },
+            { id: 'qwen-max', name: '通义千问 Max' },
+            { id: 'qwen-long', name: '通义千问 Long' },
+            { id: 'deepseek-v3', name: 'DeepSeek V3' },
+            { id: 'deepseek-r1', name: 'DeepSeek R1' }
+        ],
+        claude: [
+            { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4' },
+            { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet' }
+        ],
+        deepseek: [
+            { id: 'deepseek-chat', name: 'DeepSeek Chat' }
+        ],
+        moonshot: [
+            { id: 'moonshot-v1-32k', name: 'Moonshot 32K' },
+            { id: 'moonshot-v1-128k', name: 'Moonshot 128K' }
+        ],
+        zhipu: [
+            { id: 'glm-4', name: 'GLM-4' },
+            { id: 'glm-4-flash', name: 'GLM-4 Flash' }
+        ]
+    };
+
     // IndexedDB 存储模块
     var Storage = {
         dbName: 'weMediaDB',
@@ -158,7 +195,16 @@
         copyDesc: document.getElementById('copyDesc'),
 
         // Canvas
-        canvas: document.getElementById('renderCanvas')
+        canvas: document.getElementById('renderCanvas'),
+
+        // AI功能
+        modelSelect: document.getElementById('xhsModelSelect'),
+        optimizeAllBtn: document.getElementById('optimizeAllBtn'),
+        aiPreviewModal: document.getElementById('aiPreviewModal'),
+        aiPreviewBody: document.getElementById('aiPreviewBody'),
+        aiPreviewClose: document.getElementById('aiPreviewClose'),
+        aiPreviewCancel: document.getElementById('aiPreviewCancel'),
+        aiPreviewApply: document.getElementById('aiPreviewApply')
     };
 
     // 状态
@@ -170,7 +216,11 @@
         generatedImages: [],  // 生成的图片
         // 用户标记的区域（相对于原图的比例）
         coverArea: null,      // { x, y, width, height } 比例值 0-1
-        bgArea: null          // { x, y, width, height } 比例值 0-1
+        bgArea: null,         // { x, y, width, height } 比例值 0-1
+        // AI功能
+        selectedModel: null,  // 当前选中的模型
+        allModels: [],        // 所有可用模型
+        aiOptimizeResults: {} // AI优化结果缓存
     };
 
     // 初始化
@@ -178,6 +228,7 @@
         bindEvents();
         initFullscreen();
         initAreaMarker();
+        initAI(); // 初始化AI功能
 
         // 初始化 IndexedDB 并恢复已保存的模板
         Storage.init().then(function() {
@@ -266,7 +317,7 @@
         // 正文字数统计
         elements.contentEditor.addEventListener('input', function() {
             var count = this.innerText.length;
-            elements.contentCharCount.textContent = count + ' 字';
+            elements.contentCharCount.textContent = count + '字';
         });
 
         // 支持粘贴图片
@@ -275,7 +326,7 @@
         // 正文描述字数统计
         elements.xhsDesc.addEventListener('input', function() {
             var count = this.value.length;
-            elements.descCharCount.textContent = count + ' 字';
+            elements.descCharCount.textContent = count + '字';
         });
 
         // 生成按钮
@@ -311,7 +362,429 @@
             e.stopPropagation();
             deleteTemplate('bg');
         });
+
+        // AI优化按钮事件
+        document.querySelectorAll('.btn-ai-optimize').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                var target = this.getAttribute('data-target');
+                optimizeSingleField(target, this);
+            });
+        });
+
+        // 一键优化按钮
+        if (elements.optimizeAllBtn) {
+            elements.optimizeAllBtn.addEventListener('click', optimizeAllFields);
+        }
+
+        // 模型选择器
+        if (elements.modelSelect) {
+            elements.modelSelect.addEventListener('change', function() {
+                var value = this.value;
+                if (value) {
+                    var parts = value.split('|');
+                    state.selectedModel = {
+                        providerId: parts[0],
+                        modelId: parts[1]
+                    };
+                } else {
+                    state.selectedModel = null;
+                }
+            });
+        }
+
+        // AI预览弹窗事件
+        if (elements.aiPreviewClose) {
+            elements.aiPreviewClose.addEventListener('click', closeAIPreview);
+        }
+        if (elements.aiPreviewCancel) {
+            elements.aiPreviewCancel.addEventListener('click', closeAIPreview);
+        }
+        if (elements.aiPreviewApply) {
+            elements.aiPreviewApply.addEventListener('click', applyAIOptimization);
+        }
+        if (elements.aiPreviewModal) {
+            elements.aiPreviewModal.querySelector('.xhs-ai-preview-backdrop').addEventListener('click', closeAIPreview);
+        }
+
+        // 监听API配置更新事件
+        window.addEventListener('apiConfigUpdated', function() {
+            loadModels();
+        });
     }
+
+    // ========== AI功能 ==========
+    
+    // 初始化AI功能
+    async function initAI() {
+        // 先初始化UI.Select容器
+        if (window.UI && window.UI.Select) {
+            window.UI.Select.init(document.querySelector('.xhs-main'));
+        }
+        // 异步加载模型数据
+        await loadModels();
+    }
+
+    // 加载所有可用模型（异步获取）
+    async function loadModels() {
+        // 确保获取最新的DOM元素
+        elements.modelSelect = document.getElementById('xhsModelSelect');
+        
+        if (!window.ToolsAPIConfig) {
+            state.allModels = [];
+            renderModelSelect();
+            return;
+        }
+
+        var configs = window.ToolsAPIConfig.loadAllConfigs();
+        var models = [];
+        
+        // 显示加载状态
+        if (elements.modelSelect) {
+            elements.modelSelect.innerHTML = '<option value="">加载模型中...</option>';
+            if (window.UI && window.UI.Select) {
+                window.UI.Select.refresh(elements.modelSelect);
+            }
+        }
+
+        // 遍历已配置的厂商，动态获取模型列表
+        var providerIds = Object.keys(configs);
+        
+        for (var i = 0; i < providerIds.length; i++) {
+            var providerId = providerIds[i];
+            var config = configs[providerId];
+            
+            if (config.apiKey) {
+                try {
+                    // 动态获取模型列表
+                    var providerModels = await window.ToolsAPIConfig.fetchModels(
+                        providerId, 
+                        config.apiKey, 
+                        config.baseUrl || config.endpoint
+                    );
+                    
+                    providerModels.forEach(function(model) {
+                        models.push({
+                            providerId: providerId,
+                            modelId: model.id,
+                            displayName: model.name
+                        });
+                    });
+                } catch (error) {
+                    console.warn('获取 ' + providerId + ' 模型列表失败:', error.message);
+                    // 如果动态获取失败，使用备用的硬编码列表
+                    var fallbackModels = PROVIDER_MODELS[providerId] || [];
+                    fallbackModels.forEach(function(model) {
+                        models.push({
+                            providerId: providerId,
+                            modelId: model.id,
+                            displayName: model.name + ' (离线)'
+                        });
+                    });
+                }
+            }
+        }
+
+        state.allModels = models;
+        renderModelSelect();
+    }
+
+    // 渲染模型选择器
+    function renderModelSelect() {
+        var select = elements.modelSelect;
+        if (!select) return;
+
+        select.innerHTML = '';
+
+        if (state.allModels.length === 0) {
+            select.innerHTML = '<option value="">请先在设置中配置API</option>';
+            if (elements.optimizeAllBtn) {
+                elements.optimizeAllBtn.disabled = true;
+            }
+            // 刷新UI.Select
+            if (window.UI && window.UI.Select) {
+                window.UI.Select.refresh(select);
+            }
+            return;
+        }
+
+        // 添加默认选项
+        var defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = '选择模型';
+        select.appendChild(defaultOption);
+
+        // 按厂商分组
+        var grouped = {};
+        state.allModels.forEach(function(model) {
+            if (!grouped[model.providerId]) {
+                grouped[model.providerId] = [];
+            }
+            grouped[model.providerId].push(model);
+        });
+
+        Object.keys(grouped).forEach(function(providerId) {
+            var providerInfo = window.ToolsAPIConfig.getProviderInfo(providerId);
+            var providerName = providerInfo ? providerInfo.name : providerId;
+            var optgroup = document.createElement('optgroup');
+            optgroup.label = providerName;
+
+            grouped[providerId].forEach(function(model) {
+                var option = document.createElement('option');
+                option.value = model.providerId + '|' + model.modelId;
+                option.textContent = model.displayName;
+                optgroup.appendChild(option);
+            });
+
+            select.appendChild(optgroup);
+        });
+
+        if (elements.optimizeAllBtn) {
+            elements.optimizeAllBtn.disabled = false;
+        }
+
+        // 刷新UI.Select
+        if (window.UI && window.UI.Select) {
+            window.UI.Select.refresh(select);
+        }
+    }
+
+    // AI优化提示词
+    var AI_PROMPTS = {
+        coverTitle: {
+            system: '你是一个小红书运营专家，擅长写吸引人的封面标题。',
+            user: '请优化以下小红书封面标题，使其更加吸引眼球、简洁有力（控制在15字以内）。只输出优化后的标题，不要任何解释：\n\n'
+        },
+        contentEditor: {
+            system: '你是一个小红书内容创作专家，擅长写出高互动的正文内容。',
+            user: '请优化以下小红书正文内容，使其更加生动有趣、易读、有互动性。保持原意，适当添加emoji表情，每段不要太长。只输出优化后的内容，不要任何解释：\n\n'
+        },
+        xhsTitle: {
+            system: '你是一个小红书运营专家，擅长写优秀的发布标题。',
+            user: '请优化以下小红书发布标题，使其更加吸引人点击、包含关键词、控制在20字以内。只输出优化后的标题，不要任何解释：\n\n'
+        },
+        xhsDesc: {
+            system: '你是一个小红书运营专家，擅长写高转化的发布内容。',
+            user: '请优化以下小红书发布内容，使其更加吸引人、包含话题标签、引导互动。适当添加emoji和#话题标签。只输出优化后的内容，不要任何解释：\n\n'
+        }
+    };
+
+    // 获取字段内容
+    function getFieldContent(target) {
+        if (target === 'contentEditor') {
+            return elements.contentEditor.innerText.trim();
+        } else {
+            var el = document.getElementById(target);
+            return el ? el.value.trim() : '';
+        }
+    }
+
+    // 设置字段内容
+    function setFieldContent(target, content) {
+        if (target === 'contentEditor') {
+            elements.contentEditor.innerText = content;
+            var count = content.length;
+            elements.contentCharCount.textContent = count + '字';
+        } else {
+            var el = document.getElementById(target);
+            if (el) {
+                el.value = content;
+                // 触发字数统计更新
+                if (target === 'xhsDesc') {
+                    elements.descCharCount.textContent = content.length + '字';
+                }
+            }
+        }
+    }
+
+    // 调用AI API
+    async function callAI(systemPrompt, userPrompt) {
+        if (!state.selectedModel || !window.ToolsAPIConfig) {
+            throw new Error('请先选择模型');
+        }
+
+        var activeConfig = window.ToolsAPIConfig.getConfig(state.selectedModel.providerId);
+        if (!activeConfig || !activeConfig.apiKey) {
+            throw new Error('API配置不完整');
+        }
+
+        var providerInfo = window.ToolsAPIConfig.getProviderInfo(state.selectedModel.providerId);
+        var apiUrl = activeConfig.baseUrl || (providerInfo ? providerInfo.endpoint : '');
+        if (!apiUrl) {
+            throw new Error('API地址配置不正确');
+        }
+
+        // 确保URL以/chat/completions结尾
+        if (!apiUrl.endsWith('/chat/completions')) {
+            apiUrl = apiUrl.replace(/\/$/, '') + '/chat/completions';
+        }
+
+        var response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + activeConfig.apiKey
+            },
+            body: JSON.stringify({
+                model: state.selectedModel.modelId,
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: userPrompt }
+                ],
+                temperature: 0.7,
+                max_tokens: 2000
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('AI请求失败: ' + response.status);
+        }
+
+        var data = await response.json();
+        return data.choices[0].message.content.trim();
+    }
+
+    // 优化单个字段
+    async function optimizeSingleField(target, btn) {
+        var content = getFieldContent(target);
+        if (!content) {
+            alert('请先输入内容');
+            return;
+        }
+
+        if (!state.selectedModel) {
+            alert('请先选择模型');
+            return;
+        }
+
+        var prompt = AI_PROMPTS[target];
+        if (!prompt) {
+            alert('不支持的字段类型');
+            return;
+        }
+
+        // 设置loading状态
+        btn.classList.add('is-loading');
+        btn.disabled = true;
+
+        try {
+            var optimized = await callAI(prompt.system, prompt.user + content);
+            
+            // 存储优化结果
+            state.aiOptimizeResults = {
+                [target]: {
+                    original: content,
+                    optimized: optimized
+                }
+            };
+
+            // 显示预览
+            showAIPreview();
+        } catch (error) {
+            alert('AI优化失败: ' + error.message);
+        } finally {
+            btn.classList.remove('is-loading');
+            btn.disabled = false;
+        }
+    }
+
+    // 一键优化所有字段
+    async function optimizeAllFields() {
+        if (!state.selectedModel) {
+            alert('请先选择模型');
+            return;
+        }
+
+        var btn = elements.optimizeAllBtn;
+        var originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i> 优化中...';
+        btn.disabled = true;
+
+        var results = {};
+        var fields = ['coverTitle', 'contentEditor', 'xhsTitle', 'xhsDesc'];
+        var hasContent = false;
+
+        try {
+            for (var i = 0; i < fields.length; i++) {
+                var target = fields[i];
+                var content = getFieldContent(target);
+                
+                if (content) {
+                    hasContent = true;
+                    var prompt = AI_PROMPTS[target];
+                    var optimized = await callAI(prompt.system, prompt.user + content);
+                    results[target] = {
+                        original: content,
+                        optimized: optimized
+                    };
+                }
+            }
+
+            if (!hasContent) {
+                alert('请先输入内容');
+                return;
+            }
+
+            state.aiOptimizeResults = results;
+            showAIPreview();
+        } catch (error) {
+            alert('AI优化失败: ' + error.message);
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    // 显示AI预览弹窗
+    function showAIPreview() {
+        var body = elements.aiPreviewBody;
+        body.innerHTML = '';
+
+        var fieldNames = {
+            coverTitle: '封面标题',
+            contentEditor: '正文内容',
+            xhsTitle: '发布标题',
+            xhsDesc: '发布内容'
+        };
+
+        Object.keys(state.aiOptimizeResults).forEach(function(target) {
+            var result = state.aiOptimizeResults[target];
+            var item = document.createElement('div');
+            item.className = 'xhs-ai-preview-item';
+            item.innerHTML = 
+                '<div class="xhs-ai-preview-label">' + (fieldNames[target] || target) + '</div>' +
+                '<div class="xhs-ai-preview-original">' + escapeHtml(result.original) + '</div>' +
+                '<div class="xhs-ai-preview-optimized">' + escapeHtml(result.optimized) + '</div>';
+            body.appendChild(item);
+        });
+
+        elements.aiPreviewModal.classList.add('is-open');
+    }
+
+    // 关闭AI预览弹窗
+    function closeAIPreview() {
+        elements.aiPreviewModal.classList.remove('is-open');
+    }
+
+    // 应用AI优化结果
+    function applyAIOptimization() {
+        Object.keys(state.aiOptimizeResults).forEach(function(target) {
+            var result = state.aiOptimizeResults[target];
+            setFieldContent(target, result.optimized);
+        });
+
+        closeAIPreview();
+        state.aiOptimizeResults = {};
+    }
+
+    // HTML转义
+    function escapeHtml(text) {
+        var div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // ========== 模板管理 ==========
 
     // 删除模板
     function deleteTemplate(type) {
@@ -375,7 +848,7 @@
                         elements.contentEditor.appendChild(img);
                     }
                     // 更新字数
-                    elements.contentCharCount.textContent = elements.contentEditor.innerText.length + ' 字';
+                    elements.contentCharCount.textContent = elements.contentEditor.innerText.length + '字';
                 };
                 reader.readAsDataURL(file);
                 return;

@@ -5,16 +5,20 @@
     const CONFIG_KEY = 'tools_api_configs'; // 存储所有配置
     const ACTIVE_PROVIDER_KEY = 'tools_active_provider'; // 存储当前使用的厂商
     
+    // 图标 CDN 基础路径
+    const ICON_CDN = 'https://unpkg.com/@lobehub/icons-static-png@latest/light';
+    
     // 支持的提供商列表
     const PROVIDERS = {
-        openai: { name: 'OpenAI (GPT)', icon: '🤖', endpoint: 'https://api.openai.com/v1' },
-        qwen: { name: '阿里云通义千问', icon: '☁️', endpoint: 'https://dashscope.aliyuncs.com/compatible-mode/v1' },
-        claude: { name: 'Anthropic Claude', icon: '🧠', endpoint: 'https://api.anthropic.com/v1' },
-        deepseek: { name: 'DeepSeek', icon: '🔍', endpoint: 'https://api.deepseek.com/v1' },
-        moonshot: { name: '月之暗面 Kimi', icon: '🌙', endpoint: 'https://api.moonshot.cn/v1' },
-        zhipu: { name: '智谱 GLM', icon: '💡', endpoint: 'https://open.bigmodel.cn/api/paas/v4' },
-        minimax: { name: 'MiniMax', icon: '⚡', endpoint: 'https://api.minimax.chat/v1' },
-        baichuan: { name: '百川智能', icon: '🏔️', endpoint: 'https://api.baichuan-ai.com/v1' },
+        openai: { name: 'OpenAI (GPT)', icon: `${ICON_CDN}/openai.png`, endpoint: 'https://api.openai.com/v1' },
+        qwen: { name: '阿里云通义千问', icon: `${ICON_CDN}/qwen.png`, endpoint: 'https://dashscope.aliyuncs.com/compatible-mode/v1' },
+        bailian: { name: '阿里云百炼', icon: `${ICON_CDN}/bailian.png`, endpoint: 'https://dashscope.aliyuncs.com/compatible-mode/v1' },
+        claude: { name: 'Anthropic Claude', icon: `${ICON_CDN}/anthropic.png`, endpoint: 'https://api.anthropic.com/v1' },
+        deepseek: { name: 'DeepSeek', icon: `${ICON_CDN}/deepseek-color.png`, endpoint: 'https://api.deepseek.com/v1' },
+        moonshot: { name: '月之暗面 Kimi', icon: `${ICON_CDN}/moonshot.png`, endpoint: 'https://api.moonshot.cn/v1' },
+        zhipu: { name: '智谱 GLM', icon: `${ICON_CDN}/zhipu-color.png`, endpoint: 'https://open.bigmodel.cn/api/paas/v4' },
+        minimax: { name: 'MiniMax', icon: `${ICON_CDN}/minimax-color.png`, endpoint: 'https://api.minimax.chat/v1' },
+        baichuan: { name: '百川智能', icon: `${ICON_CDN}/baichuan-color.png`, endpoint: 'https://api.baichuan-ai.com/v1' },
         custom: { name: '自定义 API', icon: '🔧', endpoint: '' }
     };
     
@@ -155,8 +159,21 @@
         return getConfig(activeProvider);
     }
     
+    // 模型缓存（避免重复请求）
+    const modelsCache = {};
+    const CACHE_DURATION = 5 * 60 * 1000; // 5分钟缓存
+    
     // 获取模型列表（调用API）
-    async function fetchModels(provider, apiKey, endpoint) {
+    async function fetchModels(provider, apiKey, endpoint, forceRefresh = false) {
+        // 检查缓存
+        const cacheKey = `${provider}_${apiKey.substring(0, 8)}`;
+        if (!forceRefresh && modelsCache[cacheKey]) {
+            const cached = modelsCache[cacheKey];
+            if (Date.now() - cached.timestamp < CACHE_DURATION) {
+                return cached.models;
+            }
+        }
+        
         try {
             const providerInfo = PROVIDERS[provider];
             if (!providerInfo) {
@@ -173,6 +190,9 @@
                 case 'openai':
                 case 'deepseek':
                 case 'moonshot':
+                case 'qwen':
+                case 'bailian':
+                    // 这些厂商支持 OpenAI 兼容的 /models 接口
                     url = `${apiEndpoint}/models`;
                     headers = {
                         'Authorization': `Bearer ${apiKey}`,
@@ -180,17 +200,10 @@
                     };
                     break;
                     
-                case 'qwen':
-                    // 通义千问使用固定模型列表
-                    return [
-                        { id: 'qwen-plus', name: '通义千问 Plus' },
-                        { id: 'qwen-turbo', name: '通义千问 Turbo' },
-                        { id: 'qwen-max', name: '通义千问 Max' }
-                    ];
-                    
                 case 'claude':
-                    // Anthropic Claude 使用固定模型列表
+                    // Anthropic Claude 使用固定模型列表（不支持 /models 接口）
                     return [
+                        { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4' },
                         { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet' },
                         { id: 'claude-3-opus-20240229', name: 'Claude 3 Opus' },
                         { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku' }
@@ -241,10 +254,35 @@
                 
                 // 解析响应，提取模型列表
                 if (data.data && Array.isArray(data.data)) {
-                    return data.data.map(model => ({
+                    // 过滤出文本生成模型（排除 embedding、audio 等）
+                    const textModels = data.data.filter(model => {
+                        const id = model.id.toLowerCase();
+                        // 排除非文本生成模型
+                        if (id.includes('embedding') || 
+                            id.includes('audio') || 
+                            id.includes('tts') || 
+                            id.includes('whisper') ||
+                            id.includes('dall-e') ||
+                            id.includes('image') ||
+                            id.includes('vision') ||
+                            id.includes('moderation')) {
+                            return false;
+                        }
+                        return true;
+                    });
+                    
+                    const models = textModels.map(model => ({
                         id: model.id,
-                        name: model.id
+                        name: formatModelName(model.id)
                     }));
+                    
+                    // 缓存结果
+                    modelsCache[cacheKey] = {
+                        models: models,
+                        timestamp: Date.now()
+                    };
+                    
+                    return models;
                 }
                 
                 throw new Error('无法解析模型列表');
@@ -254,6 +292,41 @@
             console.error('获取模型列表失败:', error);
             throw error;
         }
+    }
+    
+    // 格式化模型名称，使其更易读
+    function formatModelName(modelId) {
+        // 常见模型名称映射
+        const nameMap = {
+            'gpt-4o': 'GPT-4o',
+            'gpt-4o-mini': 'GPT-4o Mini',
+            'gpt-4-turbo': 'GPT-4 Turbo',
+            'gpt-4': 'GPT-4',
+            'gpt-3.5-turbo': 'GPT-3.5 Turbo',
+            'qwen-plus': '通义千问 Plus',
+            'qwen-turbo': '通义千问 Turbo',
+            'qwen-max': '通义千问 Max',
+            'qwen-long': '通义千问 Long',
+            'qwen-vl-plus': '通义千问 VL Plus',
+            'qwen-vl-max': '通义千问 VL Max',
+            'deepseek-chat': 'DeepSeek Chat',
+            'deepseek-coder': 'DeepSeek Coder',
+            'deepseek-v3': 'DeepSeek V3',
+            'deepseek-r1': 'DeepSeek R1',
+            'moonshot-v1-8k': 'Moonshot 8K',
+            'moonshot-v1-32k': 'Moonshot 32K',
+            'moonshot-v1-128k': 'Moonshot 128K'
+        };
+        
+        if (nameMap[modelId]) {
+            return nameMap[modelId];
+        }
+        
+        // 简单格式化：将连字符替换为空格，首字母大写
+        return modelId
+            .split('-')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
     }
     
     // 暴露到全局

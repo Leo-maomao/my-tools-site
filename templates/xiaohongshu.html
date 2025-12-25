@@ -43,28 +43,59 @@
         <span id="bgMarkText">标记区域</span>
       </button>
     </div>
+
+    <!-- AI模型选择器 -->
+    <div class="xhs-ai-card">
+      <div class="xhs-ai-card-header">
+        <h3><i class="ri-sparkling-line"></i> AI优化</h3>
+      </div>
+      <div class="xhs-ai-model">
+        <select id="xhsModelSelect"></select>
+      </div>
+      <button class="xhs-ai-optimize-all" id="optimizeAllBtn" title="AI优化全部内容">
+        <i class="ri-magic-line"></i> 一键优化
+      </button>
+    </div>
   </div>
 
   <!-- 中间：内容输入 -->
   <div class="xhs-content-input">
     <div class="input-card">
       <div class="form-group">
-        <label>封面标题</label>
+        <label>
+          封面标题
+          <button class="btn-ai-optimize" data-target="coverTitle" title="AI优化">
+            <i class="ri-sparkling-line"></i>
+          </button>
+        </label>
         <input type="text" id="coverTitle" placeholder="请输入封面标题" autocomplete="off">
       </div>
-      <div class="form-group">
+      <div class="form-group form-group-content">
         <label>
-          正文内容 <span class="char-count" id="contentCharCount">0 字</span>
+          正文内容（<span class="char-count" id="contentCharCount">0字</span>）
+          <button class="btn-ai-optimize" data-target="contentEditor" title="AI优化">
+            <i class="ri-sparkling-line"></i>
+          </button>
         </label>
         <div class="content-editor" id="contentEditor" contenteditable="true" data-placeholder="请输入正文内容，支持粘贴图片"></div>
       </div>
       <div class="form-group">
-        <label>发布标题</label>
+        <label>
+          发布标题
+          <button class="btn-ai-optimize" data-target="xhsTitle" title="AI优化">
+            <i class="ri-sparkling-line"></i>
+          </button>
+        </label>
         <input type="text" id="xhsTitle" placeholder="请输入发布标题" autocomplete="off">
       </div>
-      <div class="form-group">
-        <label>正文描述 <span class="char-count" id="descCharCount">0 字</span></label>
-        <textarea id="xhsDesc" placeholder="请输入正文描述" rows="4" autocomplete="off"></textarea>
+      <div class="form-group form-group-desc">
+        <label>
+          发布内容（<span class="char-count" id="descCharCount">0字</span>）
+          <button class="btn-ai-optimize" data-target="xhsDesc" title="AI优化">
+            <i class="ri-sparkling-line"></i>
+          </button>
+        </label>
+        <textarea id="xhsDesc" placeholder="请输入发布内容" rows="4" autocomplete="off"></textarea>
       </div>
       <button class="btn-generate" id="generateBtn">
         <i class="ri-magic-line"></i> 生成图片
@@ -157,6 +188,26 @@
       <i class="ri-arrow-right-s-line"></i>
     </button>
     <div class="fullscreen-info" id="fullscreenInfo">1 / 3</div>
+  </div>
+</div>
+
+<!-- AI优化预览弹窗 -->
+<div class="xhs-ai-preview-modal" id="aiPreviewModal">
+  <div class="xhs-ai-preview-backdrop"></div>
+  <div class="xhs-ai-preview-content">
+    <div class="xhs-ai-preview-header">
+      <h3><i class="ri-sparkling-line"></i> AI优化结果</h3>
+      <button class="xhs-ai-preview-close" id="aiPreviewClose">
+        <i class="ri-close-line"></i>
+      </button>
+    </div>
+    <div class="xhs-ai-preview-body" id="aiPreviewBody">
+      <!-- 动态填充 -->
+    </div>
+    <div class="xhs-ai-preview-footer">
+      <button class="btn-cancel" id="aiPreviewCancel">取消</button>
+      <button class="btn-apply" id="aiPreviewApply">应用优化</button>
+    </div>
   </div>
 </div>
 

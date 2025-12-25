@@ -3,13 +3,63 @@
   'use strict';
 
   var CONFIG = {
-    AI_API_URL: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
-    AI_API_KEY: 'sk-b83669be3e4b41ec8379bd80fe6c657f',
-    AI_MODEL: 'qwen-plus',
-    AI_MODEL_VISION: 'qwen-vl-plus',
     STORAGE_KEY: 'pa_conversations',
+    MODEL_STORAGE_KEY: 'pa_selected_model',
     SUPABASE_URL: 'https://aexcnubowsarpxkohqvv.supabase.co',
     SUPABASE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFleGNudWJvd3NhcnB4a29ocXZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyMjYyOTksImV4cCI6MjA3OTgwMjI5OX0.TCGkoBou99fui-cgcpod-b3BaSdq1mg7SFUtR2mIxms'
+  };
+
+  // 各厂商支持的模型列表
+  var PROVIDER_MODELS = {
+    openai: [
+      { id: 'gpt-4o', name: 'GPT-4o', vision: true },
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini', vision: true },
+      { id: 'gpt-4-turbo', name: 'GPT-4 Turbo', vision: true },
+      { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', vision: false }
+    ],
+    qwen: [
+      { id: 'qwen-plus', name: '通义千问 Plus', vision: false },
+      { id: 'qwen-turbo', name: '通义千问 Turbo', vision: false },
+      { id: 'qwen-max', name: '通义千问 Max', vision: false },
+      { id: 'qwen-vl-plus', name: '通义千问 VL', vision: true }
+    ],
+    bailian: [
+      { id: 'qwen-plus', name: '通义千问 Plus', vision: false },
+      { id: 'qwen-turbo', name: '通义千问 Turbo', vision: false },
+      { id: 'qwen-max', name: '通义千问 Max', vision: false },
+      { id: 'qwen-long', name: '通义千问 Long', vision: false },
+      { id: 'qwen-vl-plus', name: '通义千问 VL Plus', vision: true },
+      { id: 'qwen-vl-max', name: '通义千问 VL Max', vision: true },
+      { id: 'deepseek-v3', name: 'DeepSeek V3', vision: false },
+      { id: 'deepseek-r1', name: 'DeepSeek R1', vision: false }
+    ],
+    claude: [
+      { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4', vision: true },
+      { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet', vision: true },
+      { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku', vision: true }
+    ],
+    deepseek: [
+      { id: 'deepseek-chat', name: 'DeepSeek Chat', vision: false },
+      { id: 'deepseek-coder', name: 'DeepSeek Coder', vision: false }
+    ],
+    moonshot: [
+      { id: 'moonshot-v1-8k', name: 'Moonshot 8K', vision: false },
+      { id: 'moonshot-v1-32k', name: 'Moonshot 32K', vision: false },
+      { id: 'moonshot-v1-128k', name: 'Moonshot 128K', vision: false }
+    ],
+    zhipu: [
+      { id: 'glm-4', name: 'GLM-4', vision: false },
+      { id: 'glm-4v', name: 'GLM-4V', vision: true },
+      { id: 'glm-3-turbo', name: 'GLM-3 Turbo', vision: false }
+    ],
+    minimax: [
+      { id: 'abab6.5s-chat', name: 'MiniMax 6.5s', vision: false },
+      { id: 'abab5.5-chat', name: 'MiniMax 5.5', vision: false }
+    ],
+    baichuan: [
+      { id: 'Baichuan2-Turbo', name: 'Baichuan2 Turbo', vision: false },
+      { id: 'Baichuan2-Turbo-192k', name: 'Baichuan2 192K', vision: false }
+    ]
   };
 
   var state = {
@@ -17,9 +67,12 @@
     currentId: null,
     pendingFiles: [],
     pendingImages: [],
-    pendingQuote: null,  // 引用的消息
+    pendingQuote: null,
     supabase: null,
-    isSending: false  // 发送锁
+    isSending: false,
+    // 模型选择相关
+    selectedModel: null,  // { provider, modelId, modelName, providerName }
+    availableModels: []   // 可用的模型列表
   };
 
   var els = {};
@@ -41,8 +94,14 @@
       imageBtn: document.getElementById('imageBtn'),
       imageInput: document.getElementById('imageInput'),
       imagePreview: document.getElementById('imagePreview'),
-      quotePreview: document.getElementById('quotePreview')
+      quotePreview: document.getElementById('quotePreview'),
+      // 模型选择
+      modelSelect: document.getElementById('modelSelect'),
+      modelSelectWrap: document.getElementById('modelSelectWrap')
     };
+
+    // 初始化模型选择
+    initModelSelect();
 
     await loadConversations();
     bindEvents();
@@ -56,12 +115,198 @@
     
     // 监听登录状态变化
     window.addEventListener('toolsUserLoggedIn', async function() {
-      // 登录成功后，将本地数据同步到云端
       await saveConversations();
-      // 重新加载云端数据
       await loadConversations();
       renderConversationList();
     });
+
+    // 监听 API 配置变化
+    window.addEventListener('apiConfigUpdated', function() {
+      initModelSelect();
+    });
+  }
+
+  // 初始化模型选择（异步获取模型列表）
+  async function initModelSelect() {
+    if (!window.ToolsAPIConfig) {
+      console.warn('ToolsAPIConfig 未加载');
+      return;
+    }
+
+    // 显示加载状态
+    if (els.modelSelect) {
+      els.modelSelect.innerHTML = '<option value="">加载模型中...</option>';
+      if (window.UI && window.UI.Select) {
+        window.UI.Select.init(els.modelSelectWrap);
+      }
+    }
+
+    // 获取所有已配置的厂商
+    var configs = window.ToolsAPIConfig.loadAllConfigs();
+    var providers = window.ToolsAPIConfig.getAllProviders();
+    var configuredProviders = Object.keys(configs);
+
+    // 动态获取模型列表
+    state.availableModels = [];
+    
+    for (var i = 0; i < configuredProviders.length; i++) {
+      var providerKey = configuredProviders[i];
+      var config = configs[providerKey];
+      var providerInfo = providers[providerKey];
+      
+      if (config.apiKey) {
+        try {
+          // 动态获取模型列表
+          var models = await window.ToolsAPIConfig.fetchModels(
+            providerKey,
+            config.apiKey,
+            config.baseUrl || config.endpoint
+          );
+          
+          models.forEach(function(model) {
+            state.availableModels.push({
+              provider: providerKey,
+              providerName: providerInfo ? providerInfo.name : providerKey,
+              modelId: model.id,
+              modelName: model.name,
+              vision: false // 动态获取的模型默认不支持视觉
+            });
+          });
+        } catch (error) {
+          console.warn('获取 ' + providerKey + ' 模型列表失败:', error.message);
+          // 回退到备用列表
+          var fallbackModels = PROVIDER_MODELS[providerKey] || [];
+          fallbackModels.forEach(function(model) {
+            state.availableModels.push({
+              provider: providerKey,
+              providerName: providerInfo ? providerInfo.name : providerKey,
+              modelId: model.id,
+              modelName: model.name + ' (离线)',
+              vision: model.vision
+            });
+          });
+        }
+      }
+    }
+
+    // 恢复上次选择的模型
+    var savedModel = localStorage.getItem(CONFIG.MODEL_STORAGE_KEY);
+    if (savedModel) {
+      try {
+        var parsed = JSON.parse(savedModel);
+        // 检查该模型是否仍然可用
+        var found = state.availableModels.find(function(m) {
+          return m.provider === parsed.provider && m.modelId === parsed.modelId;
+        });
+        if (found) {
+          state.selectedModel = found;
+        }
+      } catch (e) {}
+    }
+
+    // 渲染原生 select
+    renderModelSelect();
+    
+    // 刷新 UI.Select 组件
+    if (window.UI && window.UI.Select && els.modelSelect) {
+      window.UI.Select.refresh(els.modelSelect);
+    }
+  }
+
+  // 渲染模型选择器（原生 select）
+  function renderModelSelect() {
+    if (!els.modelSelect) return;
+
+    var currentValue = state.selectedModel ? 
+      state.selectedModel.provider + ':' + state.selectedModel.modelId : '';
+    
+    if (state.availableModels.length === 0) {
+      // 没有配置 API 时，显示提示
+      els.modelSelect.innerHTML = '<option value="">请先在设置中配置API</option>';
+    } else {
+      // 有可用模型时，显示选择提示
+      els.modelSelect.innerHTML = '<option value="">选择模型</option>';
+      // 按厂商分组
+      var grouped = {};
+      state.availableModels.forEach(function(model) {
+        if (!grouped[model.provider]) {
+          grouped[model.provider] = {
+            name: model.providerName,
+            models: []
+          };
+        }
+        grouped[model.provider].models.push(model);
+      });
+
+      Object.keys(grouped).forEach(function(providerKey) {
+        var group = grouped[providerKey];
+        var optgroup = document.createElement('optgroup');
+        optgroup.label = group.name;
+        
+        group.models.forEach(function(model) {
+          var opt = document.createElement('option');
+          opt.value = model.provider + ':' + model.modelId;
+          opt.textContent = model.modelName;
+          optgroup.appendChild(opt);
+        });
+        
+        els.modelSelect.appendChild(optgroup);
+      });
+
+      // 恢复选中值
+      if (currentValue) {
+        els.modelSelect.value = currentValue;
+      }
+    }
+    
+    // 刷新 UI.Select
+    if (window.UI && window.UI.Select) {
+      window.UI.Select.refresh(els.modelSelect);
+    }
+  }
+
+  // 选择模型（通过 select change 事件）
+  function selectModel(value) {
+    if (!value) {
+      state.selectedModel = null;
+      localStorage.removeItem(CONFIG.MODEL_STORAGE_KEY);
+      return;
+    }
+    
+    var parts = value.split(':');
+    var provider = parts[0];
+    var modelId = parts[1];
+    
+    var model = state.availableModels.find(function(m) {
+      return m.provider === provider && m.modelId === modelId;
+    });
+    if (!model) return;
+
+    state.selectedModel = model;
+    localStorage.setItem(CONFIG.MODEL_STORAGE_KEY, JSON.stringify(model));
+  }
+
+  // 获取当前选中模型的 API 配置
+  function getCurrentAPIConfig() {
+    if (!state.selectedModel || !window.ToolsAPIConfig) {
+      return null;
+    }
+
+    var config = window.ToolsAPIConfig.getConfig(state.selectedModel.provider);
+    if (!config || !config.apiKey) {
+      return null;
+    }
+
+    return {
+      provider: state.selectedModel.provider,
+      apiKey: config.apiKey,
+      baseUrl: config.baseUrl,
+      model: state.selectedModel.modelId,
+      modelName: state.selectedModel.modelName,
+      vision: state.selectedModel.vision,
+      // Claude 特殊字段
+      apiVersion: config.apiVersion
+    };
   }
 
   function bindEvents() {
@@ -72,12 +317,29 @@
     els.imageBtn.addEventListener('click', function() { els.imageInput.click(); });
     els.imageInput.addEventListener('change', handleImageSelect);
 
+    // 模型选择
+    if (els.modelSelect) {
+      els.modelSelect.addEventListener('change', function() {
+        selectModel(els.modelSelect.value);
+      });
+    }
+
     els.userInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && !e.shiftKey) {
+      // 只拦截 Enter 键发送消息，其他快捷键保持默认行为
+      if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
         sendMessage();
       }
     });
+
+    // 输入框自动调整高度
+    function autoResize() {
+      var el = els.userInput;
+      el.style.height = 'auto';
+      var newHeight = Math.min(el.scrollHeight, 200);
+      el.style.height = newHeight + 'px';
+    }
+    els.userInput.addEventListener('input', autoResize);
 
     // 粘贴图片
     els.userInput.addEventListener('paste', handlePaste);
@@ -289,6 +551,20 @@
 
     if (!text && !hasFiles && !hasImages && !hasQuote) return;
 
+    // 检查是否选择了模型
+    if (!state.selectedModel) {
+      if (window.UI && window.UI.Message) {
+        window.UI.Message.warning('请先选择一个 AI 模型');
+      } else {
+        alert('请先选择一个 AI 模型');
+      }
+      // 聚焦模型选择
+      if (els.modelSelect) {
+        els.modelSelect.focus();
+      }
+      return;
+    }
+
     state.isSending = true;
 
     var conv = getCurrentConversation();
@@ -467,14 +743,23 @@
   }
 
   async function callAIWithImages(text, imageUrls) {
-    // 过滤有效的图片URL - 只使用http(s)开头的URL
+    var apiConfig = getCurrentAPIConfig();
+    if (!apiConfig) {
+      throw new Error('请先在设置中配置 API');
+    }
+
+    // 检查是否支持视觉
+    if (!apiConfig.vision) {
+      console.warn('当前模型不支持图片分析，使用纯文本');
+      return await callAISimple(text || '请分析');
+    }
+
+    // 过滤有效的图片URL
     var validUrls = imageUrls.filter(function(url) {
       return url && url.startsWith('http');
     });
 
-    // 如果没有有效的http图片URL，退回到纯文本对话
     if (validUrls.length === 0) {
-      console.warn('没有有效的http图片URL，使用纯文本对话');
       return await callAISimple(text || '请分析');
     }
 
@@ -485,22 +770,11 @@
     });
 
     try {
-      var response = await fetch(CONFIG.AI_API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + CONFIG.AI_API_KEY },
-        body: JSON.stringify({
-          model: CONFIG.AI_MODEL_VISION,
-          messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userContent }]
-        })
-      });
-      if (!response.ok) {
-        var errData = await response.text();
-        console.error('AI图片请求失败:', errData);
-        // 如果图片请求失败，退回到纯文本
-        return await callAISimple(text);
-      }
-      var data = await response.json();
-      return data.choices[0].message.content;
+      var result = await callAPIWithConfig(apiConfig, [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userContent }
+      ]);
+      return result;
     } catch (e) {
       console.error('callAIWithImages错误:', e);
       return await callAISimple(text);
@@ -567,87 +841,114 @@
       userContent += '\n';
     });
 
-    return await callAI(systemPrompt, userContent);
+    return await callAISimple(userContent, systemPrompt);
   }
 
-  async function callAIForChat(messages) {
-    var systemPrompt = '你是毛毛的产品助理，可以帮助：\n' +
-      '1. 回答产品设计、需求分析、用户体验等问题\n' +
-      '2. 分析PRD文档（用户上传HTML文件时）\n' +
-      '3. 提供产品方案建议\n\n' +
-      '请用中文回答，简洁专业。';
-
-    var chatMessages = messages.slice(-10).map(function(m) {
-      var content = m.content || '';
-      // 如果有引用，加到内容前面
-      if (m.quote && m.quote.content) {
-        content = '[引用: ' + m.quote.content.substring(0, 100) + ']\n' + content;
-      }
-      return { role: m.role, content: content };
-    }).filter(function(m) { return m.content; });
-
-    var response = await fetch(CONFIG.AI_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + CONFIG.AI_API_KEY
-      },
-      body: JSON.stringify({
-        model: CONFIG.AI_MODEL,
-        messages: [{ role: 'system', content: systemPrompt }].concat(chatMessages)
-      })
-    });
-
-    if (!response.ok) throw new Error('请求失败');
-    var data = await response.json();
-    return data.choices[0].message.content;
-  }
-
-  async function callAISimple(userText) {
+  async function callAISimple(userText, customSystemPrompt) {
     if (!userText || userText.trim() === '') {
       throw new Error('消息内容为空');
     }
-    var systemPrompt = '你是毛毛的产品助理，可以帮助回答产品设计、需求分析、用户体验等问题。请用中文回答，简洁专业。';
+
+    var apiConfig = getCurrentAPIConfig();
+    if (!apiConfig) {
+      throw new Error('请先在设置中配置 API');
+    }
+
+    var systemPrompt = customSystemPrompt || '你是毛毛的产品助理，可以帮助回答产品设计、需求分析、用户体验等问题。请用中文回答，简洁专业。';
+
     try {
-      var response = await fetch(CONFIG.AI_API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + CONFIG.AI_API_KEY },
-        body: JSON.stringify({
-          model: CONFIG.AI_MODEL,
-          messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userText }]
-        })
-      });
-      if (!response.ok) {
-        var errText = await response.text();
-        console.error('API错误:', errText);
-        throw new Error('请求失败');
-      }
-      var data = await response.json();
-      return data.choices[0].message.content;
+      var result = await callAPIWithConfig(apiConfig, [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userText }
+      ]);
+      return result;
     } catch (e) {
       console.error('callAISimple错误:', e);
       throw e;
     }
   }
 
-  async function callAI(systemPrompt, userContent) {
-    var response = await fetch(CONFIG.AI_API_URL, {
-      method: 'POST',
-      headers: {
+  // 统一的 API 调用函数，支持不同厂商
+  async function callAPIWithConfig(apiConfig, messages) {
+    var url, headers, body;
+
+    // Claude 使用不同的 API 格式
+    if (apiConfig.provider === 'claude') {
+      url = apiConfig.baseUrl + '/v1/messages';
+      headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + CONFIG.AI_API_KEY
-      },
-      body: JSON.stringify({
-        model: CONFIG.AI_MODEL,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userContent }
-        ]
-      })
+        'x-api-key': apiConfig.apiKey,
+        'anthropic-version': apiConfig.apiVersion || '2023-06-01'
+      };
+
+      // 转换消息格式为 Claude 格式
+      var systemMsg = '';
+      var claudeMessages = [];
+      messages.forEach(function(m) {
+        if (m.role === 'system') {
+          systemMsg = typeof m.content === 'string' ? m.content : m.content[0].text;
+        } else {
+          // 处理包含图片的消息
+          if (Array.isArray(m.content)) {
+            var content = m.content.map(function(c) {
+              if (c.type === 'text') {
+                return { type: 'text', text: c.text };
+              } else if (c.type === 'image_url') {
+                return {
+                  type: 'image',
+                  source: {
+                    type: 'url',
+                    url: c.image_url.url
+                  }
+                };
+              }
+              return c;
+            });
+            claudeMessages.push({ role: m.role, content: content });
+          } else {
+            claudeMessages.push({ role: m.role, content: m.content });
+          }
+        }
+      });
+
+      body = JSON.stringify({
+        model: apiConfig.model,
+        max_tokens: 4096,
+        system: systemMsg,
+        messages: claudeMessages
+      });
+    } else {
+      // OpenAI 兼容格式（大多数厂商）
+      url = apiConfig.baseUrl + '/chat/completions';
+      headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiConfig.apiKey
+      };
+      body = JSON.stringify({
+        model: apiConfig.model,
+        messages: messages
+      });
+    }
+
+    var response = await fetch(url, {
+      method: 'POST',
+      headers: headers,
+      body: body
     });
 
-    if (!response.ok) throw new Error('请求失败');
+    if (!response.ok) {
+      var errText = await response.text();
+      console.error('API 请求失败:', errText);
+      throw new Error('API 请求失败: ' + response.status);
+    }
+
     var data = await response.json();
+
+    // Claude 返回格式不同
+    if (apiConfig.provider === 'claude') {
+      return data.content[0].text;
+    }
+
     return data.choices[0].message.content;
   }
 
@@ -1211,5 +1512,12 @@
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
+  }
+  
+  // 页面加载完成后显示引导（从Supabase加载配置）
+  if (typeof window.ToolsGuide !== 'undefined') {
+    setTimeout(function() {
+      window.ToolsGuide.show('product-assistant');
+    }, 300);
   }
 })();

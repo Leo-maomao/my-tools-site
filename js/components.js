@@ -101,21 +101,78 @@
 
     function renderOptions(dropdown, select) {
       dropdown.innerHTML = '';
-      var opts = select.options;
-      for (var i = 0; i < opts.length; i++) {
-        var div = document.createElement('div');
-        div.className = 'ui-select-option';
-        div.dataset.value = opts[i].value;
-        div.textContent = opts[i].text;
-        if (opts[i].selected) div.classList.add('is-selected');
-        if (opts[i].disabled) div.classList.add('is-disabled');
-        dropdown.appendChild(div);
+      
+      // 获取空提示文本（可通过 data-empty-text 自定义）
+      var emptyText = select.dataset.emptyText || '暂无选项';
+      
+      // 检查是否有 optgroup
+      var optgroups = select.querySelectorAll('optgroup');
+      var hasOptions = false;
+      
+      if (optgroups.length > 0) {
+        // 先渲染不在 optgroup 中的选项
+        var topLevelOpts = select.querySelectorAll(':scope > option');
+        topLevelOpts.forEach(function(opt) {
+          hasOptions = true;
+          var div = document.createElement('div');
+          div.className = 'ui-select-option';
+          div.dataset.value = opt.value;
+          div.textContent = opt.text;
+          if (opt.selected) div.classList.add('is-selected');
+          if (opt.disabled) div.classList.add('is-disabled');
+          dropdown.appendChild(div);
+        });
+        
+        // 渲染 optgroup 及其选项
+        optgroups.forEach(function(group) {
+          var groupOpts = group.querySelectorAll('option');
+          if (groupOpts.length > 0) {
+            hasOptions = true;
+            var groupDiv = document.createElement('div');
+            groupDiv.className = 'ui-select-group';
+            groupDiv.textContent = group.label;
+            dropdown.appendChild(groupDiv);
+            
+            groupOpts.forEach(function(opt) {
+              var div = document.createElement('div');
+              div.className = 'ui-select-option';
+              div.dataset.value = opt.value;
+              div.textContent = opt.text;
+              if (opt.selected) div.classList.add('is-selected');
+              if (opt.disabled) div.classList.add('is-disabled');
+              dropdown.appendChild(div);
+            });
+          }
+        });
+      } else {
+        // 无 optgroup，直接渲染所有选项
+        var opts = select.options;
+        if (opts.length > 0) hasOptions = true;
+        for (var i = 0; i < opts.length; i++) {
+          var div = document.createElement('div');
+          div.className = 'ui-select-option';
+          div.dataset.value = opts[i].value;
+          div.textContent = opts[i].text;
+          if (opts[i].selected) div.classList.add('is-selected');
+          if (opts[i].disabled) div.classList.add('is-disabled');
+          dropdown.appendChild(div);
+        }
+      }
+      
+      // 如果没有选项，显示空提示
+      if (!hasOptions) {
+        var emptyDiv = document.createElement('div');
+        emptyDiv.className = 'ui-select-empty';
+        emptyDiv.textContent = emptyText;
+        dropdown.appendChild(emptyDiv);
       }
     }
 
     function updateValue(select, span) {
       var opt = select.options[select.selectedIndex];
-      span.textContent = opt ? opt.text : '请选择';
+      // 使用第一个选项的文本作为默认占位符，如果没有则显示"选择"
+      var defaultText = select.options[0] ? select.options[0].text : '选择';
+      span.textContent = opt ? opt.text : defaultText;
       span.classList.toggle('is-placeholder', !opt || !opt.value);
     }
 

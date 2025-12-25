@@ -8,7 +8,7 @@
   let currentGuideImageData = null;
   let guideConfigMap = {};
   let selectedProvider = '';
-  let selectedProviderText = '-- 请选择提供商 --';
+  let selectedProviderText = '请选择厂商';
 
   // DOM元素
   let elements = {};
@@ -36,6 +36,13 @@
       name: '阿里云通义千问',
       fields: [
         { id: 'apiKey', label: 'API Key', type: 'password', required: true, placeholder: '请输入 DashScope API Key' },
+        { id: 'baseUrl', label: 'API 基础地址', type: 'text', required: true, default: 'https://dashscope.aliyuncs.com/compatible-mode/v1', hidden: true }
+      ]
+    },
+    bailian: {
+      name: '阿里云百炼',
+      fields: [
+        { id: 'apiKey', label: 'API Key', type: 'password', required: true, placeholder: '请输入百炼平台 API Key' },
         { id: 'baseUrl', label: 'API 基础地址', type: 'text', required: true, default: 'https://dashscope.aliyuncs.com/compatible-mode/v1', hidden: true }
       ]
     },
@@ -114,15 +121,16 @@
           <div class="modal-body">
             <div class="settings-form" id="apiConfigForm">
               <div class="form-group">
-                <label>提供商 <span class="required">*</span></label>
+                <label>厂商 <span class="required">*</span></label>
                 <div id="providerSelect" class="ui-select">
                   <div class="ui-select-trigger" tabindex="0">
-                    <span class="ui-select-value is-placeholder">-- 请选择提供商 --</span>
+                    <span class="ui-select-value is-placeholder">请选择厂商</span>
                   </div>
                   <div class="ui-select-dropdown">
-                    <div class="ui-select-option" data-value="">-- 请选择提供商 --</div>
+                    <div class="ui-select-option" data-value="">请选择厂商</div>
                     <div class="ui-select-option" data-value="openai">OpenAI (GPT)</div>
                     <div class="ui-select-option" data-value="qwen">阿里云通义千问</div>
+                    <div class="ui-select-option" data-value="bailian">阿里云百炼</div>
                     <div class="ui-select-option" data-value="claude">Anthropic Claude</div>
                     <div class="ui-select-option" data-value="deepseek">DeepSeek</div>
                     <div class="ui-select-option" data-value="moonshot">月之暗面 Kimi</div>
@@ -139,7 +147,6 @@
           </div>
           <div class="modal-footer">
             <button class="modal-btn cancel" id="apiModalCancel">取消</button>
-            <button class="modal-btn btn-delete" id="apiModalDelete" style="display: none;">删除</button>
             <button class="modal-btn confirm" id="apiModalSave">保存</button>
           </div>
         </div>
@@ -239,7 +246,6 @@
         apiModalClose: document.getElementById('apiModalClose'),
         apiModalTitle: document.getElementById('apiModalTitle'),
         apiModalCancel: document.getElementById('apiModalCancel'),
-        apiModalDelete: document.getElementById('apiModalDelete'),
         apiModalSave: document.getElementById('apiModalSave'),
         
         // API 表单
@@ -316,9 +322,6 @@
     }
     if (elements.apiModalSave) {
       elements.apiModalSave.addEventListener('click', saveAPIConfig);
-    }
-    if (elements.apiModalDelete) {
-      elements.apiModalDelete.addEventListener('click', deleteAPIConfig);
     }
     // API配置弹窗：阻止modal-box内的点击事件冒泡
     const apiModalBox = elements.apiConfigModal?.querySelector('.modal-box');
@@ -423,11 +426,9 @@
     
     if (provider) {
       elements.apiModalTitle.textContent = '编辑配置';
-      elements.apiModalDelete.style.display = 'inline-flex';
       loadAPIConfigToForm(provider);
     } else {
       elements.apiModalTitle.textContent = '新增配置';
-      elements.apiModalDelete.style.display = 'none';
       resetAPIForm();
     }
     
@@ -471,18 +472,20 @@
       const config = configs[key];
       const providerInfo = allProviders[key];
       const isActive = key === activeProvider;
-      // 显示配置状态
-      const statusText = config.apiKey ? '已配置' : '未配置';
+      
+      // 判断 icon 是 URL 还是 emoji
+      const iconHtml = providerInfo.icon.startsWith('http') 
+        ? `<img src="${providerInfo.icon}" alt="${providerInfo.name}" />`
+        : providerInfo.icon;
       
       return `
         <div class="api-item ${isActive ? 'is-active' : ''}" data-provider="${key}">
           <div class="api-item-info">
             <div class="api-item-icon">
-              ${providerInfo.icon}
+              ${iconHtml}
             </div>
             <div class="api-item-details">
               <div class="api-item-name">${providerInfo.name}</div>
-              <div class="api-item-endpoint">${statusText}</div>
             </div>
             ${isActive ? '<span class="api-item-badge"><i class="ri-check-line"></i> 使用中</span>' : ''}
           </div>
@@ -542,15 +545,15 @@
     const providerConfig = PROVIDER_CONFIGS[provider];
     const providerName = providerConfig ? providerConfig.name : provider;
     
-    // 先选择提供商（这会渲染空字段）
-    selectOption(provider, providerName);
+    // 更新选择器显示，但不渲染字段（skipRender=true）
+    selectOption(provider, providerName, true);
     
-    // 然后用保存的配置值重新渲染字段
+    // 用保存的配置值渲染字段
     renderProviderFields(provider, config);
   }
 
   function resetAPIForm() {
-    selectOption('', '-- 请选择提供商 --');
+    selectOption('', '请选择厂商');
     const container = document.getElementById('providerFields');
     if (container) container.innerHTML = '';
   }
@@ -559,7 +562,7 @@
     const provider = selectedProvider;
     
     if (!provider) {
-      showMessage('请选择 API 提供商', 'warning');
+      showMessage('请选择厂商', 'warning');
       return;
     }
     
@@ -643,17 +646,31 @@
 
   // UI Select 功能
   function initUISelect() {
-    if (!elements.providerSelect) return;
+    if (!elements.providerSelect) {
+      console.log('initUISelect: providerSelect 不存在');
+      return;
+    }
     
     const trigger = elements.providerSelect.querySelector('.ui-select-trigger');
-    if (!trigger) return;
+    if (!trigger) {
+      console.log('initUISelect: trigger 不存在');
+      return;
+    }
     
-    // 从弹窗中获取dropdown并移到body
-    let dropdown = elements.providerSelect.querySelector('.ui-select-dropdown');
-    if (!dropdown) return;
+    // 检查 dropdown 是否已经被移到 body
+    let dropdown = document.getElementById('providerDropdown');
+    if (!dropdown) {
+      // 从弹窗中获取dropdown并移到body
+      dropdown = elements.providerSelect.querySelector('.ui-select-dropdown');
+      if (!dropdown) {
+        console.log('initUISelect: dropdown 不存在');
+        return;
+      }
+      dropdown.id = 'providerDropdown';
+      document.body.appendChild(dropdown);
+    }
     
-    dropdown.id = 'providerDropdown';
-    document.body.appendChild(dropdown);
+    console.log('initUISelect: 开始绑定事件');
     
     const options = dropdown.querySelectorAll('.ui-select-option');
     
@@ -707,7 +724,7 @@
     }
   }
 
-  function selectOption(value, text) {
+  function selectOption(value, text, skipRender = false) {
     selectedProvider = value;
     selectedProviderText = text;
     
@@ -731,8 +748,10 @@
       }
     });
     
-    // 渲染对应提供商的动态字段
-    renderProviderFields(value);
+    // 渲染对应提供商的动态字段（除非跳过）
+    if (!skipRender) {
+      renderProviderFields(value);
+    }
   }
 
   // 渲染提供商动态字段

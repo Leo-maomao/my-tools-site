@@ -44,7 +44,7 @@
         },
         
         // 检查是否应该显示引导
-        shouldShow: function(toolId) {
+        shouldShow: function(toolId, configUpdatedAt) {
             const all = this.getAll();
             const status = all[toolId];
             
@@ -53,6 +53,20 @@
             
             // 如果用户选择了"不再提醒"，不显示
             if (status.dontShowAgain) return false;
+            
+            // 如果已经显示过
+            if (status.hasShown) {
+                // 如果有配置更新时间，且配置比上次查看更新，则重新显示
+                if (configUpdatedAt && status.lastShown) {
+                    const configTime = new Date(configUpdatedAt).getTime();
+                    const lastShownTime = new Date(status.lastShown).getTime();
+                    if (configTime > lastShownTime) {
+                        return true;
+                    }
+                }
+                // 已看过且配置未更新，不再显示
+                return false;
+            }
             
             // 默认显示
             return true;
@@ -212,6 +226,7 @@
     // 显示引导（立即显示，无延迟）
     async function showGuide(toolId, config) {
         currentToolId = toolId;
+        let configUpdatedAt = null;
         
         // 如果没有传入config，从Supabase加载
         if (!config) {
@@ -237,6 +252,9 @@
                             return;
                         }
                         
+                        // 记录配置更新时间
+                        configUpdatedAt = data.updated_at;
+                        
                         config = {
                             steps: [{
                                 title: hasTitle ? data.title : null,
@@ -259,8 +277,8 @@
             }
         }
         
-        // 单步引导才检查是否需要显示
-        if (!Array.isArray(config.steps) && !GuideManager.shouldShow(toolId)) {
+        // 检查是否需要显示（传入配置更新时间用于判断是否需要重新显示）
+        if (!GuideManager.shouldShow(toolId, configUpdatedAt)) {
             return;
         }
         

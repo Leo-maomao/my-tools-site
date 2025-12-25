@@ -3,6 +3,49 @@
  * Part 1: 基础框架（状态管理、Tab切换、Toast）
  */
 
+// ============ 各厂商支持的文本模型 ============
+const PROVIDER_MODELS = {
+  openai: [
+    { id: 'gpt-4o', name: 'GPT-4o' },
+    { id: 'gpt-4o-mini', name: 'GPT-4o Mini' },
+    { id: 'gpt-4-turbo', name: 'GPT-4 Turbo' }
+  ],
+  anthropic: [
+    { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4' },
+    { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet' },
+    { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku' }
+  ],
+  deepseek: [
+    { id: 'deepseek-chat', name: 'DeepSeek Chat' },
+    { id: 'deepseek-reasoner', name: 'DeepSeek R1' }
+  ],
+  qwen: [
+    { id: 'qwen-max', name: '通义千问 Max' },
+    { id: 'qwen-plus', name: '通义千问 Plus' },
+    { id: 'qwen-turbo', name: '通义千问 Turbo' }
+  ],
+  bailian: [
+    { id: 'qwen-plus', name: '通义千问 Plus' },
+    { id: 'qwen-turbo', name: '通义千问 Turbo' },
+    { id: 'qwen-max', name: '通义千问 Max' },
+    { id: 'qwen-long', name: '通义千问 Long' },
+    { id: 'deepseek-v3', name: 'DeepSeek V3' },
+    { id: 'deepseek-r1', name: 'DeepSeek R1' }
+  ],
+  zhipu: [
+    { id: 'glm-4-plus', name: 'GLM-4 Plus' },
+    { id: 'glm-4-flash', name: 'GLM-4 Flash' }
+  ],
+  moonshot: [
+    { id: 'moonshot-v1-128k', name: 'Moonshot 128K' },
+    { id: 'moonshot-v1-32k', name: 'Moonshot 32K' }
+  ],
+  doubao: [
+    { id: 'doubao-1-5-pro-32k', name: '豆包 1.5 Pro' },
+    { id: 'doubao-1-5-lite-32k', name: '豆包 1.5 Lite' }
+  ]
+};
+
 // ============ 状态管理 ============
 const state = {
   currentTab: 'script',      // script | characters
@@ -381,8 +424,130 @@ function navigateToStep(step) {
   saveProjectToStorage();
 }
 
+// ============ 初始化模型选择器（异步获取） ============
+async function initModelSelect() {
+  const select = $('#textModel');
+  if (!select) return;
+  
+  // 检查 API 配置
+  if (!window.ToolsAPIConfig) {
+    select.innerHTML = '<option value="">请先在设置中配置API</option>';
+    return;
+  }
+  
+  // 显示加载状态
+  select.innerHTML = '<option value="">加载模型中...</option>';
+  if (window.UI && window.UI.Select) {
+    window.UI.Select.refresh(select);
+  }
+  
+  const configs = window.ToolsAPIConfig.loadAllConfigs();
+  const providers = window.ToolsAPIConfig.getAllProviders();
+  const configuredProviders = Object.keys(configs);
+  
+  if (configuredProviders.length === 0) {
+    // 没有配置 API
+    select.innerHTML = '<option value="">请先在设置中配置API</option>';
+  } else {
+    // 动态获取模型列表
+    let allModels = [];
+    
+    for (let i = 0; i < configuredProviders.length; i++) {
+      const providerKey = configuredProviders[i];
+      const config = configs[providerKey];
+      const providerInfo = providers[providerKey];
+      
+      if (config.apiKey) {
+        try {
+          // 动态获取模型列表
+          const models = await window.ToolsAPIConfig.fetchModels(
+            providerKey,
+            config.apiKey,
+            config.baseUrl || config.endpoint
+          );
+          
+          models.forEach(function(model) {
+            allModels.push({
+              providerKey: providerKey,
+              providerName: providerInfo ? providerInfo.name : providerKey,
+              modelId: model.id,
+              modelName: model.name
+            });
+          });
+        } catch (error) {
+          console.warn('获取 ' + providerKey + ' 模型列表失败:', error.message);
+          // 回退到备用列表
+          const fallbackModels = PROVIDER_MODELS[providerKey] || [];
+          fallbackModels.forEach(function(model) {
+            allModels.push({
+              providerKey: providerKey,
+              providerName: providerInfo ? providerInfo.name : providerKey,
+              modelId: model.id,
+              modelName: model.name + ' (离线)'
+            });
+          });
+        }
+      }
+    }
+    
+    if (allModels.length === 0) {
+      select.innerHTML = '<option value="">请先在设置中配置API</option>';
+    } else {
+      // 渲染模型列表
+      select.innerHTML = '<option value="">选择模型</option>';
+      
+      // 按厂商分组
+      const grouped = {};
+      allModels.forEach(function(model) {
+        if (!grouped[model.providerKey]) {
+          grouped[model.providerKey] = {
+            name: model.providerName,
+            models: []
+          };
+        }
+        grouped[model.providerKey].models.push(model);
+      });
+      
+      Object.keys(grouped).forEach(function(providerKey) {
+        const group = grouped[providerKey];
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = group.name;
+        
+        group.models.forEach(function(model) {
+          const option = document.createElement('option');
+          option.value = model.providerKey + '|' + model.modelId;
+          option.textContent = model.modelName;
+          optgroup.appendChild(option);
+        });
+        
+        select.appendChild(optgroup);
+      });
+      
+      // 恢复已保存的选择
+      if (state.settings.textModel) {
+        select.value = state.settings.textModel;
+      }
+    }
+  }
+  
+  // 刷新 UI.Select
+  if (window.UI && window.UI.Select) {
+    window.UI.Select.refresh(select);
+  }
+}
+
 // ============ 初始化入口 ============
-function init() {
+async function init() {
+  // 初始化全局下拉组件（先初始化容器）
+  if (window.UI && window.UI.Select) {
+    window.UI.Select.init(document.querySelector('.dw-main'));
+    // 也初始化模态框内的下拉组件
+    window.UI.Select.init(document.querySelector('#characterModal'));
+  }
+  
+  // 异步加载模型选择器
+  await initModelSelect();
+  
   // 从本地存储加载角色库
   loadCharactersFromStorage();
 
@@ -417,6 +582,13 @@ function init() {
 
   // 内联设置绑定
   initInlineSettings();
+  
+  // 显示新手引导（从Supabase加载配置）
+  if (typeof window.ToolsGuide !== 'undefined') {
+    setTimeout(function() {
+      window.ToolsGuide.show('drama-workshop');
+    }, 300);
+  }
 }
 
 // ============ 内联设置绑定 ============
@@ -439,7 +611,12 @@ function initInlineSettings() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', init);
+// 兼容动态路由加载
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 
 /**
  * Part 2: 角色管理（多图上传）
@@ -448,36 +625,43 @@ document.addEventListener('DOMContentLoaded', init);
 // ============ 角色模块初始化 ============
 function initCharacterModule() {
   // 添加角色按钮
-  $('#addCharacterBtn').addEventListener('click', () => openCharacterModal());
+  const addBtn = $('#addCharacterBtn');
+  if (addBtn) addBtn.addEventListener('click', () => openCharacterModal());
 
   // 弹窗关闭
-  $('#closeModalBtn').addEventListener('click', closeCharacterModal);
-  $('#cancelModalBtn').addEventListener('click', closeCharacterModal);
-  $('.dw-modal-backdrop').addEventListener('click', closeCharacterModal);
+  const closeBtn = $('#closeModalBtn');
+  const cancelBtn = $('#cancelModalBtn');
+  const backdrop = $('.dw-modal-backdrop');
+  if (closeBtn) closeBtn.addEventListener('click', closeCharacterModal);
+  if (cancelBtn) cancelBtn.addEventListener('click', closeCharacterModal);
+  if (backdrop) backdrop.addEventListener('click', closeCharacterModal);
 
   // 保存角色
-  $('#saveCharacterBtn').addEventListener('click', saveCharacter);
+  const saveBtn = $('#saveCharacterBtn');
+  if (saveBtn) saveBtn.addEventListener('click', saveCharacter);
 
   // 多图上传
   const uploadAddBtn = $('#uploadAddBtn');
   const fileInput = $('#characterImages');
 
-  uploadAddBtn.addEventListener('click', () => fileInput.click());
-  fileInput.addEventListener('change', handleMultiImageUpload);
+  if (uploadAddBtn && fileInput) {
+    uploadAddBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', handleMultiImageUpload);
 
-  // 拖拽上传
-  uploadAddBtn.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    uploadAddBtn.classList.add('is-dragover');
-  });
-  uploadAddBtn.addEventListener('dragleave', () => {
-    uploadAddBtn.classList.remove('is-dragover');
-  });
-  uploadAddBtn.addEventListener('drop', (e) => {
-    e.preventDefault();
-    uploadAddBtn.classList.remove('is-dragover');
-    handleDroppedImages(e.dataTransfer.files);
-  });
+    // 拖拽上传
+    uploadAddBtn.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadAddBtn.classList.add('is-dragover');
+    });
+    uploadAddBtn.addEventListener('dragleave', () => {
+      uploadAddBtn.classList.remove('is-dragover');
+    });
+    uploadAddBtn.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadAddBtn.classList.remove('is-dragover');
+      handleDroppedImages(e.dataTransfer.files);
+    });
+  }
 }
 
 // ============ 弹窗操作 ============
@@ -505,6 +689,11 @@ function openCharacterModal(characterId = null) {
 
   renderUploadPreviews();
   $('#characterModal').classList.add('is-visible');
+  
+  // 初始化模态框中的下拉组件
+  if (window.UI && window.UI.Select) {
+    window.UI.Select.init(document.querySelector('#characterModal'));
+  }
 }
 
 function closeCharacterModal() {
@@ -540,6 +729,8 @@ function removeUploadImage(index) {
   state.tempImages.splice(index, 1);
   renderUploadPreviews();
 }
+// 暴露到全局，供 onclick 使用
+window.removeUploadImage = removeUploadImage;
 
 function renderUploadPreviews() {
   const container = $('#uploadPreviews');
@@ -656,35 +847,45 @@ function updateCharacterCount() {
 
 // ============ 剧本模块初始化 ============
 function initScriptModule() {
+  // 辅助函数：安全绑定事件
+  const bindClick = (selector, handler) => {
+    const el = $(selector);
+    if (el) el.addEventListener('click', handler);
+  };
+  const bindInput = (selector, handler) => {
+    const el = $(selector);
+    if (el) el.addEventListener('input', handler);
+  };
+
   // 步骤1：生成大纲
-  $('#generateOutlineBtn').addEventListener('click', generateOutline);
+  bindClick('#generateOutlineBtn', generateOutline);
 
   // 步骤1.5：大纲面板
-  $('#backToIdeaBtn').addEventListener('click', showIdeaPanel);
-  $('#toEpisodeBtn').addEventListener('click', () => goToStep(2));
+  bindClick('#backToIdeaBtn', showIdeaPanel);
+  bindClick('#toEpisodeBtn', () => goToStep(2));
 
   // 步骤2：分集剧本
-  $('#backToOutlineBtn').addEventListener('click', () => goToStep(1));
-  $('#generateEpisodeBtn').addEventListener('click', generateEpisodeScript);
-  $('#regenerateScriptBtn').addEventListener('click', generateEpisodeScript);
-  $('#toShotsBtn').addEventListener('click', analyzeShots);
-  $('#prevEpisodeBtn').addEventListener('click', () => changeEpisode(-1));
-  $('#nextEpisodeBtn').addEventListener('click', () => changeEpisode(1));
+  bindClick('#backToOutlineBtn', () => goToStep(1));
+  bindClick('#generateEpisodeBtn', generateEpisodeScript);
+  bindClick('#regenerateScriptBtn', generateEpisodeScript);
+  bindClick('#toShotsBtn', analyzeShots);
+  bindClick('#prevEpisodeBtn', () => changeEpisode(-1));
+  bindClick('#nextEpisodeBtn', () => changeEpisode(1));
 
   // 剧本内容变化时实时更新按钮状态
-  $('#scriptContent').addEventListener('input', updateScriptButtons);
+  bindInput('#scriptContent', updateScriptButtons);
 
   // 步骤3：分镜
-  $('#backToScriptBtn').addEventListener('click', () => goToStep(2));
-  $('#toFramesBtn').addEventListener('click', () => goToStep(4));
+  bindClick('#backToScriptBtn', () => goToStep(2));
+  bindClick('#toFramesBtn', () => goToStep(4));
 
   // 步骤4：分镜图
-  $('#backToShotsBtn').addEventListener('click', () => goToStep(3));
-  $('#toVideoBtn').addEventListener('click', () => goToStep(5));
-  $('#generateAllFramesBtn').addEventListener('click', generateAllFrames);
+  bindClick('#backToShotsBtn', () => goToStep(3));
+  bindClick('#toVideoBtn', () => goToStep(5));
+  bindClick('#generateAllFramesBtn', generateAllFrames);
 
   // 步骤5：视频
-  $('#backToFramesBtn').addEventListener('click', () => goToStep(4));
+  bindClick('#backToFramesBtn', () => goToStep(4));
 
   // @提及功能
   initMentionFeature();
@@ -694,6 +895,10 @@ function initScriptModule() {
 function initMentionFeature() {
   const textarea = $('#storyIdea');
   const dropdown = $('#mentionDropdown');
+  
+  // 如果必要元素不存在，直接返回
+  if (!textarea || !dropdown) return;
+  
   let mentionStart = -1;
   let activeIndex = 0;
 
@@ -1398,12 +1603,18 @@ function previewImage(src) {
 
 // 关闭图片预览
 function initImagePreviewModal() {
-  $('#closeImagePreviewBtn').addEventListener('click', () => {
-    $('#imagePreviewModal').classList.remove('is-visible');
-  });
-  $('#imagePreviewModal .dw-modal-backdrop').addEventListener('click', () => {
-    $('#imagePreviewModal').classList.remove('is-visible');
-  });
+  const closeBtn = $('#closeImagePreviewBtn');
+  const backdrop = $('#imagePreviewModal .dw-modal-backdrop');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      $('#imagePreviewModal').classList.remove('is-visible');
+    });
+  }
+  if (backdrop) {
+    backdrop.addEventListener('click', () => {
+      $('#imagePreviewModal').classList.remove('is-visible');
+    });
+  }
 }
 
 // ============ 视频卡片渲染 ============
@@ -1636,3 +1847,14 @@ function downloadMergedVideo() {
 
   showToast('开始下载...', 'success');
 }
+
+// ============ 全局暴露（供 onclick 使用） ============
+window.openCharacterModal = openCharacterModal;
+window.deleteCharacter = deleteCharacter;
+window.generateFrame = generateFrame;
+window.previewImage = previewImage;
+window.clearEndFrame = clearEndFrame;
+window.setEndFrameRef = setEndFrameRef;
+window.generateSingleVideo = generateSingleVideo;
+window.downloadVideo = downloadVideo;
+window.selectMergedEpisode = selectMergedEpisode;

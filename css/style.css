@@ -655,6 +655,7 @@ a {
 .sidebar.is-collapsed {
   width: 64px;
   padding: 24px 12px;
+  overflow: hidden;
 }
 
 .sidebar.is-collapsed .sidebar-header {
@@ -678,6 +679,20 @@ a {
   display: none;
 }
 
+.sidebar.is-collapsed .sidebar-footer {
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 0;
+  height: auto;
+}
+
+.sidebar.is-collapsed .sidebar-footer-btn {
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+}
+
 .sidebar.is-collapsed + .main-content {
   margin-left: 64px;
 }
@@ -697,6 +712,16 @@ a {
 .main-content:has(.dw-main),
 .main-content:has(.fund-main) {
   padding: 8px !important;
+}
+
+/* 设置页面 - 禁止外部滚动，内部滚动 */
+.main-content:has(.settings-main) {
+  padding: 0 !important;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .page-header {
@@ -916,8 +941,24 @@ a {
    通用组件样式 - Ant Design 风格
    ============================================ */
 
-/* === 按钮 === */
-/* 基础 button 元素样式（全局生效） */
+/* === 全局按钮组件 UI.Button === */
+/* 
+ * 三种基础样式：
+ * - .ui-btn (白底黑字，默认按钮)
+ * - .ui-btn-primary (蓝底白字，主要按钮)
+ * - .ui-btn-danger (红底白字，危险按钮)
+ * 
+ * 尺寸修饰：
+ * - .ui-btn-sm (小尺寸)
+ * - .ui-btn-lg (大尺寸)
+ * 
+ * 其他修饰：
+ * - .ui-btn-icon (仅图标按钮)
+ * - .ui-btn-block (块级按钮，占满宽度)
+ */
+
+/* 基础按钮样式 */
+.ui-btn,
 button {
   display: inline-flex;
   align-items: center;
@@ -926,35 +967,135 @@ button {
   height: 32px;
   padding: 0 15px;
   font-size: 14px;
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.5;
   border-radius: 6px;
   border: 1px solid #d9d9d9;
   background: #fff;
   color: var(--text-main);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: box-shadow 0.2s ease;
   white-space: nowrap;
   user-select: none;
   font-family: inherit;
 }
 
+.ui-btn:hover:not(:disabled),
 button:hover:not(:disabled) {
-  background: rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.ui-btn:active:not(:disabled),
 button:active:not(:disabled) {
-  border-color: #1d4ed8;
-  color: #1d4ed8;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
+.ui-btn:disabled,
 button:disabled {
   background: #f5f5f5;
   color: rgba(0, 0, 0, 0.25);
   border-color: #d9d9d9;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
+/* 主要按钮 - 蓝底白字 */
+.ui-btn-primary,
+button.ui-btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.ui-btn-primary:hover:not(:disabled),
+button.ui-btn-primary:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
+}
+
+.ui-btn-primary:active:not(:disabled),
+button.ui-btn-primary:active:not(:disabled) {
+  box-shadow: 0 1px 4px rgba(79, 70, 229, 0.35);
+}
+
+.ui-btn-primary:disabled,
+button.ui-btn-primary:disabled {
+  background: #a5b4fc;
+  border-color: #a5b4fc;
+  color: #fff;
+}
+
+/* 危险按钮 - 红底白字 */
+.ui-btn-danger,
+button.ui-btn-danger {
+  background: var(--error);
+  border-color: var(--error);
+  color: #fff;
+}
+
+.ui-btn-danger:hover:not(:disabled),
+button.ui-btn-danger:hover:not(:disabled) {
+  background: var(--error);
+  border-color: var(--error);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.35);
+}
+
+.ui-btn-danger:active:not(:disabled),
+button.ui-btn-danger:active:not(:disabled) {
+  box-shadow: 0 1px 4px rgba(239, 68, 68, 0.35);
+}
+
+.ui-btn-danger:disabled,
+button.ui-btn-danger:disabled {
+  background: #fca5a5;
+  border-color: #fca5a5;
+  color: #fff;
+}
+
+/* 按钮尺寸 - 小 */
+.ui-btn-sm,
+button.ui-btn-sm {
+  height: 24px;
+  padding: 0 8px;
+  font-size: 12px;
+  border-radius: 4px;
+}
+
+/* 按钮尺寸 - 大 */
+.ui-btn-lg,
+button.ui-btn-lg {
+  height: 40px;
+  padding: 0 20px;
+  font-size: 16px;
+  border-radius: 8px;
+}
+
+/* 图标按钮 */
+.ui-btn-icon,
+button.ui-btn-icon {
+  width: 32px;
+  padding: 0;
+}
+
+.ui-btn-icon.ui-btn-sm,
+button.ui-btn-icon.ui-btn-sm {
+  width: 24px;
+}
+
+.ui-btn-icon.ui-btn-lg,
+button.ui-btn-icon.ui-btn-lg {
+  width: 40px;
+}
+
+/* 块级按钮 */
+.ui-btn-block,
+button.ui-btn-block {
+  display: flex;
+  width: 100%;
+}
+
+/* === 兼容旧版按钮类名（逐步废弃） === */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -963,14 +1104,20 @@ button:disabled {
   height: 32px;
   padding: 0 15px;
   font-size: 14px;
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.5;
   border-radius: 6px;
-  border: 1px solid transparent;
+  border: 1px solid #d9d9d9;
+  background: #fff;
+  color: var(--text-main);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: box-shadow 0.2s ease;
   white-space: nowrap;
   user-select: none;
+}
+
+.btn:hover:not(:disabled) {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .btn:disabled {
@@ -978,7 +1125,6 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* 主按钮 */
 .btn-primary {
   background: var(--accent);
   border-color: var(--accent);
@@ -987,67 +1133,20 @@ button:disabled {
 
 .btn-primary:hover:not(:disabled) {
   background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
 }
 
-.btn-primary:active:not(:disabled) {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
-}
-
-/* 默认按钮 */
 .btn-default {
   background: #fff;
-  border-color: var(--border-subtle);
+  border-color: #d9d9d9;
   color: var(--text-main);
 }
 
 .btn-default:hover:not(:disabled) {
-  background: rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.btn-default:active:not(:disabled) {
-  border-color: #1d4ed8;
-  color: #1d4ed8;
-}
-
-/* 虚线按钮 */
-.btn-dashed {
-  background: #fff;
-  border-color: var(--border-subtle);
-  border-style: dashed;
-  color: var(--text-main);
-}
-
-.btn-dashed:hover:not(:disabled) {
-  background: rgba(0, 0, 0, 0.04);
-}
-
-/* 文字按钮 */
-.btn-text {
-  background: transparent;
-  border-color: transparent;
-  color: var(--text-main);
-  padding: 0 8px;
-}
-
-.btn-text:hover:not(:disabled) {
-  background: rgba(0, 0, 0, 0.04);
-}
-
-/* 链接按钮 */
-.btn-link {
-  background: transparent;
-  border-color: transparent;
-  color: var(--accent);
-  padding: 0;
-  height: auto;
-}
-
-.btn-link:hover:not(:disabled) {
-  background: rgba(0, 0, 0, 0.04);
-}
-
-/* 危险按钮 */
 .btn-danger {
   background: var(--error);
   border-color: var(--error);
@@ -1055,36 +1154,25 @@ button:disabled {
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: #ef4444;
+  background: var(--error);
+  border-color: var(--error);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.35);
 }
 
-/* 成功按钮 */
-.btn-success {
-  background: var(--success);
-  border-color: var(--success);
-  color: #fff;
-}
-
-.btn-success:hover:not(:disabled) {
-  background: #10b981;
-}
-
-/* 按钮尺寸 */
 .btn-sm {
   height: 24px;
-  padding: 0 7px;
+  padding: 0 8px;
   font-size: 12px;
   border-radius: 4px;
 }
 
 .btn-lg {
   height: 40px;
-  padding: 0 15px;
+  padding: 0 20px;
   font-size: 16px;
   border-radius: 8px;
 }
 
-/* 图标按钮 */
 .btn-icon {
   width: 32px;
   padding: 0;
@@ -1307,70 +1395,88 @@ select:disabled,
 }
 
 /* ============================================
-   UI 组件库 - Ant Design 风格
+   UI 组件库 - 全局下拉组件
+   使用方法：
+   1. HTML: <select>...</select>
+   2. JS: UI.Select.init() 或 UI.Select.init(container)
+   3. 尺寸: 添加 class "select-sm" 或 "select-lg"
+   4. 无边框: 添加 class "select-borderless"
    ============================================ */
 
 /* === UI Select 下拉组件 === */
 .ui-select {
   position: relative;
-  display: block;
-  width: 100%;
+  display: inline-block;
+  min-width: 100px;
   margin: 0;
 }
 
+/* 触发器 - 标准样式 */
 .ui-select-trigger {
   display: flex;
   align-items: center;
-  height: 32px;
+  width: 100%;
+  height: 36px;
   padding: 0 32px 0 12px;
   font-size: 14px;
   color: var(--text-main);
-  background: #fff;
-  border: 1px solid #d9d9d9;
-  border-radius: 6px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+  transition: all 0.2s ease;
   user-select: none;
   position: relative;
   white-space: nowrap;
-  line-height: 1.5714;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
+/* 下拉箭头 - Remixicon */
 .ui-select-trigger::after {
-  content: '';
+  content: '\ea4e';
+  font-family: 'remixicon';
   position: absolute;
-  right: 12px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  width: 0;
-  height: 0;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 5px solid #8c8c8c;
-  transition: transform 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+  font-size: 16px;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+  /* 确保不使用 border 方式的箭头 */
+  width: auto;
+  height: auto;
+  border: none;
 }
 
 .ui-select.is-open .ui-select-trigger::after {
   transform: translateY(-50%) rotate(180deg);
 }
 
+/* 悬停状态 */
 .ui-select-trigger:hover {
-  background: rgba(0, 0, 0, 0.04);
+  border-color: var(--accent);
 }
 
+/* 打开状态 */
 .ui-select.is-open .ui-select-trigger {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
 }
 
+/* 禁用状态 */
 .ui-select-trigger.is-disabled {
-  background: #f5f5f5;
-  color: rgba(0, 0, 0, 0.25);
+  background: var(--bg);
+  color: var(--text-muted);
   cursor: not-allowed;
 }
 
+.ui-select-trigger.is-disabled:hover {
+  border-color: var(--border-subtle);
+}
+
+/* 占位符样式 - 使用主字色保持统一 */
 .ui-select-value.is-placeholder {
-  color: #bfbfbf;
+  color: var(--text-main);
 }
 
 /* 下拉面板 */
@@ -1379,19 +1485,21 @@ select:disabled,
   top: calc(100% + 4px);
   left: 0;
   min-width: 100%;
-  max-height: 256px;
+  width: max-content;
+  max-width: 320px;
+  max-height: 280px;
+  overflow-x: hidden;
   overflow-y: auto;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08),
-              0 3px 6px -4px rgba(0, 0, 0, 0.12),
-              0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   z-index: 1060;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-8px);
-  transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
-  padding: 4px 0;
+  transform: translateY(-4px);
+  transition: all 0.15s ease;
+  padding: 4px 6px;
 }
 
 .ui-select.is-open .ui-select-dropdown {
@@ -1404,38 +1512,59 @@ select:disabled,
 .ui-select.is-open-up .ui-select-dropdown {
   top: auto;
   bottom: calc(100% + 4px);
-  transform: translateY(8px);
+  transform: translateY(4px);
 }
 
 .ui-select.is-open-up.is-open .ui-select-dropdown {
   transform: translateY(0);
 }
 
+/* 下拉面板滚动条 */
+.ui-select-dropdown::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ui-select-dropdown::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.ui-select-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 4px 0;
+}
+
 /* 选项 */
 .ui-select-option {
   display: flex;
   align-items: center;
-  padding: 5px 12px;
+  justify-content: flex-start;
+  padding: 8px 12px;
+  margin: 2px 0;
   font-size: 14px;
   color: var(--text-main);
   cursor: pointer;
-  transition: background 0.15s;
-  min-height: 32px;
+  transition: background 0.15s ease;
+  white-space: normal;
+  word-break: break-word;
+  border-radius: var(--radius-sm);
 }
 
 .ui-select-option:hover,
 .ui-select-option.is-focused {
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--bg);
 }
 
 .ui-select-option.is-selected {
   color: var(--accent);
-  font-weight: 600;
-  background: rgba(37, 99, 235, 0.08);
+  font-weight: 500;
+  background: var(--bg);
 }
 
 .ui-select-option.is-disabled {
-  color: rgba(0, 0, 0, 0.25);
+  color: var(--text-main);
   cursor: not-allowed;
 }
 
@@ -1443,19 +1572,81 @@ select:disabled,
   background: transparent;
 }
 
-/* 尺寸变体 */
-.ui-select--sm .ui-select-trigger {
-  height: 24px;
-  padding: 0 22px 0 7px;
-  font-size: 12px;
-  border-radius: 4px;
+/* 空列表提示 */
+.ui-select-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  font-size: 14px;
+  color: var(--text-muted);
+  cursor: default;
 }
 
+/* 分组标题 */
+.ui-select-group {
+  padding: 8px 12px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: default;
+}
+
+.ui-select-group:not(:first-child) {
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 4px;
+  padding-top: 8px;
+}
+
+/* 尺寸变体 - 小号 */
+.ui-select--sm .ui-select-trigger {
+  height: 28px;
+  padding: 0 26px 0 8px;
+  font-size: 12px;
+  border-radius: var(--radius-sm);
+}
+
+.ui-select--sm .ui-select-trigger::after {
+  right: 6px;
+  font-size: 14px;
+}
+
+.ui-select--sm .ui-select-option {
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+/* 尺寸变体 - 大号 */
 .ui-select--lg .ui-select-trigger {
-  height: 40px;
-  padding: 0 32px 0 11px;
-  font-size: 16px;
-  border-radius: 8px;
+  height: 44px;
+  padding: 0 36px 0 14px;
+  font-size: 15px;
+}
+
+.ui-select--lg .ui-select-trigger::after {
+  right: 12px;
+  font-size: 18px;
+}
+
+.ui-select--lg .ui-select-option {
+  padding: 10px 14px;
+  font-size: 15px;
+}
+
+/* 无边框变体 */
+.ui-select--borderless .ui-select-trigger {
+  border: none;
+  background: transparent;
+}
+
+.ui-select--borderless .ui-select-trigger:hover {
+  background: var(--bg);
+}
+
+.ui-select--borderless.is-open .ui-select-trigger {
+  background: var(--bg);
 }
 
 /* 隐藏原生 select */
@@ -2371,7 +2562,7 @@ select.modal-input:focus {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow-y: visible;
 }
 
 /* 正文区域 */
@@ -2484,13 +2675,14 @@ select.modal-input:focus {
   border-radius: 0;
 }
 
-/* 按钮样式 */
+/* 按钮样式 - 使用全局按钮组件 */
 .guide-btn {
   height: 38px;
   padding: 0 20px;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
+  transition: box-shadow 0.2s ease;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -2506,12 +2698,13 @@ select.modal-input:focus {
 }
 
 .guide-btn-primary:hover {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
 }
 
 .guide-btn-primary:active {
-  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(79, 70, 229, 0.35);
 }
 
 .guide-btn-default {
@@ -2521,12 +2714,13 @@ select.modal-input:focus {
 }
 
 .guide-btn-default:hover {
-  background: rgba(0, 0, 0, 0.04);
-  border-color: #bfbfbf;
+  background: #ffffff;
+  border-color: #d9d9d9;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .guide-btn-default:active {
-  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* 响应式 */

@@ -1,20 +1,22 @@
 /* 产品助理页面样式 - 简化版 */
 
-/* 主内容区 */
+/* 主内容区 - 占满父容器 */
 .pa-main {
   padding: 0 !important;
+  margin: -8px; /* 抵消 main-content 的 padding */
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 16px); /* 减去 main-content 的 8px * 2 */
-  overflow: hidden; /* 不显示滚动条，让内部区域滚动 */
+  height: calc(100vh);
+  overflow: hidden;
   min-width: 600px;
 }
 
-/* 两栏布局 */
+/* 两栏布局 - 直接占满 */
 .pa-layout {
   display: flex;
   flex: 1;
   overflow: hidden;
+  background: var(--card-bg);
 }
 
 /* 左侧：对话列表 */
@@ -153,7 +155,7 @@
   font-size: 13px;
 }
 
-/* 按钮样式 - 继承全局 button，只覆盖特殊属性 */
+/* 按钮样式 - 使用全局 ui-btn 组件 */
 .pa-btn {
   gap: 6px;
   padding: 8px 16px;
@@ -165,10 +167,11 @@
   color: #fff;
 }
 
-.pa-btn--primary:hover {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
+.pa-btn--primary:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
   color: #fff;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
 }
 
 .pa-btn--icon {
@@ -384,18 +387,173 @@
 
 /* 输入区域 */
 .pa-input-area {
-  display: flex;
-  gap: 12px;
   padding: 16px 24px;
-  background: var(--card-bg);
-  border-top: 1px solid var(--border-subtle);
+  background: var(--bg);
 }
 
-.pa-input-wrapper {
-  flex: 1;
+/* 输入框容器 - 一体式设计 */
+.pa-input-box {
+  background: var(--card-bg);
+  border: 1px solid #c0c0c0;
+  border-radius: 16px;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.pa-input-box:hover {
+  border-color: var(--accent);
+}
+
+
+
+/* 预览区容器 */
+.pa-previews {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.pa-previews:empty {
+  display: none;
+}
+
+/* 输入框 - 无边框，更大 */
+.pa-input {
+  width: 100%;
+  min-height: 24px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 16px 20px;
+  padding-right: 8px;
+  border: none;
+  background: transparent;
+  resize: none;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-main);
+}
+
+/* 输入框滚动条样式 - 距离边框 15px，上边距和文本对齐 */
+.pa-input::-webkit-scrollbar {
+  width: 21px;
+}
+
+.pa-input::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 16px 0; /* 和 padding-top 一致 */
+}
+
+.pa-input::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+  border: solid transparent;
+  border-width: 0 15px 0 0;
+  background-clip: padding-box;
+}
+
+.pa-input::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+  background-clip: padding-box;
+}
+
+.pa-input::placeholder {
+  color: var(--text-muted);
+}
+
+.pa-input:focus {
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+  border: none;
+}
+
+.pa-input:disabled {
+  cursor: not-allowed;
+  background: transparent;
+}
+
+.pa-input.is-dragover {
+  background: rgba(37, 99, 235, 0.05);
+}
+
+/* 底部工具栏 - 一体化，无分隔线 */
+.pa-input-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+}
+
+.pa-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 工具栏按钮 */
+.pa-toolbar-btn {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  font-size: 18px;
+}
+
+.pa-toolbar-btn:hover {
+  background: var(--bg);
+  color: var(--accent);
+}
+
+/* 模型选择器 - 使用全局 UI.Select 无边框变体 */
+.pa-model-select {
+  min-width: 120px;
+}
+
+.pa-model-select .ui-select {
+  min-width: 120px;
+}
+
+.pa-model-select .ui-select-trigger {
+  height: 34px;
+  font-size: 13px;
+  background: var(--card-bg);
+  padding-right: 28px;
+}
+
+/* 发送按钮 */
+.pa-send-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.pa-send-btn:hover {
+  background: #1d4ed8;
+  transform: scale(1.02);
+}
+
+.pa-send-btn:disabled {
+  background: var(--text-muted);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.pa-send-btn i {
+  font-size: 18px;
 }
 
 /* 图片预览区 */
@@ -403,6 +561,7 @@
   display: none;
   flex-wrap: wrap;
   gap: 8px;
+  padding: 12px 16px 0;
 }
 
 .pa-image-thumb {
@@ -446,6 +605,7 @@
   display: none;
   flex-wrap: wrap;
   gap: 8px;
+  padding: 12px 16px 0;
 }
 
 /* 引用预览区（输入框上方） */
@@ -454,6 +614,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  margin: 12px 16px 0;
   padding: 8px 12px;
   background: var(--bg);
   border-radius: var(--radius-sm);
@@ -513,28 +674,6 @@
 }
 
 /* 输入框 - 继承全局 textarea 样式 */
-.pa-input {
-  flex: 1;
-  padding: 12px;
-  resize: none;
-  background: var(--bg);
-}
-
-.pa-input:focus {
-  background: var(--card-bg);
-}
-
-.pa-input.is-dragover {
-  border-color: var(--accent);
-  background: rgba(37, 99, 235, 0.05);
-}
-
-.pa-input-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-self: flex-end;
-}
 
 /* 加载动画 */
 @keyframes ri-spin {

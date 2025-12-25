@@ -50,6 +50,11 @@
 
   // 初始化
   function init() {
+    // 初始化全局下拉组件
+    if (window.UI && window.UI.Select) {
+      window.UI.Select.init(document.querySelector('.fund-main'));
+    }
+    
     loadWatchlist();
     bindEvents();
     fetchMarketIndices();

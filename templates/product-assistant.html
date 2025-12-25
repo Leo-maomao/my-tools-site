@@ -16,12 +16,6 @@
 
   <!-- 中间：对话区 -->
   <div class="pa-chat">
-    <!-- 对话区顶部工具栏 -->
-    <div class="pa-chat-header">
-      <button class="pa-btn pa-btn--icon" id="showGuideBtn" title="查看使用指南">
-        <i class="ri-question-line"></i>
-      </button>
-    </div>
     
     <div class="pa-messages" id="messageList">
       <div class="pa-welcome">
@@ -45,34 +39,47 @@
       </div>
     </div>
     <div class="pa-input-area">
-      <div class="pa-input-wrapper">
-        <!-- 引用预览区 -->
-        <div class="pa-quote-preview" id="quotePreview"></div>
-        <!-- 图片预览区 -->
-        <div class="pa-image-preview" id="imagePreview"></div>
-        <!-- 文件预览区 -->
-        <div class="pa-file-preview" id="filePreview"></div>
+      <div class="pa-input-box">
+        <!-- 预览区 -->
+        <div class="pa-previews">
+          <div class="pa-quote-preview" id="quotePreview"></div>
+          <div class="pa-image-preview" id="imagePreview"></div>
+          <div class="pa-file-preview" id="filePreview"></div>
+        </div>
+        <!-- 输入框 -->
         <textarea
           class="pa-input"
           id="userInput"
           placeholder="输入问题，或粘贴图片/上传文件..."
-          rows="3"
+          rows="1"
           autocomplete="off"
         ></textarea>
+        <!-- 底部工具栏 -->
+        <div class="pa-input-toolbar">
+          <div class="pa-toolbar-left">
+            <!-- 模型选择 -->
+            <div class="pa-model-select" id="modelSelectWrap">
+              <select id="modelSelect">
+                <option value="">选择模型</option>
+              </select>
+            </div>
+            <!-- 上传按钮 -->
+            <button class="pa-toolbar-btn" id="imageBtn" type="button" title="上传图片">
+              <i class="ri-image-add-line"></i>
+            </button>
+            <button class="pa-toolbar-btn" id="fileBtn" type="button" title="上传HTML文件">
+              <i class="ri-file-code-line"></i>
+            </button>
+          </div>
+          <!-- 发送按钮 -->
+          <button class="pa-send-btn" id="sendBtn" type="button">
+            <i class="ri-send-plane-fill"></i>
+          </button>
+        </div>
       </div>
-      <div class="pa-input-actions">
-        <button class="pa-btn pa-btn--icon" id="imageBtn" title="上传图片">
-          <i class="ri-image-add-line"></i>
-        </button>
-        <input type="file" id="imageInput" accept="image/*" multiple style="display:none">
-        <button class="pa-btn pa-btn--icon" id="fileBtn" title="上传HTML文件">
-          <i class="ri-file-code-line"></i>
-        </button>
-        <input type="file" id="fileInput" accept=".html" multiple style="display:none">
-        <button class="pa-btn pa-btn--primary" id="sendBtn">
-          <i class="ri-send-plane-fill"></i>
-        </button>
-      </div>
+      <!-- 隐藏的文件输入 -->
+      <input type="file" id="imageInput" accept="image/*" multiple style="display:none">
+      <input type="file" id="fileInput" accept=".html" multiple style="display:none">
     </div>
   </div>
 </div>

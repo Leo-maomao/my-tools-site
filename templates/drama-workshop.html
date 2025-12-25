@@ -182,12 +182,8 @@
       <div class="dw-footer-options">
         <label class="dw-inline-label">
           <span>文本模型</span>
-          <select id="textModel" class="dw-select dw-select--sm">
-            <option value="qwen-plus">通义千问 Plus</option>
-            <option value="qwen-max">通义千问 Max</option>
-            <option value="qwen-turbo">通义千问 Turbo</option>
-            <option value="deepseek-chat">DeepSeek</option>
-            <option value="glm-4">智谱 GLM-4</option>
+          <select id="textModel">
+            <option value="">选择模型</option>
           </select>
         </label>
       </div>
@@ -330,7 +326,7 @@
       <div class="dw-header-actions">
         <label class="dw-inline-label">
           <span>图像模型</span>
-          <select id="imageModel" class="dw-select dw-select--sm">
+          <select id="imageModel" >
             <option value="wanx-v1">通义万相</option>
             <option value="stable-diffusion">Stable Diffusion</option>
             <option value="midjourney">Midjourney</option>
@@ -373,7 +369,7 @@
         <div class="dw-inline-options">
           <label class="dw-inline-label">
             <span>视频模型</span>
-            <select id="videoModel" class="dw-select dw-select--sm">
+            <select id="videoModel" >
               <option value="wanx-video">通义万相视频</option>
               <option value="runway-gen3">Runway Gen-3</option>
               <option value="pika-labs">Pika Labs</option>
@@ -383,7 +379,7 @@
           </label>
           <label class="dw-inline-label">
             <span>分辨率</span>
-            <select id="videoResolution" class="dw-select dw-select--sm">
+            <select id="videoResolution" >
               <option value="720p">720p</option>
               <option value="1080p" selected>1080p</option>
               <option value="2k">2K</option>
@@ -392,7 +388,7 @@
           </label>
           <label class="dw-inline-label">
             <span>帧率</span>
-            <select id="videoFps" class="dw-select dw-select--sm">
+            <select id="videoFps" >
               <option value="24">24fps</option>
               <option value="30" selected>30fps</option>
               <option value="60">60fps</option>
@@ -468,3 +464,63 @@
   </div>
 </div>
 </div>
+
+<!-- 角色添加/编辑弹窗 -->
+<div class="dw-modal" id="characterModal">
+  <div class="dw-modal-backdrop"></div>
+  <div class="dw-modal-content">
+    <div class="dw-modal-header">
+      <h3 id="modalTitle">添加角色</h3>
+      <button class="dw-modal-close" id="closeModalBtn">
+        <i class="ri-close-line"></i>
+      </button>
+    </div>
+    <div class="dw-modal-body">
+      <div class="dw-form-group">
+        <label class="dw-label">角色名称 <span class="required">*</span></label>
+        <input type="text" id="characterName" class="dw-input" placeholder="请输入角色名称" autocomplete="off">
+      </div>
+      <div class="dw-form-group">
+        <label class="dw-label">性别</label>
+        <select id="characterGender" class="dw-select">
+          <option value="male">男</option>
+          <option value="female">女</option>
+          <option value="other">其他</option>
+        </select>
+      </div>
+      <div class="dw-form-group">
+        <label class="dw-label">角色描述</label>
+        <textarea id="characterDesc" class="dw-textarea" rows="3" placeholder="描述角色的外貌、性格、背景等" autocomplete="off"></textarea>
+      </div>
+      <div class="dw-form-group">
+        <label class="dw-label">角色图片</label>
+        <div class="dw-upload-area">
+          <div class="dw-upload-previews" id="uploadPreviews"></div>
+          <button type="button" class="dw-upload-add" id="uploadAddBtn">
+            <i class="ri-add-line"></i>
+            <span>添加图片</span>
+          </button>
+          <input type="file" id="characterImages" accept="image/*" multiple hidden>
+        </div>
+      </div>
+    </div>
+    <div class="dw-modal-footer">
+      <button class="dw-btn" id="cancelModalBtn">取消</button>
+      <button class="dw-btn dw-btn--primary" id="saveCharacterBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 图片预览弹窗 -->
+<div class="dw-modal" id="imagePreviewModal">
+  <div class="dw-modal-backdrop"></div>
+  <div class="dw-modal--image">
+    <button class="dw-modal-close" id="closeImagePreviewBtn">
+      <i class="ri-close-line"></i>
+    </button>
+    <img id="previewImage" src="" alt="预览图片">
+  </div>
+</div>
+
+<!-- Toast 提示 -->
+<div class="dw-toast" id="toast"></div>

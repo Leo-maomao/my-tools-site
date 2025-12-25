@@ -100,6 +100,27 @@
   flex-shrink: 0;
 }
 
+.dr-form-row--4 {
+  grid-template-columns: repeat(4, minmax(100px, 1fr));
+  flex-shrink: 0;
+}
+
+@media (max-width: 1200px) {
+  .dr-form-row--4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 报告小助手下拉菜单 - 使用全局 UI.Select 大号变体 */
+.dr-input-panel .ui-select {
+  width: 100%;
+  display: block;
+}
+
+.dr-input-panel .ui-select-trigger {
+  height: 42px;
+}
+
 /* 使用全局 textarea 样式，只覆盖特殊属性 */
 .dr-textarea {
   width: 100%;
@@ -107,14 +128,8 @@
   resize: none;
 }
 
-/* 使用全局 select 样式，只覆盖特殊属性 */
-.dr-select {
-  width: 100%;
-  height: 42px;
-  padding: 0 36px 0 14px;
-}
 
-/* 按钮样式 - 继承全局 button，只覆盖特殊属性 */
+/* 按钮样式 - 使用全局 ui-btn 组件 */
 .dr-btn {
   padding: 10px 16px;
   font-weight: 500;
@@ -127,9 +142,10 @@
 }
 
 .dr-btn--primary:hover:not(:disabled) {
-  background: var(--accent-light);
-  border-color: var(--accent-light);
+  background: var(--accent);
+  border-color: var(--accent);
   color: #fff;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
 }
 
 .dr-btn--small {
