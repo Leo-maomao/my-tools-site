@@ -144,13 +144,6 @@
           detail: { route, config } 
         }));
         
-        // 7. 页面访问埋点
-        if (typeof trackEvent === 'function') {
-          trackEvent('page_view', {
-            page_name: config.name || route || 'home',
-            page_route: route || 'home'
-          });
-        }
 
       } catch (error) {
         console.error('路由加载失败:', error);

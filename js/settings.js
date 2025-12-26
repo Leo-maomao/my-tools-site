@@ -622,11 +622,6 @@
       loadAPIList();
       window.dispatchEvent(new CustomEvent('apiConfigUpdated'));
       
-      // 埋点：API 配置保存
-      if (typeof trackEvent === 'function') {
-        trackEvent('api_config_save', { provider: provider });
-      }
-    } else {
       showMessage('配置保存失败，请重试', 'error');
     }
   }
