@@ -566,6 +566,16 @@
     }
 
     state.isSending = true;
+    
+    // 埋点：产品助理对话
+    if (typeof trackEvent === 'function') {
+      trackEvent('pa_chat', {
+        has_text: !!text,
+        has_files: hasFiles,
+        has_images: hasImages,
+        model: state.selectedModel || 'unknown'
+      });
+    }
 
     var conv = getCurrentConversation();
     if (!conv) return;

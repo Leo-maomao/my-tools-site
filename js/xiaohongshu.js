@@ -955,6 +955,14 @@
             alert('请至少上传一个模板图片');
             return;
         }
+        
+        // 埋点：小红书图片生成
+        if (typeof trackEvent === 'function') {
+            trackEvent('xhs_generate', {
+                has_cover: !!(state.coverTemplate && coverTitle),
+                has_content: !!(state.bgTemplate && hasContent)
+            });
+        }
 
         state.generatedImages = [];
         elements.previewContainer.innerHTML = '';

@@ -76,6 +76,16 @@
   
   // 监听登录状态变化
   window.addEventListener('toolsAuthChanged', updateAdminCards);
+  
+  // 工具卡片点击埋点
+  document.querySelectorAll('.platform-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+      var toolName = this.querySelector('h3') ? this.querySelector('h3').textContent : 'unknown';
+      if (typeof trackEvent === 'function') {
+        trackEvent('tool_click', { tool_name: toolName });
+      }
+    });
+  });
 })();
 </script>
 

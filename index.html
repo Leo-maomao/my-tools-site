@@ -111,6 +111,29 @@
     </div>
   </div>
 
+  <!-- 51.la 统计脚本 -->
+  <script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+  <script>
+    // 51.la 初始化
+    try {
+      if (window.LA) {
+        LA.init({id:"3OV3C1DLozIUagyB",ck:"3OV3C1DLozIUagyB"});
+      }
+    } catch (e) {}
+    
+    // 埋点工具函数
+    function trackEvent(eventName, params) {
+      try {
+        if (window.LA && typeof LA.track === 'function') {
+          LA.track(eventName, params || {});
+        }
+      } catch (e) {}
+    }
+    
+    // 暴露到全局
+    window.trackEvent = trackEvent;
+  </script>
+
   <!-- 全局脚本 -->
   <script src="js/api-config.js"></script>
   <script src="js/sidebar.js"></script>
@@ -130,6 +153,14 @@
           window.location.hash = '#settings';
         });
       }
+      
+      // 侧边栏点击埋点
+      document.querySelectorAll('.nav-item').forEach(function(item) {
+        item.addEventListener('click', function() {
+          var toolName = this.querySelector('span') ? this.querySelector('span').textContent : 'unknown';
+          trackEvent('sidebar_click', { tool_name: toolName });
+        });
+      });
     });
   </script>
 </body>

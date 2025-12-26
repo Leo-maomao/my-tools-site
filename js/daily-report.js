@@ -396,6 +396,16 @@
 
     state.isGenerating = true;
     updateUI('loading', null, null, reportType.name);
+    
+    // 埋点：报告生成
+    if (typeof trackEvent === 'function') {
+      trackEvent('report_generate', {
+        report_type: reportTypeKey,
+        template: templateKey,
+        format: formatKey,
+        model: state.selectedModel || 'unknown'
+      });
+    }
 
     try {
       var result = await callAI(workContent, reportTypeKey, templateKey, formatKey);
