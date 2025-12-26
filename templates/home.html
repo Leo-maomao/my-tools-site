@@ -34,7 +34,7 @@
     </div>
   </a>
 
-  <a href="#drama-workshop" class="platform-card platform-card--drama">
+  <a href="#drama-workshop" class="platform-card platform-card--drama" data-require-admin="true" style="display: none;">
     <div class="platform-icon">
       <i class="ri-movie-2-line"></i>
     </div>
@@ -54,4 +54,28 @@
     </div>
   </a>
 </div>
+
+<script>
+// 首页加载时检查管理员权限，显示/隐藏受限工具
+(function() {
+  function updateAdminCards() {
+    var isAdmin = window.ToolsAuth && window.ToolsAuth.isAdmin();
+    var adminItems = document.querySelectorAll('.platform-grid [data-require-admin="true"]');
+    adminItems.forEach(function(item) {
+      // platform-card 使用 flex 布局
+      item.style.display = isAdmin ? 'flex' : 'none';
+    });
+  }
+  
+  // 异步检查并更新
+  if (window.ToolsAuth && window.ToolsAuth.checkAdmin) {
+    window.ToolsAuth.checkAdmin().then(updateAdminCards);
+  } else {
+    updateAdminCards();
+  }
+  
+  // 监听登录状态变化
+  window.addEventListener('toolsAuthChanged', updateAdminCards);
+})();
+</script>
 

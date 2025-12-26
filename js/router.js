@@ -37,7 +37,8 @@
       template: 'templates/drama-workshop.html',
       css: 'css/drama-workshop.css',
       js: 'js/drama-workshop.js',
-      init: null
+      init: null,
+      requireAdmin: true  // 仅管理员可见
     },
     'fund-assistant': {
       name: '基金助手',
@@ -99,6 +100,16 @@
       }
 
       const config = routes[route];
+      
+      // 权限检查：需要管理员权限的路由
+      if (config.requireAdmin) {
+        const isAdmin = window.ToolsAuth && window.ToolsAuth.isAdmin();
+        if (!isAdmin) {
+          console.warn('需要管理员权限访问:', route);
+          window.location.hash = '';
+          return;
+        }
+      }
       
       // 显示加载状态
       if (appContent) {
@@ -252,6 +263,19 @@
 
   // 暴露到全局
   window.Router = Router;
+  
+  // 暴露路由配置，供其他模块使用
+  window.RouterConfig = {
+    routes: routes,
+    // 获取需要管理员权限的路由列表
+    getAdminRoutes: () => {
+      return Object.keys(routes).filter(key => routes[key].requireAdmin);
+    },
+    // 检查路由是否需要管理员权限
+    requiresAdmin: (route) => {
+      return routes[route] && routes[route].requireAdmin;
+    }
+  };
 
   // 页面加载完成后初始化路由
   if (document.readyState === 'loading') {

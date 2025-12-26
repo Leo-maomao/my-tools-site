@@ -221,6 +221,108 @@
   box-shadow: 0 2px 8px rgba(239, 68, 68, 0.35);
 }
 
+/* 终止按钮样式 - 优先级高于 dw-btn--primary */
+.dw-btn.is-danger,
+.dw-btn.dw-btn--primary.is-danger {
+  background: var(--error) !important;
+  border-color: var(--error) !important;
+  color: #fff !important;
+}
+
+.dw-btn.is-danger:hover:not(:disabled),
+.dw-btn.dw-btn--primary.is-danger:hover:not(:disabled) {
+  background: #dc2626 !important;
+  border-color: #dc2626 !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.35);
+}
+
+/* 单个任务终止按钮（在缩略图内） */
+.dw-abort-btn {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  background: var(--error);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.dw-abort-btn:hover {
+  background: #dc2626;
+}
+
+.dw-abort-btn i {
+  font-size: 12px;
+}
+
+/* 视频卡片内的终止按钮 */
+.dw-abort-btn-video {
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: var(--error);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dw-abort-btn-video:hover {
+  background: #dc2626;
+}
+
+/* 危险按钮样式（终止按钮） */
+.dw-btn--danger {
+  background: var(--error) !important;
+  border-color: var(--error) !important;
+  color: #fff !important;
+}
+
+.dw-btn--danger:hover:not(:disabled) {
+  background: #dc2626 !important;
+  border-color: #dc2626 !important;
+}
+
+/* 生成中的缩略图样式 */
+.dw-frame-thumb.is-generating,
+.dw-frame-preview.is-generating {
+  position: relative;
+}
+
+.dw-thumb-loading {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+}
+
+.dw-frame-loading {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+}
+
 .dw-btn--ghost {
   color: var(--text-muted);
   border-color: transparent;
@@ -443,6 +545,24 @@
   width: 100%;
   padding: 12px 14px;
   resize: vertical;
+}
+
+/* 文本域滚动条样式 */
+.dw-textarea::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dw-textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dw-textarea::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.dw-textarea::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }
 
 .dw-textarea--lg {
@@ -1424,6 +1544,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
+  align-items: start; /* 防止行高拉伸 */
 }
 
 /* 紧凑版分镜图卡片 */
@@ -1434,8 +1555,9 @@
   padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  height: 220px; /* 固定高度保持一致 */
+  gap: 8px;
+  min-height: 200px; /* 最小高度，允许内容自适应 */
+  overflow: hidden; /* 防止内容溢出 */
 }
 
 .dw-frame-header-compact {
@@ -1478,13 +1600,16 @@
 .dw-frame-previews {
   display: flex;
   gap: 12px;
+  flex: 1;
+  min-height: 0; /* 允许收缩 */
 }
 
 .dw-frame-preview-item {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
+  min-width: 0; /* 允许收缩 */
 }
 
 .dw-frame-label {
@@ -1496,7 +1621,7 @@
 .dw-frame-thumb {
   width: 100%;
   aspect-ratio: 9/16;
-  max-height: 140px;
+  max-height: 100px;
   background: #1a1a2e;
   border: 2px dashed var(--border-subtle);
   border-radius: var(--radius-sm);
@@ -1630,7 +1755,7 @@
 .dw-frame-thumb-empty {
   width: 100%;
   aspect-ratio: 9/16;
-  max-height: 140px;
+  max-height: 100px;
   background: #f1f5f9;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);

@@ -19,8 +19,14 @@
     { id: 'product-assistant', name: '产品助理' },
     { id: 'daily-report', name: '报告小助手' },
     { id: 'fund-assistant', name: '基金助手' },
-    { id: 'drama-workshop', name: '短剧工坊' }
+    { id: 'drama-workshop', name: '短剧工坊', requireAdmin: true }
   ];
+  
+  // 获取当前用户可见的工具列表
+  function getVisibleTools() {
+    const isAdmin = window.ToolsAuth && window.ToolsAuth.isAdmin();
+    return TOOLS.filter(tool => !tool.requireAdmin || isAdmin);
+  }
 
 
   // 提供商配置定义（只管理 Key，模型在工具页选择）
@@ -619,7 +625,7 @@
       showMessage('配置保存失败，请重试', 'error');
     }
   }
-
+  
   function deleteAPIConfig() {
     if (!currentEditProvider) return;
     
@@ -1004,9 +1010,10 @@
       return;
     }
     
-    // 渲染工具列表
+    // 渲染工具列表（根据权限过滤）
+    const visibleTools = getVisibleTools();
     try {
-      elements.guideGrid.innerHTML = TOOLS.map(tool => {
+      elements.guideGrid.innerHTML = visibleTools.map(tool => {
         const config = guideConfigMap[tool.id];
         const hasConfig = !!config;
         
@@ -1032,7 +1039,7 @@
         `;
       }).join('');
       
-      console.log('✓ 渲染了', TOOLS.length, '个工具卡片');
+      console.log('✓ 渲染了', visibleTools.length, '个工具卡片');
       console.log('guideGrid.children.length:', elements.guideGrid.children.length);
       console.log('guideGrid HTML:', elements.guideGrid.innerHTML.substring(0, 200) + '...');
     } catch (error) {
@@ -1050,7 +1057,7 @@
     // 绑定点击事件
     elements.guideGrid.querySelectorAll('.guide-card').forEach(card => {
       const toolId = card.dataset.tool;
-      const tool = TOOLS.find(t => t.id === toolId);
+      const tool = visibleTools.find(t => t.id === toolId);
       const config = guideConfigMap[toolId];
       
       card.addEventListener('click', () => {

@@ -187,12 +187,28 @@
             let headers = {};
             
             switch (provider) {
-                case 'openai':
-                case 'deepseek':
-                case 'moonshot':
                 case 'qwen':
                 case 'bailian':
-                    // 这些厂商支持 OpenAI 兼容的 /models 接口
+                    // 阿里云百炼 - 使用代理避免 CORS
+                    url = '/api/bailian/models';
+                    headers = {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    };
+                    break;
+                    
+                case 'openai':
+                    // OpenAI - 使用代理避免 CORS
+                    url = '/api/openai/models';
+                    headers = {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    };
+                    break;
+                    
+                case 'deepseek':
+                case 'moonshot':
+                    // 其他厂商 - 直接调用（可能有 CORS 问题）
                     url = `${apiEndpoint}/models`;
                     headers = {
                         'Authorization': `Bearer ${apiKey}`,
@@ -315,31 +331,160 @@
 
             // 不同厂商的图片生成模型
             switch (provider) {
-                case 'openai':
-                    // OpenAI DALL-E
-                    return [
+                case 'openai': {
+                    // OpenAI - 使用 API 获取模型列表并与预定义合并
+                    const predefinedOpenAIImage = [
                         { id: 'dall-e-3', name: 'DALL-E 3' },
-                        { id: 'dall-e-2', name: 'DALL-E 2' }
+                        { id: 'dall-e-2', name: 'DALL-E 2' },
+                        { id: 'gpt-image-1', name: 'GPT Image 1' }
                     ];
+                    
+                    try {
+                        const url = '/api/openai/models';
+                        const headers = {
+                            'Authorization': `Bearer ${apiKey}`,
+                            'Content-Type': 'application/json'
+                        };
+                        const response = await fetch(url, { headers });
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.data && Array.isArray(data.data)) {
+                                const apiModels = data.data.filter(m => {
+                                    const id = (m.id || '').toLowerCase();
+                                    return id.includes('dall-e') || id.includes('image');
+                                }).map(m => ({ id: m.id, name: m.id, fromApi: true }));
+                                
+                                const existingIds = new Set(apiModels.map(m => m.id));
+                                const merged = [...apiModels, ...predefinedOpenAIImage.filter(m => !existingIds.has(m.id))];
+                                console.log('OpenAI图片模型（合并后）:', merged.length, '个');
+                                modelsCache[cacheKey] = { models: merged, timestamp: Date.now() };
+                                return merged;
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('从OpenAI API获取模型失败:', e);
+                    }
+                    modelsCache[cacheKey] = { models: predefinedOpenAIImage, timestamp: Date.now() };
+                    return predefinedOpenAIImage;
+                }
 
                 case 'bailian':
-                case 'qwen':
-                    // 阿里百炼 - 通义万相
-                    return [
+                case 'qwen': {
+                    // 阿里百炼 - 使用 OpenAI 兼容模式接口获取模型列表
+                    // 并与预定义常用模型合并
+                    
+                    // 预定义的常用图片生成模型
+                    const predefinedImageModels = [
                         { id: 'wanx-v1', name: '通义万相 v1' },
-                        { id: 'wanx-sketch-to-image-v1', name: '通义万相 草图生图' },
-                        { id: 'wanx-background-generation-v2', name: '通义万相 背景生成' }
+                        { id: 'wanx2.0-t2i-turbo', name: '通义万相2.0 文生图Turbo' },
+                        { id: 'wanx2.1-t2i-turbo', name: '通义万相2.1 文生图Turbo' },
+                        { id: 'wanx2.1-t2i-plus', name: '通义万相2.1 文生图Plus' },
+                        { id: 'flux-schnell', name: 'FLUX Schnell' },
+                        { id: 'flux-dev', name: 'FLUX Dev' },
+                        { id: 'stable-diffusion-3.5-large', name: 'SD 3.5 Large' },
+                        { id: 'stable-diffusion-xl', name: 'SDXL' },
+                        { id: 'wanx-style-cosplay-v1', name: '通义万相 Cosplay人物' },
+                        { id: 'wanx-style-repaint-v1', name: '通义万相 人像风格重绘' }
                     ];
+                    
+                    try {
+                        const url = '/api/bailian/models';
+                        const headers = {
+                            'Authorization': `Bearer ${apiKey}`,
+                            'Content-Type': 'application/json'
+                        };
 
-                case 'zhipu':
-                    // 智谱 CogView
-                    return [
+                        const response = await fetch(url, { headers });
+                        if (response.ok) {
+                            const data = await response.json();
+                            
+                            if (data.data && Array.isArray(data.data)) {
+                                // 从 API 返回中筛选图片相关模型
+                                const apiImageModels = data.data.filter(model => {
+                                    const modelId = (model.id || '').toLowerCase();
+                                    // 包含图片相关关键词
+                                    const isImageRelated = modelId.includes('image') ||
+                                           modelId.includes('wanx') ||
+                                           modelId.includes('flux') ||
+                                           modelId.includes('stable') ||
+                                           modelId.includes('cogview');
+                                    // 排除视频模型和纯编辑模型
+                                    const isVideoModel = modelId.includes('i2v') || 
+                                           modelId.includes('video') || 
+                                           modelId.includes('t2v') ||
+                                           modelId.includes('v2v');
+                                    return isImageRelated && !isVideoModel;
+                                }).map(model => ({
+                                    id: model.id,
+                                    name: model.id,
+                                    fromApi: true
+                                }));
+                                
+                                // 合并：API 模型优先，然后是预定义模型（去重）
+                                const existingIds = new Set(apiImageModels.map(m => m.id));
+                                const mergedModels = [
+                                    ...apiImageModels,
+                                    ...predefinedImageModels.filter(m => !existingIds.has(m.id))
+                                ];
+                                
+                                console.log('百炼图片模型（合并后）:', mergedModels.length, '个');
+                                
+                                // 缓存结果
+                                modelsCache[cacheKey] = {
+                                    models: mergedModels,
+                                    timestamp: Date.now()
+                                };
+                                return mergedModels;
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('从百炼API获取模型失败，使用预定义列表:', e);
+                    }
+                    
+                    // 备用：返回预定义模型列表
+                    modelsCache[cacheKey] = { models: predefinedImageModels, timestamp: Date.now() };
+                    return predefinedImageModels;
+                }
+
+                case 'zhipu': {
+                    // 智谱 - 使用 API 获取模型列表并与预定义合并
+                    const predefinedZhipuImage = [
                         { id: 'cogview-3', name: 'CogView-3' },
-                        { id: 'cogview-3-plus', name: 'CogView-3 Plus' }
+                        { id: 'cogview-3-plus', name: 'CogView-3 Plus' },
+                        { id: 'cogview-4', name: 'CogView-4' }
                     ];
+                    
+                    try {
+                        const url = '/api/zhipu/models';
+                        const headers = {
+                            'Authorization': `Bearer ${apiKey}`,
+                            'Content-Type': 'application/json'
+                        };
+                        const response = await fetch(url, { headers });
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.data && Array.isArray(data.data)) {
+                                const apiModels = data.data.filter(m => {
+                                    const id = (m.id || '').toLowerCase();
+                                    return id.includes('cogview') || id.includes('image');
+                                }).map(m => ({ id: m.id, name: m.id, fromApi: true }));
+                                
+                                const existingIds = new Set(apiModels.map(m => m.id));
+                                const merged = [...apiModels, ...predefinedZhipuImage.filter(m => !existingIds.has(m.id))];
+                                console.log('智谱图片模型（合并后）:', merged.length, '个');
+                                modelsCache[cacheKey] = { models: merged, timestamp: Date.now() };
+                                return merged;
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('从智谱API获取模型失败:', e);
+                    }
+                    modelsCache[cacheKey] = { models: predefinedZhipuImage, timestamp: Date.now() };
+                    return predefinedZhipuImage;
+                }
 
-                case 'custom':
-                    // 自定义API：尝试从 /models 接口获取图片模型
+                case 'custom': {
+                    // 自定义API：从 /models 接口获取图片模型
                     try {
                         const url = `${apiEndpoint}/models`;
                         const headers = {
@@ -351,35 +496,34 @@
                         if (response.ok) {
                             const data = await response.json();
                             if (data.data && Array.isArray(data.data)) {
-                                // 只保留图片生成模型
+                                // 筛选图片生成模型
                                 const imageModels = data.data.filter(model => {
-                                    const id = model.id.toLowerCase();
-                                    return id.includes('dall-e') ||
+                                    const id = (model.id || '').toLowerCase();
+                                    const isImage = id.includes('dall-e') ||
                                            id.includes('image') ||
                                            id.includes('wanx') ||
                                            id.includes('cogview') ||
+                                           id.includes('flux') ||
                                            id.includes('stable-diffusion') ||
                                            id.includes('midjourney');
-                                });
-
-                                const models = imageModels.map(model => ({
+                                    const isVideo = id.includes('video') || id.includes('i2v') || id.includes('t2v');
+                                    return isImage && !isVideo;
+                                }).map(model => ({
                                     id: model.id,
-                                    name: formatModelName(model.id)
+                                    name: model.id,
+                                    fromApi: true
                                 }));
 
-                                // 缓存结果
-                                modelsCache[cacheKey] = {
-                                    models: models,
-                                    timestamp: Date.now()
-                                };
-
-                                return models;
+                                console.log('自定义API图片模型:', imageModels.length, '个');
+                                modelsCache[cacheKey] = { models: imageModels, timestamp: Date.now() };
+                                return imageModels;
                             }
                         }
                     } catch (e) {
-                        console.warn('自定义API获取图片模型失败，返回空列表');
+                        console.warn('自定义API获取图片模型失败:', e);
                     }
                     return [];
+                }
 
                 default:
                     // 其他厂商暂不支持图片生成
@@ -414,25 +558,147 @@
             // 不同厂商的视频生成模型
             switch (provider) {
                 case 'bailian':
-                case 'qwen':
-                    // 阿里百炼 - 通义万相视频
-                    return [
-                        { id: 'wanx-video-v1', name: '通义万相视频 v1' },
-                        { id: 'wanx-animation-v1', name: '通义万相动画 v1' }
+                case 'qwen': {
+                    // 阿里百炼 - 使用 OpenAI 兼容模式接口获取视频模型列表
+                    // 并与预定义常用模型合并
+                    
+                    // 预定义的常用视频生成模型
+                    const predefinedVideoModels = [
+                        { id: 'wanx2.1-i2v-turbo', name: '通义万相2.1 图生视频Turbo' },
+                        { id: 'wanx2.1-i2v-plus', name: '通义万相2.1 图生视频Plus' },
+                        { id: 'wanx-i2v-01', name: '通义万相 图生视频v1' },
+                        { id: 'wanx2.1-t2v-turbo', name: '通义万相2.1 文生视频Turbo' },
+                        { id: 'wanx2.1-t2v-plus', name: '通义万相2.1 文生视频Plus' }
                     ];
+                    
+                    try {
+                        const url = '/api/bailian/models';
+                        const headers = {
+                            'Authorization': `Bearer ${apiKey}`,
+                            'Content-Type': 'application/json'
+                        };
 
-                case 'zhipu':
-                    // 智谱 CogVideo
-                    return [
-                        { id: 'cogvideo-v1', name: 'CogVideo v1' }
+                        const response = await fetch(url, { headers });
+                        if (response.ok) {
+                            const data = await response.json();
+                            
+                            if (data.data && Array.isArray(data.data)) {
+                                // 从 API 返回中筛选视频相关模型
+                                const apiVideoModels = data.data.filter(model => {
+                                    const modelId = (model.id || '').toLowerCase();
+                                    // 包含视频相关关键词
+                                    return modelId.includes('i2v') || 
+                                           modelId.includes('video') || 
+                                           modelId.includes('t2v') ||
+                                           modelId.includes('v2v') ||
+                                           modelId.includes('animation');
+                                }).map(model => ({
+                                    id: model.id,
+                                    name: model.id,
+                                    fromApi: true
+                                }));
+                                
+                                // 合并：API 模型优先，然后是预定义模型（去重）
+                                const existingIds = new Set(apiVideoModels.map(m => m.id));
+                                const mergedModels = [
+                                    ...apiVideoModels,
+                                    ...predefinedVideoModels.filter(m => !existingIds.has(m.id))
+                                ];
+                                
+                                console.log('百炼视频模型（合并后）:', mergedModels.length, '个');
+                                
+                                // 缓存结果
+                                modelsCache[cacheKey] = {
+                                    models: mergedModels,
+                                    timestamp: Date.now()
+                                };
+                                return mergedModels;
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('从百炼API获取视频模型失败，使用预定义列表:', e);
+                    }
+                    
+                    // 备用：返回预定义模型列表
+                    modelsCache[cacheKey] = { models: predefinedVideoModels, timestamp: Date.now() };
+                    return predefinedVideoModels;
+                }
+
+                case 'zhipu': {
+                    // 智谱 - 使用 API 获取视频模型列表并与预定义合并
+                    const predefinedZhipuVideo = [
+                        { id: 'cogvideox', name: 'CogVideoX' },
+                        { id: 'cogvideox-flash', name: 'CogVideoX Flash' }
                     ];
+                    
+                    try {
+                        const url = '/api/zhipu/models';
+                        const headers = {
+                            'Authorization': `Bearer ${apiKey}`,
+                            'Content-Type': 'application/json'
+                        };
+                        const response = await fetch(url, { headers });
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.data && Array.isArray(data.data)) {
+                                const apiModels = data.data.filter(m => {
+                                    const id = (m.id || '').toLowerCase();
+                                    return id.includes('video') || id.includes('cogvideo');
+                                }).map(m => ({ id: m.id, name: m.id, fromApi: true }));
+                                
+                                const existingIds = new Set(apiModels.map(m => m.id));
+                                const merged = [...apiModels, ...predefinedZhipuVideo.filter(m => !existingIds.has(m.id))];
+                                console.log('智谱视频模型（合并后）:', merged.length, '个');
+                                modelsCache[cacheKey] = { models: merged, timestamp: Date.now() };
+                                return merged;
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('从智谱API获取视频模型失败:', e);
+                    }
+                    modelsCache[cacheKey] = { models: predefinedZhipuVideo, timestamp: Date.now() };
+                    return predefinedZhipuVideo;
+                }
 
-                case 'openai':
-                    // OpenAI 暂不支持视频生成
+                case 'openai': {
+                    // OpenAI - 使用 API 获取视频模型（如 Sora）
+                    const predefinedOpenAIVideo = [
+                        { id: 'sora', name: 'Sora' }
+                    ];
+                    
+                    try {
+                        const url = '/api/openai/models';
+                        const headers = {
+                            'Authorization': `Bearer ${apiKey}`,
+                            'Content-Type': 'application/json'
+                        };
+                        const response = await fetch(url, { headers });
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.data && Array.isArray(data.data)) {
+                                const apiModels = data.data.filter(m => {
+                                    const id = (m.id || '').toLowerCase();
+                                    return id.includes('video') || id.includes('sora');
+                                }).map(m => ({ id: m.id, name: m.id, fromApi: true }));
+                                
+                                if (apiModels.length > 0) {
+                                    const existingIds = new Set(apiModels.map(m => m.id));
+                                    const merged = [...apiModels, ...predefinedOpenAIVideo.filter(m => !existingIds.has(m.id))];
+                                    console.log('OpenAI视频模型（合并后）:', merged.length, '个');
+                                    modelsCache[cacheKey] = { models: merged, timestamp: Date.now() };
+                                    return merged;
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('从OpenAI API获取视频模型失败:', e);
+                    }
+                    // OpenAI 视频模型可能未开放，返回空或预定义
                     return [];
+                }
 
-                case 'custom':
-                    // 自定义API：尝试从 /models 接口获取视频模型
+                case 'custom': {
+                    // 自定义API：从 /models 接口获取视频模型
                     try {
                         const url = `${apiEndpoint}/models`;
                         const headers = {
@@ -444,34 +710,34 @@
                         if (response.ok) {
                             const data = await response.json();
                             if (data.data && Array.isArray(data.data)) {
-                                // 只保留视频生成模型
+                                // 筛选视频生成模型
                                 const videoModels = data.data.filter(model => {
-                                    const id = model.id.toLowerCase();
+                                    const id = (model.id || '').toLowerCase();
                                     return id.includes('video') ||
+                                           id.includes('i2v') ||
+                                           id.includes('t2v') ||
+                                           id.includes('v2v') ||
                                            id.includes('animation') ||
                                            id.includes('cogvideo') ||
+                                           id.includes('sora') ||
                                            id.includes('runway') ||
                                            id.includes('pika');
-                                });
-
-                                const models = videoModels.map(model => ({
+                                }).map(model => ({
                                     id: model.id,
-                                    name: formatModelName(model.id)
+                                    name: model.id,
+                                    fromApi: true
                                 }));
 
-                                // 缓存结果
-                                modelsCache[cacheKey] = {
-                                    models: models,
-                                    timestamp: Date.now()
-                                };
-
-                                return models;
+                                console.log('自定义API视频模型:', videoModels.length, '个');
+                                modelsCache[cacheKey] = { models: videoModels, timestamp: Date.now() };
+                                return videoModels;
                             }
                         }
                     } catch (e) {
-                        console.warn('自定义API获取视频模型失败，返回空列表');
+                        console.warn('自定义API获取视频模型失败:', e);
                     }
                     return [];
+                }
 
                 default:
                     // 其他厂商暂不支持视频生成
@@ -482,6 +748,462 @@
             console.error('获取视频模型列表失败:', error);
             throw error;
         }
+    }
+
+    // ============ 图片上传到 Supabase Storage ============
+    async function uploadImageToStorage(base64Image) {
+        // 获取 Supabase 客户端
+        const supabase = window.toolsSupabase;
+        if (!supabase) {
+            throw new Error('Supabase 未初始化，无法上传图片');
+        }
+
+        try {
+            // 将 base64 转换为 Blob
+            const base64Data = base64Image.split(',')[1];
+            const mimeType = base64Image.match(/data:([^;]+);/)?.[1] || 'image/png';
+            const byteCharacters = atob(base64Data);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: mimeType });
+
+            // 生成唯一文件名
+            const ext = mimeType.split('/')[1] || 'png';
+            const fileName = `character-ref-${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${ext}`;
+
+            // 上传到 Supabase Storage (chat-images bucket)
+            console.log('正在上传图片到 Supabase Storage...');
+            const { data, error } = await supabase.storage
+                .from('chat-images')
+                .upload(fileName, blob, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            // 获取公网 URL
+            const { data: urlData } = supabase.storage
+                .from('chat-images')
+                .getPublicUrl(fileName);
+
+            console.log('图片上传成功，公网URL:', urlData.publicUrl);
+            return urlData.publicUrl;
+        } catch (error) {
+            console.error('图片上传失败:', error);
+            throw new Error(`图片上传失败: ${error.message}`);
+        }
+    }
+
+    // ============ 角色参考图片生成（人物一致性）============
+    // 判断是否是图像编辑模型（通过关键词匹配）
+    function isImageEditModelByName(modelId) {
+        const id = (modelId || '').toLowerCase();
+        // 包含这些关键词的是图像编辑模型
+        return id.includes('imageedit') ||      // wanx2.1-imageedit, qwen-image-edit-plus
+               id.includes('image-edit') ||     // qwen-image-edit-plus
+               id.includes('repaint') ||        // wanx-style-repaint-v1
+               id.includes('cosplay') ||        // wanx-style-cosplay-v1
+               id.includes('i2i');              // image-to-image 模型
+    }
+    
+    // 判断是否是纯文生图模型
+    function isTextToImageModelByName(modelId) {
+        const id = (modelId || '').toLowerCase();
+        // 包含这些关键词的是纯文生图模型
+        return id.includes('t2i') ||            // text-to-image
+               id.includes('z-image') ||        // z-image-turbo
+               id.includes('flux') ||           // flux-schnell, flux-dev
+               id.includes('stable-diffusion') || // stable-diffusion
+               id.includes('cogview') ||        // cogview
+               id.includes('dall-e');           // dall-e
+    }
+
+    async function generateImageWithCharacterRef(apiKey, prompt, refImages, size, n, originalModel) {
+        // 获取第一个角色的参考图片
+        const refImage = refImages[0];
+        
+        // 构建包含角色名的增强提示词
+        const characterNames = refImages.map(r => r.name).join('、');
+        const enhancedPrompt = `${prompt}，主角是${characterNames}`;
+        console.log('使用角色增强提示词，角色:', characterNames);
+        console.log('使用模型:', originalModel);
+
+        // 检查图片格式
+        const hasValidImage = refImage && refImage.image;
+        let isBase64 = hasValidImage && refImage.image.startsWith('data:');
+        let isUrl = hasValidImage && (refImage.image.startsWith('http://') || refImage.image.startsWith('https://'));
+        let imageUrl = isUrl ? refImage.image : null;
+
+        // 判断模型类型（使用关键词匹配）
+        const isImageEditModel = isImageEditModelByName(originalModel);
+        const isTextOnlyModel = isTextToImageModelByName(originalModel);
+        
+        console.log('模型类型判断:', { isImageEditModel, isTextOnlyModel, modelId: originalModel });
+        
+        if (isTextOnlyModel && !isImageEditModel) {
+            console.log('模型是纯文生图模型，不支持图片输入，使用增强提示词生成');
+        }
+
+        // 只有图像编辑模型才尝试使用图片输入
+        if (isImageEditModel && hasValidImage) {
+            // 如果是 base64，先上传获取 URL
+            if (isBase64 && !isUrl) {
+                console.log('图像编辑模型需要图片URL，正在上传 base64 图片到云存储...');
+                try {
+                    imageUrl = await uploadImageToStorage(refImage.image);
+                    isUrl = true;
+                    isBase64 = false;
+                    console.log('图片上传成功，获取到公网URL:', imageUrl);
+                } catch (uploadError) {
+                    console.warn('图片上传失败，将使用纯文生图模式:', uploadError.message);
+                    imageUrl = null;
+                }
+            }
+
+            // 如果有有效的图片 URL，使用图像编辑接口
+            if (imageUrl) {
+                console.log('使用图像编辑接口，传入参考图片URL:', imageUrl);
+                try {
+                    const response = await fetch('/api/dashscope/services/aigc/image2image/image-synthesis', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${apiKey}`,
+                            'Content-Type': 'application/json',
+                            'X-DashScope-Async': 'enable'
+                        },
+                        body: JSON.stringify({
+                            model: originalModel,
+                            input: { 
+                                prompt: enhancedPrompt,
+                                base_image_url: imageUrl
+                            },
+                            parameters: { size: size, n: n }
+                        })
+                    });
+
+                    const data = await response.json();
+                    
+                    // 检查是否成功
+                    if (response.ok && data.output && data.output.task_id) {
+                        return await pollImageTask(apiKey, data.output.task_id);
+                    }
+                    
+                    // 如果失败，记录错误并继续使用文生图
+                    console.warn('图像编辑接口失败:', data.message || response.status);
+                } catch (err) {
+                    console.warn('图像编辑接口调用失败:', err.message);
+                }
+            }
+        }
+
+        // 默认：使用文生图接口
+        console.log('使用阿里百炼文生图接口，模型:', originalModel);
+        const response = await fetch('/api/dashscope/services/aigc/text2image/image-synthesis', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json',
+                'X-DashScope-Async': 'enable'
+            },
+            body: JSON.stringify({
+                model: originalModel || 'wanx-v1',
+                input: { prompt: enhancedPrompt },
+                parameters: { size: size, n: n }
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `API 请求失败: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.output && data.output.task_id) {
+            return await pollImageTask(apiKey, data.output.task_id);
+        }
+        throw new Error('图片生成任务创建失败');
+    }
+
+    // ============ 图片生成 API ============
+    async function generateImage(prompt, options = {}) {
+        // 支持指定厂商，或使用当前激活的厂商
+        let provider, apiKey, endpoint;
+        
+        if (options.provider) {
+            const config = getConfig(options.provider);
+            if (!config) {
+                throw new Error(`厂商 ${options.provider} 未配置`);
+            }
+            provider = options.provider;
+            apiKey = config.apiKey;
+            endpoint = config.baseUrl || config.endpoint;
+        } else {
+            const activeConfig = getActiveConfig();
+            if (!activeConfig) {
+                throw new Error('请先配置 API');
+            }
+            provider = activeConfig.provider;
+            apiKey = activeConfig.apiKey;
+            endpoint = activeConfig.baseUrl || activeConfig.endpoint;
+        }
+
+        const model = options.model || 'wanx-v1';
+        const size = options.size || '1024*1024';
+        const n = options.n || 1;
+        const refImages = options.refImages || []; // 角色参考图片
+
+        try {
+            switch (provider) {
+                case 'bailian':
+                case 'qwen': {
+                    // 检查是否有角色参考图片，如果有则使用人物一致性生成
+                    if (refImages.length > 0 && refImages[0].image) {
+                        return await generateImageWithCharacterRef(apiKey, prompt, refImages, size, n, model);
+                    }
+                    
+                    // 阿里百炼所有图片模型都使用原生接口
+                    // （兼容模式 /compatible-mode/v1 不支持图片生成 API）
+                    console.log('使用阿里百炼原生接口，模型:', model);
+                    const response = await fetch('/api/dashscope/services/aigc/text2image/image-synthesis', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${apiKey}`,
+                            'Content-Type': 'application/json',
+                            'X-DashScope-Async': 'enable'
+                        },
+                        body: JSON.stringify({
+                            model: model,
+                            input: { prompt: prompt },
+                            parameters: { size: size, n: n }
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.message || `API 请求失败: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    
+                    // 异步任务，需要轮询获取结果
+                    if (data.output && data.output.task_id) {
+                        return await pollImageTask(apiKey, data.output.task_id);
+                    }
+                    
+                    throw new Error('图片生成任务创建失败');
+                }
+
+                case 'openai': {
+                    // OpenAI DALL-E（通过代理或自定义端点）
+                    const useProxy = !endpoint || endpoint === 'https://api.openai.com/v1';
+                    const apiEndpoint = useProxy ? '/api/openai' : endpoint;
+                    const response = await fetch(`${apiEndpoint}/images/generations`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${apiKey}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            model: model,
+                            prompt: prompt,
+                            size: size.replace('*', 'x'),
+                            n: n
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.error?.message || `API 请求失败: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    if (data.data && data.data.length > 0) {
+                        return data.data.map(img => img.url);
+                    }
+                    throw new Error('图片生成失败');
+                }
+
+                case 'zhipu': {
+                    // 智谱 CogView（通过代理或自定义端点）
+                    const useProxy = !endpoint || endpoint === 'https://open.bigmodel.cn/api/paas/v4';
+                    const apiEndpoint = useProxy ? '/api/zhipu' : endpoint;
+                    const response = await fetch(`${apiEndpoint}/images/generations`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${apiKey}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            model: model,
+                            prompt: prompt
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.error?.message || `API 请求失败: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    if (data.data && data.data.length > 0) {
+                        return data.data.map(img => img.url);
+                    }
+                    throw new Error('图片生成失败');
+                }
+
+                default:
+                    throw new Error(`当前厂商 ${provider} 不支持图片生成`);
+            }
+        } catch (error) {
+            console.error('图片生成失败:', error);
+            throw error;
+        }
+    }
+
+    // 轮询阿里百炼图片生成任务（通过代理）
+    async function pollImageTask(apiKey, taskId, maxAttempts = 60) {
+        for (let i = 0; i < maxAttempts; i++) {
+            await new Promise(r => setTimeout(r, 2000)); // 每2秒轮询一次
+
+            const response = await fetch(`/api/dashscope/tasks/${taskId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`任务查询失败: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const status = data.output?.task_status;
+
+            if (status === 'SUCCEEDED') {
+                const results = data.output?.results;
+                if (results && results.length > 0) {
+                    return results.map(r => r.url);
+                }
+                throw new Error('图片生成结果为空');
+            } else if (status === 'FAILED') {
+                throw new Error(data.output?.message || '图片生成失败');
+            }
+            // PENDING 或 RUNNING 状态继续轮询
+        }
+        throw new Error('图片生成超时');
+    }
+
+    // ============ 视频生成 API ============
+    async function generateVideo(imageUrl, prompt, options = {}) {
+        // 支持指定厂商，或使用当前激活的厂商
+        let provider, apiKey, endpoint;
+        
+        if (options.provider) {
+            const config = getConfig(options.provider);
+            if (!config) {
+                throw new Error(`厂商 ${options.provider} 未配置`);
+            }
+            provider = options.provider;
+            apiKey = config.apiKey;
+            endpoint = config.baseUrl || config.endpoint;
+        } else {
+            const activeConfig = getActiveConfig();
+            if (!activeConfig) {
+                throw new Error('请先配置 API');
+            }
+            provider = activeConfig.provider;
+            apiKey = activeConfig.apiKey;
+            endpoint = activeConfig.baseUrl || activeConfig.endpoint;
+        }
+
+        const model = options.model || 'wanx2.1-i2v-turbo';
+        const duration = options.duration || 5;
+
+        try {
+            switch (provider) {
+                case 'bailian':
+                case 'qwen': {
+                    // 阿里百炼 - 通义万相视频生成（图生视频，通过代理）
+                    const response = await fetch('/api/dashscope/services/aigc/image2video/video-synthesis', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${apiKey}`,
+                            'Content-Type': 'application/json',
+                            'X-DashScope-Async': 'enable'
+                        },
+                        body: JSON.stringify({
+                            model: model,
+                            input: {
+                                image_url: imageUrl,
+                                prompt: prompt
+                            },
+                            parameters: {
+                                duration: duration
+                            }
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.message || `API 请求失败: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    
+                    // 异步任务，需要轮询获取结果
+                    if (data.output && data.output.task_id) {
+                        return await pollVideoTask(apiKey, data.output.task_id);
+                    }
+                    
+                    throw new Error('视频生成任务创建失败');
+                }
+
+                default:
+                    throw new Error(`当前厂商 ${provider} 不支持视频生成`);
+            }
+        } catch (error) {
+            console.error('视频生成失败:', error);
+            throw error;
+        }
+    }
+
+    // 轮询阿里百炼视频生成任务（通过代理）
+    async function pollVideoTask(apiKey, taskId, maxAttempts = 120) {
+        for (let i = 0; i < maxAttempts; i++) {
+            await new Promise(r => setTimeout(r, 3000)); // 每3秒轮询一次
+
+            const response = await fetch(`/api/dashscope/tasks/${taskId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`任务查询失败: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const status = data.output?.task_status;
+
+            if (status === 'SUCCEEDED') {
+                const videoUrl = data.output?.video_url;
+                if (videoUrl) {
+                    return videoUrl;
+                }
+                throw new Error('视频生成结果为空');
+            } else if (status === 'FAILED') {
+                throw new Error(data.output?.message || '视频生成失败');
+            }
+            // PENDING 或 RUNNING 状态继续轮询
+        }
+        throw new Error('视频生成超时');
     }
 
     // 格式化模型名称，使其更易读
@@ -534,6 +1256,9 @@
         fetchModels,
         fetchImageModels,
         fetchVideoModels,
+        generateImage,
+        generateVideo,
+        uploadImageToStorage,
         setActiveProvider,
         getActiveProvider,
         getActiveConfig

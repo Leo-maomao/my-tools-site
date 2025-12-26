@@ -10,11 +10,11 @@ https://my-tools-site.leo-maomao.workers.dev/
 
 ### 已实现
 
-- **小红书工具**
-  - 封面图生成（自定义背景图）
-  - 正文图生成（9宫格布局）
-  - 自动分页功能
-  - 一键下载所有图片
+- **小红书工具** - 封面图和正文图生成，支持自动分页
+- **产品助理** - AI 辅助生成原型图和 PRD
+- **报告小助手** - AI 帮你写工作报告
+- **基金助手** - 基金净值查询和自选管理
+- **短剧工坊** - AI 生成短视频脚本和分镜（管理员专属）
 
 ### 规划中
 
@@ -26,7 +26,8 @@ https://my-tools-site.leo-maomao.workers.dev/
 
 - HTML / CSS / JavaScript
 - Canvas API（图片生成）
-- Cloudflare Pages（部署）
+- Cloudflare Workers（部署 + API 代理）
+- Supabase（用户认证 + 数据存储）
 
 ## 本地开发
 
@@ -34,7 +35,11 @@ https://my-tools-site.leo-maomao.workers.dev/
 # 克隆项目
 git clone https://github.com/Leo-maomao/my-tools-site.git
 
-# 直接打开 index.html 即可预览
+# 安装依赖
+npm install
+
+# 启动本地开发服务器
+npx wrangler dev --port 8787
 ```
 
 ## 部署

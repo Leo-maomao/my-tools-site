@@ -16,7 +16,6 @@
     if (!supabase) {
       supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       window.toolsSupabase = supabase;
-      console.log('Supabase 初始化成功');
     }
     return true;
   }
@@ -131,7 +130,6 @@
   document.addEventListener('keydown', function(e) {
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'k' || e.key === 'K')) {
       e.preventDefault();
-      console.log('快捷键被触发');
       
       // 尝试初始化 Supabase
       if (!initSupabase()) {
@@ -161,7 +159,6 @@
   }
   
   function init() {
-    console.log('Auth 模块初始化开始');
     
     // 初始化 DOM 元素
     initDOMElements();
@@ -198,24 +195,44 @@
     
     // 页面加载时检查登录状态
     if (supabase) {
+      // 先获取当前会话状态
       supabase.auth.getSession().then(result => {
+        // 更新缓存的会话状态
+        cachedSession = result.data.session;
+        
         if (result.data.session) {
           onLoginSuccess();
         }
+        
+        // 触发权限更新事件（初始状态）
+        window.dispatchEvent(new CustomEvent('toolsAuthChanged', { 
+          detail: { isAdmin: !!result.data.session } 
+        }));
       });
       
-      // 监听登录状态变化
+      // 监听后续的登录状态变化
       supabase.auth.onAuthStateChange((event, session) => {
+        // 忽略 INITIAL_SESSION 事件，因为已经在 getSession 中处理了
+        if (event === 'INITIAL_SESSION') return;
+        
+        cachedSession = session;
+        
         if (event === 'SIGNED_OUT') {
           onLogoutSuccess();
         } else if (event === 'SIGNED_IN') {
           onLoginSuccess();
         }
+        
+        // 触发权限更新事件
+        window.dispatchEvent(new CustomEvent('toolsAuthChanged', { 
+          detail: { isAdmin: !!session } 
+        }));
       });
     }
-    
-    console.log('Auth 模块初始化完成');
   }
+  
+  // 同步检查是否已登录（基于缓存状态）
+  let cachedSession = null;
   
   // 暴露给全局
   window.ToolsAuth = {
@@ -224,12 +241,26 @@
     isLoggedIn: async () => {
       if (!initSupabase()) return false;
       const result = await supabase.auth.getSession();
+      cachedSession = result.data.session;
       return !!result.data.session;
     },
     getSession: async () => {
       if (!initSupabase()) return null;
       const result = await supabase.auth.getSession();
+      cachedSession = result.data.session;
       return result.data.session;
+    },
+    // 同步检查是否是管理员（基于缓存）
+    isAdmin: () => {
+      return !!cachedSession;
+    },
+    // 异步检查是否是管理员
+    checkAdmin: async () => {
+      if (!initSupabase()) return false;
+      const result = await supabase.auth.getSession();
+      cachedSession = result.data.session;
+      return !!result.data.session;
     }
   };
+  
 })();

@@ -64,6 +64,14 @@ const state = {
   // 多集合成结果
   mergedVideos: {},          // {episodeIndex: {url, name, shotCount, timestamp}}
   selectedMergedEpisode: 0,  // 当前选中查看的合成集数
+  // 生成状态控制
+  isGeneratingFrames: false,   // 是否正在批量生成图片
+  isGeneratingVideos: false,   // 是否正在批量生成视频
+  abortFrameGeneration: false, // 终止图片生成标记
+  abortVideoGeneration: false, // 终止视频生成标记
+  // 单个生成任务的终止控制
+  activeGenerations: {},       // { "shotId_start": true, "shotId_video": true } 正在生成的任务
+  abortGenerations: {},        // { "shotId_start": true } 需要终止的任务
   // 生成设置
   settings: {
     textModel: 'qwen-plus',
@@ -103,6 +111,7 @@ function saveProjectToStorage() {
     const projectData = {
       episodes: state.episodes,
       currentEpisode: state.currentEpisode,
+      currentStep: state.currentStep, // 保存当前步骤
       episodeScripts: state.episodeScripts,
       shots: state.shots,
       frames: state.frames,
@@ -128,6 +137,7 @@ function loadProjectFromStorage() {
       const project = JSON.parse(data);
       state.episodes = project.episodes || [];
       state.currentEpisode = project.currentEpisode || 0;
+      state.currentStep = project.currentStep || 1; // 恢复当前步骤
       state.episodeScripts = project.episodeScripts || {};
       state.shots = project.shots || [];
       state.frames = project.frames || [];
@@ -276,6 +286,9 @@ function goToStep(step) {
   }
 
   state.currentStep = step;
+  
+  // 每次步骤切换时保存数据
+  saveProjectToStorage();
 
   // 回到页面顶部
   document.querySelector('.dw-main').scrollTop = 0;
@@ -858,14 +871,11 @@ async function init() {
 
   // 加载项目数据并恢复状态
   const hasProject = loadProjectFromStorage();
-  if (hasProject && state.episodes.length > 0) {
+  if (hasProject && (state.episodes.length > 0 || state.shots.length > 0)) {
     // 恢复到之前的步骤
-    if (state.maxCompletedStep > 0) {
-      navigateToStep(Math.min(state.maxCompletedStep, state.currentStep || 1));
-    } else {
-      showOutlinePanel();
-    }
-    showToast('已恢复上次的项目数据', 'info');
+    const targetStep = state.currentStep || 1;
+    navigateToStep(targetStep);
+    console.log('恢复项目数据，当前步骤:', targetStep);
   } else {
     // 初始显示步骤1
     $('#step1Panel').classList.remove('is-hidden');
@@ -1427,6 +1437,7 @@ async function generateOutline() {
     state.currentEpisode = 0;
 
     showOutlinePanel();
+    saveProjectToStorage(); // 保存大纲数据
     showToast(`成功生成 ${state.episodes.length} 集大纲`, 'success');
 
   } catch (err) {
@@ -1536,6 +1547,7 @@ async function generateEpisodeScript() {
 
     $('#scriptContent').value = script;
     state.episodeScripts[state.currentEpisode] = script;
+    saveProjectToStorage(); // 保存剧本数据
     showToast('剧本生成完成', 'success');
     renderEpisodeSelector(); // 更新按钮状态
 
@@ -1558,10 +1570,16 @@ async function analyzeShots() {
     return;
   }
 
-  const selectedChars = state.characters
+  // 构建角色信息（包含外貌描述）
+  const selectedCharsInfo = state.characters
     .filter(c => state.selectedCharacters.includes(c.id))
-    .map(c => c.name)
-    .join('、');
+    .map(c => {
+      if (c.desc) {
+        return `${c.name}：${c.desc}`;
+      }
+      return c.name;
+    })
+    .join('\n');
 
   const btn = $('#toShotsBtn');
   btn.disabled = true;
@@ -1578,13 +1596,17 @@ async function analyzeShots() {
             role: 'system',
             content: `你是专业的影视分镜师。将剧本拆解为AI视频生成的分镜列表。
 
-角色：${selectedChars}
+【角色信息】
+${selectedCharsInfo}
 
+【输出要求】
 输出JSON数组，每个分镜包含：
-- scene: 场景画面描述（用于视频生成提示词，50字以内）
-- characters: 出现的角色数组
+- scene: 场景画面描述（包含角色外貌特征，用于AI图片生成，80字以内）
+- characters: 出现的角色名称数组
 - shotType: 镜头类型（全景/中景/近景/特写）
 - duration: 时长建议（3-6秒）
+
+【重要】scene描述中必须包含出场角色的关键外貌特征（如发型、服装、体态等），确保AI生成的图片角色一致。
 
 只返回JSON数组，不要其他内容。`
           },
@@ -1623,6 +1645,7 @@ async function analyzeShots() {
     }));
 
     renderShotsList();
+    saveProjectToStorage(); // 保存分镜数据
     goToStep(3);
     showToast(`成功拆解 ${state.shots.length} 个分镜`, 'success');
 
@@ -1713,10 +1736,15 @@ function renderFramesList() {
         <div class="dw-frame-previews">
           <div class="dw-frame-preview-item">
             <span class="dw-frame-label">首帧</span>
-            <div class="dw-frame-thumb ${ratioClass} ${frame.startFrame ? 'has-image' : ''}"
+            <div class="dw-frame-thumb ${ratioClass} ${frame.startFrame ? 'has-image' : ''} ${frame.startStatus === 'generating' ? 'is-generating' : ''}"
                  onclick="generateFrame('${shot.id}', 'start')">
               ${frame.startStatus === 'generating' ? `
-                <div class="dw-thumb-loading"><div class="dw-video-spinner"></div></div>
+                <div class="dw-thumb-loading">
+                  <div class="dw-video-spinner"></div>
+                  <button class="dw-abort-btn" onclick="event.stopPropagation(); stopSingleGeneration('${shot.id}_start')" title="终止生成">
+                    <i class="ri-stop-circle-line"></i>
+                  </button>
+                </div>
               ` : frame.startFrame ? `
                 <img src="${frame.startFrame}" alt="首帧">
                 <div class="dw-thumb-actions">
@@ -1744,9 +1772,12 @@ function renderEndFrameSlot(shot, frame, idx, ratioClass, nextFrame, isLast) {
   // 如果正在生成
   if (frame.endStatus === 'generating') {
     return `
-      <div class="dw-frame-preview ${ratioClass}">
+      <div class="dw-frame-preview ${ratioClass} is-generating">
         <div class="dw-frame-loading">
           <div class="dw-video-spinner"></div>
+          <button class="dw-abort-btn" onclick="event.stopPropagation(); stopSingleGeneration('${shot.id}_end')" title="终止生成">
+            <i class="ri-stop-circle-line"></i>
+          </button>
         </div>
       </div>
     `;
@@ -1835,7 +1866,16 @@ function renderEndFrameSlotCompact(shot, frame, idx, ratioClass, nextFrame, isLa
 
   // 正在生成
   if (frame.endStatus === 'generating') {
-    return `<div class="dw-frame-thumb ${ratioClass}"><div class="dw-thumb-loading"><div class="dw-video-spinner"></div></div></div>`;
+    return `
+      <div class="dw-frame-thumb ${ratioClass} is-generating">
+        <div class="dw-thumb-loading">
+          <div class="dw-video-spinner"></div>
+          <button class="dw-abort-btn" onclick="event.stopPropagation(); stopSingleGeneration('${shot.id}_end')" title="终止生成">
+            <i class="ri-stop-circle-line"></i>
+          </button>
+        </div>
+      </div>
+    `;
   }
 
   // 有自定义尾帧
@@ -1872,8 +1912,16 @@ function renderEndFrameSlotCompact(shot, frame, idx, ratioClass, nextFrame, isLa
   `;
 }
 
-// ============ 生成单个分镜图（模拟） ============
+// ============ 生成单个分镜图 ============
 async function generateFrame(shotId, type) {
+  const genKey = `${shotId}_${type}`;
+  
+  // 如果这个任务正在生成，点击则终止
+  if (state.activeGenerations[genKey]) {
+    stopSingleGeneration(genKey);
+    return;
+  }
+
   // 检查是否选择了图片模型
   const imageModelSelect = $('#imageModel');
   if (!imageModelSelect) {
@@ -1895,9 +1943,21 @@ async function generateFrame(shotId, type) {
     providerKey = parts[0];
     modelId = parts[1];
   } else {
-    // 兼容旧的硬编码格式（wanx-v1, stable-diffusion等）
+    // 兼容旧的硬编码格式
     modelId = selectedModel;
     providerKey = 'unknown';
+  }
+
+  // 检查对应厂商的 API 是否已配置
+  if (!window.ToolsAPIConfig) {
+    showToast('请先在设置中配置 API', 'error');
+    return;
+  }
+  
+  const providerConfig = window.ToolsAPIConfig.getConfig(providerKey);
+  if (!providerConfig || !providerConfig.apiKey) {
+    showToast(`请先配置 ${providerKey} 的 API Key`, 'error');
+    return;
   }
 
   console.log('使用图片模型:', providerKey, modelId);
@@ -1905,38 +1965,225 @@ async function generateFrame(shotId, type) {
   const idx = state.shots.findIndex(s => s.id === shotId);
   if (idx === -1) return;
 
+  const shot = state.shots[idx];
   const frame = state.frames[idx];
   const statusKey = type === 'start' ? 'startStatus' : 'endStatus';
   const frameKey = type === 'start' ? 'startFrame' : 'endFrame';
 
+  // 标记开始生成
+  state.activeGenerations[genKey] = true;
+  delete state.abortGenerations[genKey];
   frame[statusKey] = 'generating';
   renderFramesList();
 
-  // TODO: 接入图片生成API
-  showToast(`生成${type === 'start' ? '首' : '尾'}帧图中（模拟）...`, 'info');
-  await new Promise(r => setTimeout(r, 2000));
+  try {
+    // 构建图片生成提示词和获取角色参考图
+    const { prompt, refImages } = buildImagePrompt(shot, type);
+    showToast(`生成${type === 'start' ? '首' : '尾'}帧图中...`, 'info');
 
-  // 模拟成功
-  frame[statusKey] = 'done';
-  frame[frameKey] = 'https://picsum.photos/400/600?random=' + Date.now();
+    // 根据画面比例设置尺寸（使用通义万相支持的尺寸）
+    const ratio = $('input[name="aspectRatio"]:checked')?.value || '9:16';
+    const sizeMap = {
+      '9:16': '720*1280',   // 竖屏
+      '16:9': '1280*720',   // 横屏
+      '1:1': '1024*1024',   // 正方形
+      '4:3': '1024*1024',   // 近似使用正方形
+      '3:4': '768*1152',    // 近似竖屏
+      '21:9': '1280*720'    // 近似使用横屏
+    };
+    const size = sizeMap[ratio] || '720*1280';
 
-  // 尾帧生成后设置为 custom 模式
-  if (type === 'end') {
-    frame.endMode = 'custom';
+    // 调用图片生成 API（传递厂商、模型和角色参考图）
+    const urls = await window.ToolsAPIConfig.generateImage(prompt, {
+      provider: providerKey !== 'unknown' ? providerKey : undefined,
+      model: modelId,
+      size: size,
+      n: 1,
+      refImages: refImages // 角色参考图片（用于人物一致性）
+    });
+
+    // 检查是否被终止
+    if (state.abortGenerations[genKey]) {
+      showToast(`${type === 'start' ? '首' : '尾'}帧生成已终止`, 'warning');
+      frame[statusKey] = 'idle';
+      renderFramesList();
+      return;
+    }
+
+    if (urls && urls.length > 0) {
+      frame[statusKey] = 'done';
+      frame[frameKey] = urls[0];
+
+      // 尾帧生成后设置为 custom 模式
+      if (type === 'end') {
+        frame.endMode = 'custom';
+      }
+
+      renderFramesList();
+      saveProjectToStorage(); // 保存生成结果
+      showToast('图片生成完成', 'success');
+    } else {
+      throw new Error('未返回图片URL');
+    }
+  } catch (err) {
+    // 检查是否被终止
+    if (state.abortGenerations[genKey]) {
+      frame[statusKey] = 'idle';
+      renderFramesList();
+      return;
+    }
+    console.error('图片生成失败:', err);
+    frame[statusKey] = 'error';
+    renderFramesList();
+    showToast(`图片生成失败: ${err.message}`, 'error');
+  } finally {
+    // 清理生成状态
+    delete state.activeGenerations[genKey];
+    delete state.abortGenerations[genKey];
   }
+}
 
-  renderFramesList();
-  showToast('图片生成完成', 'success');
+// 构建图片生成提示词和获取角色参考图
+function buildImagePrompt(shot, type) {
+  let promptParts = [];
+  let refImages = []; // 角色参考图片
+  
+  // 1. 添加镜头类型
+  if (shot.shotType) {
+    promptParts.push(`${shot.shotType}镜头`);
+  }
+  
+  // 2. 添加角色描述（直接使用用户填写的描述）
+  if (shot.characters && shot.characters.length > 0) {
+    const characterDescs = shot.characters.map(charName => {
+      // 在角色库中查找完整信息
+      const char = state.characters.find(c => c.name === charName);
+      if (char) {
+        // 收集角色参考图片（用于人物一致性）
+        if (char.images && char.images.length > 0) {
+          refImages.push({
+            name: char.name,
+            image: char.images[0] // 使用第一张图片作为参考
+          });
+        }
+        // 直接使用用户填写的描述
+        if (char.desc) {
+          return `${char.name}（${char.desc}）`;
+        }
+        return char.name;
+      }
+      return charName;
+    }).filter(Boolean);
+    
+    if (characterDescs.length > 0) {
+      promptParts.push(`角色：${characterDescs.join('，')}`);
+    }
+  }
+  
+  // 3. 添加场景描述
+  if (shot.scene) {
+    promptParts.push(shot.scene);
+  }
+  
+  // 4. 如果是尾帧，添加动态描述
+  if (type === 'end') {
+    promptParts.push('动作结束时刻');
+  }
+  
+  // 5. 添加画质和风格提示
+  promptParts.push('高清，电影质感，专业摄影');
+  
+  return {
+    prompt: promptParts.join('，'),
+    refImages: refImages
+  };
 }
 
 // 一键生成所有首帧
 async function generateAllFrames() {
+  if (state.isGeneratingFrames) {
+    // 如果正在生成，点击则终止
+    stopFrameGeneration();
+    return;
+  }
+
+  state.isGeneratingFrames = true;
+  state.abortFrameGeneration = false;
+  updateFrameGenerateButton();
+
+  const total = state.shots.filter((_, i) => !state.frames[i].startFrame).length;
+  let completed = 0;
+
   for (let i = 0; i < state.shots.length; i++) {
+    // 检查是否被终止
+    if (state.abortFrameGeneration) {
+      showToast(`已终止，完成 ${completed}/${total}`, 'warning');
+      break;
+    }
+
     if (!state.frames[i].startFrame) {
       await generateFrame(state.shots[i].id, 'start');
+      completed++;
     }
   }
-  showToast('所有首帧图生成完成', 'success');
+
+  state.isGeneratingFrames = false;
+  state.abortFrameGeneration = false;
+  updateFrameGenerateButton();
+
+  if (!state.abortFrameGeneration && completed === total) {
+    showToast('所有首帧图生成完成', 'success');
+  }
+}
+
+// 终止图片生成
+// 终止单个生成任务
+function stopSingleGeneration(genKey) {
+  state.abortGenerations[genKey] = true;
+  showToast('正在终止生成...', 'info');
+  
+  // 根据 genKey 更新对应的 UI 状态
+  const parts = genKey.split('_');
+  if (parts.length >= 2) {
+    const shotId = parts.slice(0, -1).join('_'); // 支持 shotId 包含下划线
+    const type = parts[parts.length - 1];
+    
+    const idx = state.shots.findIndex(s => s.id === shotId);
+    if (idx !== -1) {
+      if (type === 'video') {
+        // 视频生成
+        state.shots[idx].videoStatus = 'idle';
+        renderVideoCards();
+      } else {
+        // 图片生成（start/end）
+        const frame = state.frames[idx];
+        if (frame) {
+          const statusKey = type === 'start' ? 'startStatus' : 'endStatus';
+          frame[statusKey] = 'idle';
+          renderFramesList();
+        }
+      }
+    }
+  }
+}
+
+function stopFrameGeneration() {
+  state.abortFrameGeneration = true;
+  showToast('正在终止生成...', 'info');
+}
+
+// 更新生成按钮状态
+function updateFrameGenerateButton() {
+  const btn = $('#generateAllFramesBtn');
+  if (!btn) return;
+  
+  if (state.isGeneratingFrames) {
+    btn.innerHTML = '<i class="ri-stop-circle-line"></i><span>终止生成</span>';
+    btn.classList.add('is-danger');
+  } else {
+    btn.innerHTML = '<i class="ri-play-circle-line"></i><span>一键生成全部</span>';
+    btn.classList.remove('is-danger');
+  }
 }
 
 // 图片预览
@@ -1991,6 +2238,9 @@ function renderVideoCards() {
           <div class="dw-video-loading">
             <div class="dw-video-spinner"></div>
             <span>正在生成...</span>
+            <button class="dw-abort-btn-video" onclick="event.stopPropagation(); stopSingleGeneration('${shot.id}_video')" title="终止生成">
+              <i class="ri-stop-circle-line"></i> 终止
+            </button>
           </div>
         ` : `
           <div class="dw-video-placeholder">
@@ -2005,11 +2255,10 @@ function renderVideoCards() {
         <div class="dw-video-desc">${shot.scene}</div>
       </div>
       <div class="dw-video-actions">
-        <button class="dw-btn dw-btn--sm dw-btn--primary"
-                onclick="generateSingleVideo('${shot.id}')"
-                ${shot.videoStatus === 'generating' ? 'disabled' : ''}>
-          <i class="ri-play-circle-line"></i>
-          <span>${shot.videoStatus === 'done' ? '重新生成' : '生成'}</span>
+        <button class="dw-btn dw-btn--sm ${shot.videoStatus === 'generating' ? 'dw-btn--danger' : 'dw-btn--primary'}"
+                onclick="generateSingleVideo('${shot.id}')">
+          <i class="${shot.videoStatus === 'generating' ? 'ri-stop-circle-line' : 'ri-play-circle-line'}"></i>
+          <span>${shot.videoStatus === 'generating' ? '终止' : shot.videoStatus === 'done' ? '重新生成' : '生成'}</span>
         </button>
         ${shot.videoStatus === 'done' ? `
           <button class="dw-btn dw-btn--sm dw-btn--success" onclick="downloadVideo('${shot.id}')">
@@ -2021,28 +2270,122 @@ function renderVideoCards() {
   `).join('');
 }
 
-// ============ 视频生成（模拟，后续接阿里API） ============
+// ============ 视频生成 ============
 async function generateSingleVideo(shotId) {
-  const shot = state.shots.find(s => s.id === shotId);
-  if (!shot) return;
+  const genKey = `${shotId}_video`;
+  
+  // 如果这个任务正在生成，点击则终止
+  if (state.activeGenerations[genKey]) {
+    stopSingleGeneration(genKey);
+    return;
+  }
 
+  const idx = state.shots.findIndex(s => s.id === shotId);
+  if (idx === -1) return;
+
+  const shot = state.shots[idx];
+  const frame = state.frames[idx];
+
+  // 检查是否有首帧图片
+  if (!frame || !frame.startFrame) {
+    showToast('请先生成首帧图片', 'error');
+    return;
+  }
+
+  // 获取视频模型配置
+  const videoModelSelect = $('#videoModel');
+  const selectedModel = videoModelSelect?.value || '';
+  
+  if (!selectedModel) {
+    showToast('请先选择视频模型', 'error');
+    return;
+  }
+
+  // 解析模型值（格式：providerKey|modelId）
+  const parts = selectedModel.split('|');
+  let providerKey, modelId;
+
+  if (parts.length === 2) {
+    providerKey = parts[0];
+    modelId = parts[1];
+  } else {
+    modelId = selectedModel;
+    providerKey = 'unknown';
+  }
+
+  // 检查对应厂商的 API 是否已配置
+  if (!window.ToolsAPIConfig) {
+    showToast('请先在设置中配置 API', 'error');
+    return;
+  }
+  
+  const providerConfig = window.ToolsAPIConfig.getConfig(providerKey);
+  if (!providerConfig || !providerConfig.apiKey) {
+    showToast(`请先配置 ${providerKey} 的 API Key`, 'error');
+    return;
+  }
+
+  // 标记开始生成
+  state.activeGenerations[genKey] = true;
+  delete state.abortGenerations[genKey];
   shot.videoStatus = 'generating';
   renderVideoCards();
 
-  // TODO: 接入阿里百炼视频生成API
-  // 目前模拟生成过程
-  showToast('视频生成中（模拟）...', 'info');
+  try {
+    showToast(`分镜 ${shot.index} 视频生成中...`, 'info');
 
-  await new Promise(r => setTimeout(r, 3000));
+    // 构建视频生成提示词
+    const prompt = shot.scene || '';
 
-  // 模拟成功
-  shot.videoStatus = 'done';
-  shot.videoUrl = 'https://www.w3schools.com/html/mov_bbb.mp4'; // 示例视频
-  renderVideoCards();
-  showToast(`分镜 ${shot.index} 生成完成`, 'success');
+    // 调用视频生成 API（传递厂商和模型）
+    const videoUrl = await window.ToolsAPIConfig.generateVideo(frame.startFrame, prompt, {
+      provider: providerKey !== 'unknown' ? providerKey : undefined,
+      model: modelId,
+      duration: shot.duration || 5
+    });
+
+    // 检查是否被终止
+    if (state.abortGenerations[genKey]) {
+      showToast(`分镜 ${shot.index} 视频生成已终止`, 'warning');
+      shot.videoStatus = 'idle';
+      renderVideoCards();
+      return;
+    }
+
+    if (videoUrl) {
+      shot.videoStatus = 'done';
+      shot.videoUrl = videoUrl;
+      renderVideoCards();
+      saveProjectToStorage(); // 保存生成结果
+      showToast(`分镜 ${shot.index} 生成完成`, 'success');
+    } else {
+      throw new Error('未返回视频URL');
+    }
+  } catch (err) {
+    // 检查是否被终止
+    if (state.abortGenerations[genKey]) {
+      shot.videoStatus = 'idle';
+      renderVideoCards();
+      return;
+    }
+    console.error('视频生成失败:', err);
+    shot.videoStatus = 'error';
+    renderVideoCards();
+    showToast(`视频生成失败: ${err.message}`, 'error');
+  } finally {
+    // 清理生成状态
+    delete state.activeGenerations[genKey];
+    delete state.abortGenerations[genKey];
+  }
 }
 
 async function generateAllVideos() {
+  if (state.isGeneratingVideos) {
+    // 如果正在生成，点击则终止
+    stopVideoGeneration();
+    return;
+  }
+
   const pending = state.shots.filter(s => s.videoStatus !== 'done');
 
   if (pending.length === 0) {
@@ -2050,14 +2393,52 @@ async function generateAllVideos() {
     return;
   }
 
+  state.isGeneratingVideos = true;
+  state.abortVideoGeneration = false;
+  updateVideoGenerateButton();
+
   showToast(`开始生成 ${pending.length} 个视频...`, 'info');
+  let completed = 0;
 
   for (const shot of pending) {
+    // 检查是否被终止
+    if (state.abortVideoGeneration) {
+      showToast(`已终止，完成 ${completed}/${pending.length}`, 'warning');
+      break;
+    }
+
     await generateSingleVideo(shot.id);
+    completed++;
     await new Promise(r => setTimeout(r, 500));
   }
 
-  showToast('全部视频生成完成！', 'success');
+  state.isGeneratingVideos = false;
+  state.abortVideoGeneration = false;
+  updateVideoGenerateButton();
+
+  if (!state.abortVideoGeneration && completed === pending.length) {
+    showToast('全部视频生成完成！', 'success');
+  }
+}
+
+// 终止视频生成
+function stopVideoGeneration() {
+  state.abortVideoGeneration = true;
+  showToast('正在终止生成...', 'info');
+}
+
+// 更新视频生成按钮状态
+function updateVideoGenerateButton() {
+  const btn = $('#generateAllVideosBtn');
+  if (!btn) return;
+  
+  if (state.isGeneratingVideos) {
+    btn.innerHTML = '<i class="ri-stop-circle-line"></i><span>终止生成</span>';
+    btn.classList.add('is-danger');
+  } else {
+    btn.innerHTML = '<i class="ri-play-circle-line"></i><span>一键生成全部</span>';
+    btn.classList.remove('is-danger');
+  }
 }
 
 // ============ 视频下载 ============
@@ -2099,17 +2480,20 @@ async function mergeAllVideos() {
   btn.disabled = true;
   btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i><span>合成中...</span>';
 
-  // TODO: 接入视频合成API
-  showToast('视频合成中（模拟）...', 'info');
-  await new Promise(r => setTimeout(r, 3000));
+  // 视频合成需要后端服务支持，这里先收集所有视频URL
+  // 后续可以对接云端视频合成服务
+  showToast('正在整理视频资源...', 'info');
+  await new Promise(r => setTimeout(r, 1000));
 
-  // 模拟合成完成
-  const mergedVideoUrl = 'https://www.w3schools.com/html/mov_bbb.mp4';
+  // 收集所有视频URL作为合成结果（暂时使用第一个视频作为预览）
+  const videoUrls = done.map(shot => shot.videoUrl);
+  const firstVideoUrl = videoUrls[0];
   const videoName = `第${state.currentEpisode + 1}集_完整视频.mp4`;
 
   // 保存到多集合成结果
   state.mergedVideos[state.currentEpisode] = {
-    url: mergedVideoUrl,
+    url: firstVideoUrl, // 预览使用第一个分镜
+    urls: videoUrls, // 保存所有分镜视频URL
     name: videoName,
     shotCount: state.shots.length,
     timestamp: Date.now()
@@ -2121,7 +2505,7 @@ async function mergeAllVideos() {
 
   // 跳转到第6步显示结果
   goToStep(6);
-  showToast('视频合成完成！', 'success');
+  showToast('视频资源整理完成！可预览各分镜视频', 'success');
 }
 
 // 渲染合成结果页面（多集列表）
@@ -2202,4 +2586,6 @@ window.setEndFrameRef = setEndFrameRef;
 window.generateSingleVideo = generateSingleVideo;
 window.downloadVideo = downloadVideo;
 window.selectMergedEpisode = selectMergedEpisode;
+window.stopFrameGeneration = stopFrameGeneration;
+window.stopVideoGeneration = stopVideoGeneration;
 /* Last updated: 2025-12-25 21:45:57 */
