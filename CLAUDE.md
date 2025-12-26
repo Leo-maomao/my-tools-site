@@ -16,18 +16,16 @@
 
 统计ID: `3OV3C1DLozIUagyB`
 
-| 事件标识 | 事件名称 | 说明 |
-|---------|---------|------|
-| `page_view` | 页面访问 | 记录各页面访问量 |
-| `tool_click` | 工具卡片点击 | 首页点击进入某工具 |
-| `sidebar_click` | 侧边栏点击 | 侧边栏导航点击 |
-| `xhs_generate` | 小红书生成 | 生成小红书图片 |
-| `pa_chat` | 产品助理对话 | 发送 AI 对话 |
-| `report_generate` | 报告生成 | 生成工作报告 |
-| `drama_outline` | 短剧大纲生成 | 生成短剧剧集大纲 |
-| `drama_frames` | 短剧分镜生成 | 批量生成分镜图 |
-| `drama_videos` | 短剧视频生成 | 批量生成视频 |
-| `api_config_save` | API 配置保存 | 保存 API 设置 |
+| 事件标识 | 事件名称 | 说明 | 参数 |
+|---------|---------|------|------|
+| `menu_click` | 菜单点击 | 左侧主菜单点击 | menu_name: 首页/小红书/产品助理/报告小助手/基金助手/设置 |
+| `tool_click` | 工具卡片点击 | 首页四个工具入口点击 | tool_name: 工具名称 |
+| `xhs_optimize` | 小红书一键优化 | AI 一键优化内容 | fields_count: 优化字段数 |
+| `xhs_generate` | 小红书生成图片 | 生成封面/正文图 | has_cover, has_content |
+| `xhs_download` | 小红书下载 | 下载生成的图片 | images_count: 图片数量 |
+| `pa_use` | 产品助理使用 | 发送消息（按会话统计） | conversation_id, message_count |
+| `report_generate` | 报告生成 | 生成工作报告 | report_type, template, format, model |
+| `fund_add` | 基金添加自选 | 添加基金到自选 | watchlist_count: 当前自选数量 |
 
 ## 项目功能
 
@@ -76,6 +74,7 @@
 
 | 日期 | Commit | 说明 |
 |-----|--------|------|
+| 2025-12-26 | `pending` | refactor: 优化埋点事件，按需求调整 |
 | 2025-12-26 | `4c6ff8a` | feat: 添加 51.la 埋点统计 |
 | 2025-12-26 | `b0d6412` | feat: 工具权限控制，短剧工坊仅管理员可见 |
 | 2025-12-25 | `aceec64` | feat: 短剧工坊多项功能优化和修复 |

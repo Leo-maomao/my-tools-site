@@ -727,6 +727,11 @@
 
             state.aiOptimizeResults = results;
             showAIPreview();
+            
+            // 埋点：小红书一键优化
+            if (typeof trackEvent === 'function') {
+                trackEvent('xhs_optimize', { fields_count: Object.keys(results).length });
+            }
         } catch (error) {
             alert('AI优化失败: ' + error.message);
         } finally {
@@ -1629,6 +1634,11 @@
 
     // 下载全部图片
     function downloadAllImages() {
+        // 埋点：小红书下载图片
+        if (typeof trackEvent === 'function') {
+            trackEvent('xhs_download', { images_count: state.generatedImages.length });
+        }
+        
         state.generatedImages.forEach(function(img, index) {
             setTimeout(function() {
                 downloadImage(img);

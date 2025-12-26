@@ -1401,15 +1401,6 @@ async function generateOutline() {
   btn.disabled = true;
   btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i><span>生成中...</span>';
   
-  // 埋点：短剧大纲生成
-  if (typeof trackEvent === 'function') {
-    trackEvent('drama_outline', {
-      style: style,
-      episode_count: episodeCount,
-      model: modelId
-    });
-  }
-
   try {
     const response = await fetch('https://ai-api.leo-maomao.workers.dev/chat', {
       method: 'POST',
@@ -2121,11 +2112,6 @@ async function generateAllFrames() {
   updateFrameGenerateButton();
 
   const total = state.shots.filter((_, i) => !state.frames[i].startFrame).length;
-  
-  // 埋点：批量生成分镜图
-  if (typeof trackEvent === 'function') {
-    trackEvent('drama_frames', { count: total });
-  }
   let completed = 0;
 
   for (let i = 0; i < state.shots.length; i++) {
@@ -2410,11 +2396,6 @@ async function generateAllVideos() {
   state.isGeneratingVideos = true;
   state.abortVideoGeneration = false;
   updateVideoGenerateButton();
-  
-  // 埋点：批量生成视频
-  if (typeof trackEvent === 'function') {
-    trackEvent('drama_videos', { count: pending.length });
-  }
 
   showToast(`开始生成 ${pending.length} 个视频...`, 'info');
   let completed = 0;

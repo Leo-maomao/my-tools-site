@@ -150,15 +150,17 @@
       const apiConfigBtn = document.getElementById('apiConfigBtn');
       if (apiConfigBtn) {
         apiConfigBtn.addEventListener('click', function() {
+          // 埋点：设置按钮点击
+          trackEvent('menu_click', { menu_name: '设置' });
           window.location.hash = '#settings';
         });
       }
       
-      // 侧边栏点击埋点
+      // 侧边栏菜单点击埋点
       document.querySelectorAll('.nav-item').forEach(function(item) {
         item.addEventListener('click', function() {
-          var toolName = this.querySelector('span') ? this.querySelector('span').textContent : 'unknown';
-          trackEvent('sidebar_click', { tool_name: toolName });
+          var menuName = this.querySelector('span') ? this.querySelector('span').textContent : 'unknown';
+          trackEvent('menu_click', { menu_name: menuName });
         });
       });
     });

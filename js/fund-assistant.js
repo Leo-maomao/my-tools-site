@@ -317,6 +317,11 @@
 
     state.watchlist.push({ code: code, name: name || code });
     saveWatchlist();
+    
+    // 埋点：添加自选
+    if (typeof trackEvent === 'function') {
+      trackEvent('fund_add', { watchlist_count: state.watchlist.length });
+    }
 
     // 如果不在搜索模式，刷新自选列表
     if (!state.isSearchMode) {
