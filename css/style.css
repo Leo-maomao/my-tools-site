@@ -806,6 +806,14 @@ a {
   color: #f43f5e;
 }
 
+.platform-card--fund .platform-icon {
+  color: #10b981;
+}
+
+.platform-card--dev .platform-icon {
+  color: #06b6d4;
+}
+
 .platform-info {
   flex: 1;
 }

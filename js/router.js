@@ -47,6 +47,13 @@
       js: 'js/fund-assistant.js',
       init: null
     },
+    'dev-tools': {
+      name: '研发工具箱',
+      template: 'templates/dev-tools.html',
+      css: 'css/dev-tools.css',
+      js: 'js/dev-tools.js',
+      init: null
+    },
     'settings': {
       name: '设置',
       template: 'templates/settings.html',
