@@ -131,6 +131,9 @@
         // 3. 加载JS（如果需要）
         if (config.js) {
           await this.loadScript(config.js, route);
+        } else {
+          // 即使没有 JS 文件，也触发 toolContentLoaded 事件（用于首页等）
+          window.dispatchEvent(new CustomEvent('toolContentLoaded', { detail: route }));
         }
 
         // 4. 更新侧边栏激活状态

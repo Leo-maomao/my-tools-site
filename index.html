@@ -87,6 +87,52 @@
     </main>
   </div>
 
+  <!-- 微信群二维码浮窗 -->
+  <div class="wechat-qr-float" id="wechatQrFloat" style="display: none;">
+    <div class="wechat-qr-close" id="wechatQrClose">
+      <i class="ri-close-line"></i>
+    </div>
+    <div class="wechat-qr-content">
+      <div class="wechat-qr-title">欢迎加入毛毛的产品小屋</div>
+      <img id="wechatQrImage" src="" alt="微信群二维码" class="wechat-qr-image" style="display: none;">
+      <div class="wechat-qr-loading" id="wechatQrLoading">加载中...</div>
+    </div>
+  </div>
+
+  <!-- 微信群按钮 -->
+  <div class="wechat-qr-btn" id="wechatQrBtn" title="加入微信群" style="display: none;">
+    <i class="ri-wechat-line"></i>
+  </div>
+
+  <!-- 用户反馈按钮 -->
+  <div class="feedback-btn" id="feedbackBtn" title="问题反馈">
+    <i class="ri-feedback-line"></i>
+  </div>
+
+  <!-- 用户反馈弹窗 -->
+  <div id="feedbackModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3>问题反馈</h3>
+        <i class="ri-close-line modal-close" id="feedbackModalClose"></i>
+      </div>
+      <div class="modal-body">
+        <div class="modal-input-group">
+          <label>反馈内容 / 功能建议 <span style="color:red">*</span></label>
+          <textarea id="feedbackContent" class="modal-input" placeholder="请描述您遇到的问题，或者提出功能建议" style="height: 120px; resize: none;" maxlength="500"></textarea>
+        </div>
+        <div class="modal-input-group">
+          <label>联系方式 (选填)</label>
+          <input id="feedbackContact" class="modal-input" placeholder="邮箱或微信号，方便我们联系您" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn cancel" id="feedbackCancelBtn">取消</button>
+        <button class="modal-btn confirm" id="feedbackSubmitBtn">提交反馈</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 登录模态框 -->
   <div id="loginModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 400px;">
@@ -164,6 +210,274 @@
         });
       });
     });
+  </script>
+
+  <!-- 微信群和反馈功能 -->
+  <script>
+  (function() {
+    var SUPABASE_URL = "https://jqsmoygkbqukgnwzkxvq.supabase.co";
+    var SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impxc21veWdrYnF1a2dud3preHZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3Mjk0MzYsImV4cCI6MjA4MDMwNTQzNn0.RrGVhh2TauEmGE4Elc2f3obUmZKHVdYVVMaz2kxKlW4";
+    var supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+    
+    // ========== 微信群二维码 ==========
+    var wechatQrFloat = document.getElementById('wechatQrFloat');
+    var wechatQrBtn = document.getElementById('wechatQrBtn');
+    var wechatQrClose = document.getElementById('wechatQrClose');
+    var wechatQrImage = document.getElementById('wechatQrImage');
+    var wechatQrLoading = document.getElementById('wechatQrLoading');
+    
+    async function loadWechatQrCode() {
+      if (!supabase) return;
+      try {
+        var result = await supabase
+          .from('config')
+          .select('value')
+          .eq('key', 'wechat_qrcode_url')
+          .single();
+        
+        if (result.data && result.data.value) {
+          wechatQrImage.src = result.data.value;
+          wechatQrImage.style.display = 'block';
+          wechatQrLoading.style.display = 'none';
+          wechatQrFloat.style.display = 'block';
+        }
+      } catch (e) {
+        console.error('加载二维码失败:', e);
+      }
+    }
+    
+    // 页面加载后加载二维码
+    setTimeout(loadWechatQrCode, 500);
+    
+    var hasClosedOnce = false;
+    var hoverTimer = null;
+    
+    if (wechatQrClose) {
+      wechatQrClose.addEventListener('click', function() {
+        hasClosedOnce = true;
+        wechatQrFloat.style.display = 'none';
+        wechatQrBtn.style.display = 'flex';
+      });
+    }
+    
+    if (wechatQrBtn) {
+      wechatQrBtn.addEventListener('click', function() {
+        if (!hasClosedOnce) {
+          wechatQrBtn.style.display = 'none';
+          wechatQrFloat.style.display = 'block';
+        }
+      });
+      
+      wechatQrBtn.addEventListener('mouseenter', function() {
+        if (hasClosedOnce) {
+          clearTimeout(hoverTimer);
+          wechatQrBtn.style.display = 'none';
+          wechatQrFloat.style.display = 'block';
+        }
+      });
+      
+      wechatQrBtn.addEventListener('mouseleave', function() {
+        if (hasClosedOnce) {
+          hoverTimer = setTimeout(function() {
+            wechatQrFloat.style.display = 'none';
+            wechatQrBtn.style.display = 'flex';
+          }, 200);
+        }
+      });
+    }
+    
+    if (wechatQrFloat) {
+      wechatQrFloat.addEventListener('mouseenter', function() {
+        if (hasClosedOnce) clearTimeout(hoverTimer);
+      });
+      
+      wechatQrFloat.addEventListener('mouseleave', function() {
+        if (hasClosedOnce) {
+          wechatQrFloat.style.display = 'none';
+          wechatQrBtn.style.display = 'flex';
+        }
+      });
+    }
+    
+    // ========== 用户反馈 ==========
+    var feedbackBtn = document.getElementById('feedbackBtn');
+    var feedbackModal = document.getElementById('feedbackModal');
+    var feedbackClose = document.getElementById('feedbackModalClose');
+    var feedbackCancel = document.getElementById('feedbackCancelBtn');
+    var feedbackSubmit = document.getElementById('feedbackSubmitBtn');
+    var feedbackContent = document.getElementById('feedbackContent');
+    var feedbackContact = document.getElementById('feedbackContact');
+    
+    function openFeedbackModal() {
+      feedbackModal.classList.add('is-visible');
+    }
+    
+    function closeFeedbackModal() {
+      feedbackModal.classList.remove('is-visible');
+      feedbackContent.value = '';
+      feedbackContact.value = '';
+    }
+    
+    if (feedbackBtn) feedbackBtn.onclick = openFeedbackModal;
+    if (feedbackClose) feedbackClose.onclick = closeFeedbackModal;
+    if (feedbackCancel) feedbackCancel.onclick = closeFeedbackModal;
+    
+    if (feedbackSubmit) {
+      feedbackSubmit.onclick = async function() {
+        var content = feedbackContent.value.trim();
+        var contact = feedbackContact.value.trim();
+        
+        if (!content) {
+          if (window.showMessage) {
+            showMessage('请输入反馈内容', 'error');
+          } else {
+            alert('请输入反馈内容');
+          }
+          return;
+        }
+        
+        // 埋点
+        if (typeof trackEvent === 'function') {
+          trackEvent('feedback_submit', {
+            has_contact: !!contact,
+            content_length: content.length
+          });
+        }
+        
+        if (!supabase) {
+          closeFeedbackModal();
+          if (window.showMessage) {
+            showMessage('反馈已提交（本地模式）', 'success');
+          } else {
+            alert('反馈已提交（本地模式）');
+          }
+          return;
+        }
+        
+        try {
+          var { error } = await supabase
+            .from('tools_feedback')
+            .insert([{ content: content, contact: contact }]);
+          
+          if (error) throw error;
+          closeFeedbackModal();
+          if (window.showMessage) {
+            showMessage('感谢您的反馈！', 'success');
+          } else {
+            alert('感谢您的反馈！');
+          }
+        } catch (e) {
+          console.error('提交反馈失败:', e);
+          if (window.showMessage) {
+            showMessage('提交失败，请重试', 'error');
+          } else {
+            alert('提交失败，请重试');
+          }
+        }
+      };
+    }
+    
+    // 暴露加载反馈列表的方法供管理员使用
+    window.loadToolsFeedback = async function() {
+      if (!supabase) return [];
+      try {
+        var { data, error } = await supabase
+          .from('tools_feedback')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        return data || [];
+      } catch (e) {
+        console.error('加载反馈失败:', e);
+        return [];
+      }
+    };
+    
+    // ========== 仅在首页显示浮动按钮 ==========
+    function updateFloatingButtonsVisibility() {
+      var hash = window.location.hash;
+      var isHomePage = !hash || hash === '#' || hash === '#/';
+      
+      // 隐藏/显示反馈按钮
+      if (feedbackBtn) {
+        feedbackBtn.style.display = isHomePage ? 'flex' : 'none';
+      }
+      
+      // 隐藏/显示微信相关元素
+      if (isHomePage) {
+        // 首页：根据状态显示二维码浮窗或按钮
+        if (hasClosedOnce) {
+          if (wechatQrBtn) wechatQrBtn.style.display = 'flex';
+          if (wechatQrFloat) wechatQrFloat.style.display = 'none';
+        }
+        // 首次加载时 loadWechatQrCode 会处理显示
+      } else {
+        // 非首页：隐藏所有微信相关元素
+        if (wechatQrBtn) wechatQrBtn.style.display = 'none';
+        if (wechatQrFloat) wechatQrFloat.style.display = 'none';
+      }
+    }
+    
+    // 监听路由变化
+    window.addEventListener('hashchange', updateFloatingButtonsVisibility);
+    
+    // 初始化时检查
+    updateFloatingButtonsVisibility();
+  })();
+  </script>
+
+  <!-- 基金助手数据预加载 -->
+  <script>
+  (function() {
+    var API_BASE = 'https://fund-api.leo-maomao.workers.dev';
+    
+    // 预加载大盘指数数据
+    async function prefetchFundData() {
+      try {
+        // 并行请求所有数据
+        var [indexRes, goldRes, usRes] = await Promise.all([
+          fetch(API_BASE + '/index'),
+          fetch(API_BASE + '/gold'),
+          fetch('https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&fields=f2,f3,f4,f12,f13,f14&secids=100.NDX,100.DJIA,100.SPX&_=' + Date.now())
+        ]);
+        
+        var data = await indexRes.json();
+        
+        // 美股数据
+        try {
+          var usData = await usRes.json();
+          if (usData.data && usData.data.diff) {
+            var usItems = usData.data.diff.map(function(item) {
+              return { code: item.f12, name: item.f14, price: item.f2, change: item.f3 };
+            });
+            data = data.concat(usItems);
+          }
+        } catch (e) {}
+        
+        // 黄金数据
+        try {
+          var goldData = await goldRes.json();
+          if (goldData && goldData.length > 0) {
+            data = data.concat(goldData);
+          }
+        } catch (e) {}
+        
+        // 缓存数据
+        window._fundDataCache = {
+          marketIndices: data,
+          timestamp: Date.now()
+        };
+        
+        console.log('✓ 基金数据预加载完成');
+      } catch (e) {
+        console.warn('基金数据预加载失败:', e);
+      }
+    }
+    
+    // 页面加载后立即预加载
+    prefetchFundData();
+  })();
   </script>
 </body>
 </html>

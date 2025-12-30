@@ -889,9 +889,7 @@ async function init() {
   
   // 显示新手引导（从Supabase加载配置）
   if (typeof window.ToolsGuide !== 'undefined') {
-    setTimeout(function() {
-      window.ToolsGuide.show('drama-workshop');
-    }, 300);
+    window.ToolsGuide.show('drama-workshop');
   }
 }
 

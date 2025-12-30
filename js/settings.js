@@ -100,15 +100,23 @@
 
 
 
-  // 等待内容加载
-  window.addEventListener('toolContentLoaded', function(e) {
+  // 等待内容加载 - 使用命名函数以便移除旧的监听器
+  function onSettingsContentLoaded(e) {
     if (e.detail !== 'settings') return;
     initSettings();
-  });
+  }
+  
+  // 移除旧的监听器（如果存在）
+  if (window._settingsContentLoadedHandler) {
+    window.removeEventListener('toolContentLoaded', window._settingsContentLoadedHandler);
+  }
+  // 保存新的监听器引用
+  window._settingsContentLoadedHandler = onSettingsContentLoaded;
+  window.addEventListener('toolContentLoaded', onSettingsContentLoaded);
 
   // 创建弹窗HTML
   function createModals() {
-    // 如果弹窗已存在，先移除
+    // 总是移除旧弹窗并重新创建，确保事件监听器指向正确的函数
     const existingAPIModal = document.getElementById('apiConfigModal');
     const existingGuideModal = document.getElementById('guideConfigModal');
     const existingDropdown = document.getElementById('providerDropdown');
@@ -224,6 +232,7 @@
     console.log('=== 设置页面初始化 ===');
     
     // 先创建弹窗（添加到body，而不是模板中）
+    // 每次都重新创建以确保事件监听器指向正确的函数
     createModals();
     
     // 延迟获取DOM元素，确保弹窗已创建
@@ -235,6 +244,8 @@
         apiPanel: document.getElementById('apiPanel'),
         guidePanel: document.getElementById('guidePanel'),
         guideTab: document.getElementById('settingsGuideTab'),
+        feedbackPanel: document.getElementById('feedbackPanel'),
+        feedbackTab: document.getElementById('settingsFeedbackTab'),
         
         // API 配置相关
         apiList: document.getElementById('apiList'),
@@ -242,7 +253,11 @@
         addApiBtn: document.getElementById('addApiBtn'),
         
         // 引导管理相关
-        guideGrid: document.getElementById('guideGrid')
+        guideGrid: document.getElementById('guideGrid'),
+        
+        // 用户反馈相关
+        feedbackList: document.getElementById('feedbackList'),
+        refreshFeedbackBtn: document.getElementById('refreshFeedbackBtn')
       };
       
       // 从body获取弹窗元素（因为它们是动态创建的）
@@ -319,14 +334,17 @@
       console.error('✗ 新增API配置按钮未找到');
     }
     
-    // API 弹窗事件
-    if (elements.apiModalClose) {
+    // API 弹窗事件 - 使用标记防止重复绑定
+    if (elements.apiModalClose && !elements.apiModalClose._bound) {
+      elements.apiModalClose._bound = true;
       elements.apiModalClose.addEventListener('click', closeAPIConfigModal);
     }
-    if (elements.apiModalCancel) {
+    if (elements.apiModalCancel && !elements.apiModalCancel._bound) {
+      elements.apiModalCancel._bound = true;
       elements.apiModalCancel.addEventListener('click', closeAPIConfigModal);
     }
-    if (elements.apiModalSave) {
+    if (elements.apiModalSave && !elements.apiModalSave._bound) {
+      elements.apiModalSave._bound = true;
       elements.apiModalSave.addEventListener('click', saveAPIConfig);
     }
     // API配置弹窗：阻止modal-box内的点击事件冒泡
@@ -353,6 +371,11 @@
       guideModalBox.addEventListener('click', (e) => e.stopPropagation());
     }
     
+    // 反馈刷新按钮
+    if (elements.refreshFeedbackBtn) {
+      elements.refreshFeedbackBtn.addEventListener('click', loadFeedbackList);
+    }
+    
     // 图片上传
     if (elements.guideImageUploadArea) {
       elements.guideImageUploadArea.addEventListener('click', () => {
@@ -372,13 +395,17 @@
 
   // 检查管理员权限
   function checkAdminPermission() {
-    if (!elements.guideTab) return;
-    
     if (window.toolsSupabase) {
       window.toolsSupabase.auth.getSession().then(({ data: { session } }) => {
         if (session && session.user) {
-          elements.guideTab.style.display = 'flex';
-          console.log('✓ 显示引导管理tab');
+          if (elements.guideTab) {
+            elements.guideTab.style.display = 'flex';
+            console.log('✓ 显示引导管理tab');
+          }
+          if (elements.feedbackTab) {
+            elements.feedbackTab.style.display = 'flex';
+            console.log('✓ 显示用户反馈tab');
+          }
         }
       });
     }
@@ -389,11 +416,13 @@
       
       window.addEventListener('toolsUserLoggedIn', () => {
         if (elements.guideTab) elements.guideTab.style.display = 'flex';
+        if (elements.feedbackTab) elements.feedbackTab.style.display = 'flex';
       });
       
       window.addEventListener('toolsUserLoggedOut', () => {
         if (elements.guideTab) elements.guideTab.style.display = 'none';
-        if (currentTab === 'guide') switchTab('api');
+        if (elements.feedbackTab) elements.feedbackTab.style.display = 'none';
+        if (currentTab === 'guide' || currentTab === 'feedback') switchTab('api');
       });
     }
   }
@@ -408,14 +437,20 @@
       if (activeTab) activeTab.classList.add('is-active');
     }
     
+    // 隐藏所有面板
+    if (elements.apiPanel) elements.apiPanel.classList.remove('is-active');
+    if (elements.guidePanel) elements.guidePanel.classList.remove('is-active');
+    if (elements.feedbackPanel) elements.feedbackPanel.classList.remove('is-active');
+    
     if (tabType === 'api') {
       if (elements.apiPanel) elements.apiPanel.classList.add('is-active');
-      if (elements.guidePanel) elements.guidePanel.classList.remove('is-active');
       loadAPIList();
     } else if (tabType === 'guide') {
-      if (elements.apiPanel) elements.apiPanel.classList.remove('is-active');
       if (elements.guidePanel) elements.guidePanel.classList.add('is-active');
       loadGuideList();
+    } else if (tabType === 'feedback') {
+      if (elements.feedbackPanel) elements.feedbackPanel.classList.add('is-active');
+      loadFeedbackList();
     }
   }
 
@@ -621,7 +656,7 @@
       closeAPIConfigModal();
       loadAPIList();
       window.dispatchEvent(new CustomEvent('apiConfigUpdated'));
-      
+    } else {
       showMessage('配置保存失败，请重试', 'error');
     }
   }
@@ -1065,6 +1100,75 @@
         openGuideConfigModal(tool, config);
       });
     });
+  }
+
+  // ===== 用户反馈功能 =====
+
+  async function loadFeedbackList() {
+    console.log('=== 加载用户反馈列表 ===');
+    
+    if (!elements.feedbackList) {
+      console.error('反馈列表元素未找到');
+      return;
+    }
+    
+    // 显示加载状态
+    elements.feedbackList.innerHTML = `
+      <div class="empty-state">
+        <i class="ri-loader-4-line spin"></i>
+        <p>加载中...</p>
+      </div>
+    `;
+    
+    // 使用全局方法加载反馈
+    if (typeof window.loadToolsFeedback !== 'function') {
+      elements.feedbackList.innerHTML = `
+        <div class="empty-state">
+          <i class="ri-error-warning-line"></i>
+          <p>反馈功能未初始化</p>
+        </div>
+      `;
+      return;
+    }
+    
+    try {
+      const feedbackData = await window.loadToolsFeedback();
+      
+      if (!feedbackData || feedbackData.length === 0) {
+        elements.feedbackList.innerHTML = `
+          <div class="empty-state">
+            <i class="ri-message-3-line"></i>
+            <p>暂无反馈</p>
+          </div>
+        `;
+        return;
+      }
+      
+      // 渲染反馈列表
+      elements.feedbackList.innerHTML = feedbackData.map(item => {
+        const time = item.created_at ? new Date(item.created_at).toLocaleString('zh-CN') : '未知时间';
+        return `
+          <div class="feedback-item">
+            <div class="feedback-meta">
+              <span class="feedback-time">${time}</span>
+              ${item.contact ? `<span class="feedback-contact">${item.contact}</span>` : ''}
+            </div>
+            <div class="feedback-text">${item.content || ''}</div>
+          </div>
+        `;
+      }).join('');
+      
+      console.log('✓ 加载了', feedbackData.length, '条反馈');
+    } catch (error) {
+      console.error('加载反馈失败:', error);
+      elements.feedbackList.innerHTML = `
+        <div class="empty-state">
+          <i class="ri-error-warning-line"></i>
+          <p>加载失败</p>
+          <span style="color: var(--text-muted); font-size: 14px;">${error.message}</span>
+        </div>
+      `;
+    }
   }
 
   function handleImageUpload(e) {

@@ -34,16 +34,6 @@
     </div>
   </a>
 
-  <a href="#drama-workshop" class="platform-card platform-card--drama" data-require-admin="true" style="display: none;">
-    <div class="platform-icon">
-      <i class="ri-movie-2-line"></i>
-    </div>
-    <div class="platform-info">
-      <h3>短剧工坊</h3>
-      <p>AI 拆解剧本分镜，一键生成短剧视频</p>
-    </div>
-  </a>
-
   <a href="#fund-assistant" class="platform-card platform-card--fund">
     <div class="platform-icon">
       <i class="ri-funds-line"></i>
@@ -53,7 +43,22 @@
       <p>实时查看基金净值和涨跌，管理自选基金</p>
     </div>
   </a>
+
+  <a href="#drama-workshop" class="platform-card platform-card--drama" data-require-admin="true" style="display: none;">
+    <div class="platform-icon">
+      <i class="ri-movie-2-line"></i>
+    </div>
+    <div class="platform-info">
+      <h3>短剧工坊</h3>
+      <p>AI 拆解剧本分镜，一键生成短剧视频</p>
+    </div>
+  </a>
 </div>
+
+<p class="home-tip">
+  <i class="ri-shield-check-line"></i>
+  涉及大模型能力的工具需在<a href="#settings">设置</a>中配置 API Key · 您的 Key 仅存储在本地，不会上传服务器，可放心使用
+</p>
 
 <script>
 // 首页加载时检查管理员权限，显示/隐藏受限工具
@@ -76,6 +81,13 @@
   
   // 监听登录状态变化
   window.addEventListener('toolsAuthChanged', updateAdminCards);
+  
+  // 监听路由切换到首页时重新检查权限
+  window.addEventListener('toolContentLoaded', function(e) {
+    if (e.detail === 'home' || e.detail === '') {
+      updateAdminCards();
+    }
+  });
   
   // 工具卡片点击埋点
   document.querySelectorAll('.platform-card').forEach(function(card) {

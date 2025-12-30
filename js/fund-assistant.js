@@ -82,7 +82,7 @@
 
     state.autoRefreshTimer = setInterval(function() {
       if (isMarketOpen()) {
-        fetchMarketIndices();
+        fetchMarketIndices(true); // 自动刷新时强制获取新数据
         // 如果在自选页面，也刷新自选数据
         if (els.watchlistPanel.classList.contains('is-active') && !state.isSearchMode) {
           renderWatchlist();
@@ -119,7 +119,7 @@
     // 手动刷新
     els.refreshBtn.addEventListener('click', function() {
       els.refreshBtn.classList.add('is-loading');
-      fetchMarketIndices().then(function() {
+      fetchMarketIndices(true).then(function() { // 手动刷新时强制获取新数据
         els.refreshBtn.classList.remove('is-loading');
       });
       if (els.watchlistPanel.classList.contains('is-active') && !state.isSearchMode) {
@@ -145,7 +145,18 @@
   }
 
   // 获取大盘指数（包含美股和黄金）
-  async function fetchMarketIndices() {
+  async function fetchMarketIndices(forceRefresh) {
+    // 优先使用预加载的缓存数据（30秒内有效）
+    if (!forceRefresh && window._fundDataCache && window._fundDataCache.marketIndices) {
+      var cacheAge = Date.now() - window._fundDataCache.timestamp;
+      if (cacheAge < 30000) {
+        console.log('✓ 使用预加载的基金数据');
+        renderMarketIndices(window._fundDataCache.marketIndices);
+        updateTimeDisplay();
+        return;
+      }
+    }
+    
     try {
       var res = await fetch(API_BASE + '/index');
       var data = await res.json();
@@ -176,6 +187,12 @@
         }
       } catch (e) {}
 
+      // 更新缓存
+      window._fundDataCache = {
+        marketIndices: data,
+        timestamp: Date.now()
+      };
+      
       renderMarketIndices(data);
       updateTimeDisplay();
     } catch (e) {
@@ -185,16 +202,25 @@
 
   // 更新时间显示
   function updateTimeDisplay() {
+    var timeEl = els.updateTime || document.getElementById('updateTime');
+    if (!timeEl) return;
+    els.updateTime = timeEl;
+    
     var now = new Date();
     var h = now.getHours().toString().padStart(2, '0');
     var m = now.getMinutes().toString().padStart(2, '0');
     var s = now.getSeconds().toString().padStart(2, '0');
-    els.updateTime.textContent = '更新于 ' + h + ':' + m + ':' + s;
+    timeEl.textContent = '更新于 ' + h + ':' + m + ':' + s;
   }
 
   // 渲染大盘指数
   function renderMarketIndices(data) {
     if (!data || !Array.isArray(data)) return;
+    
+    // 确保 DOM 元素存在
+    var marketEl = els.marketIndices || document.getElementById('marketIndices');
+    if (!marketEl) return;
+    els.marketIndices = marketEl;
 
     var indexMap = {
       '000001': '上证指数',
@@ -207,7 +233,7 @@
       'AU9999': '沪金9999'
     };
 
-    els.marketIndices.innerHTML = data.map(function(item) {
+    marketEl.innerHTML = data.map(function(item) {
       var change = parseFloat(item.change) || 0;
       var changeClass = change >= 0 ? 'up' : 'down';
       var changeText = change >= 0 ? '+' + change.toFixed(2) + '%' : change.toFixed(2) + '%';
@@ -573,6 +599,43 @@
 
   // 启动
   init();
+  
+  // 监听路由切换，重新初始化
+  window.addEventListener('toolContentLoaded', function(e) {
+    if (e.detail === 'fund-assistant') {
+      // 重新获取所有 DOM 元素
+      els.marketIndices = document.getElementById('marketIndices');
+      els.updateTime = document.getElementById('updateTime');
+      els.refreshBtn = document.getElementById('refreshBtn');
+      els.searchInput = document.getElementById('searchInput');
+      els.searchBtn = document.getElementById('searchBtn');
+      els.tabs = document.querySelectorAll('.fund-tab');
+      els.watchlistPanel = document.getElementById('watchlistPanel');
+      els.rankingPanel = document.getElementById('rankingPanel');
+      els.watchlistTable = document.getElementById('watchlistTable');
+      els.watchlistBody = document.getElementById('watchlistBody');
+      els.watchlistEmpty = document.getElementById('watchlistEmpty');
+      els.rankingTable = document.getElementById('rankingTable');
+      els.rankingBody = document.getElementById('rankingBody');
+      els.rankingWrapper = document.getElementById('rankingWrapper');
+      els.rankingLoading = document.getElementById('rankingLoading');
+      els.loadMoreIndicator = document.getElementById('loadMoreIndicator');
+      els.fundType = document.getElementById('fundType');
+      els.sortBy = document.getElementById('sortBy');
+      els.sortOrder = document.getElementById('sortOrder');
+      els.fundCount = document.getElementById('fundCount');
+      
+      // 重新初始化
+      if (window.UI && window.UI.Select) {
+        window.UI.Select.init(document.querySelector('.fund-main'));
+      }
+      loadWatchlist();
+      bindEvents();
+      fetchMarketIndices();
+      renderWatchlist();
+      startAutoRefresh();
+    }
+  });
 })();
 
 // 新手引导
@@ -581,8 +644,6 @@
   
   // 页面加载完成后显示引导（从Supabase加载配置）
   if (typeof window.ToolsGuide !== 'undefined') {
-    setTimeout(function() {
-      window.ToolsGuide.show('fund-assistant');
-    }, 300);
+    window.ToolsGuide.show('fund-assistant');
   }
 })();

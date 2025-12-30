@@ -1665,6 +1665,25 @@
 
     // 启动
     init();
+
+    // 监听路由切换事件，重新初始化 UI.Select
+    window.addEventListener('toolContentLoaded', function(e) {
+        if (e.detail === 'xiaohongshu') {
+            // 重新获取 DOM 元素（因为 HTML 模板被重新加载）
+            elements.modelSelect = document.getElementById('xhsModelSelect');
+            
+            // 重新初始化 UI.Select
+            if (window.UI && window.UI.Select && elements.modelSelect) {
+                // 检查是否需要重新创建 UI.Select
+                if (!elements.modelSelect.closest('.ui-select')) {
+                    window.UI.Select.init(document.querySelector('.xhs-main'));
+                }
+            }
+            
+            // 重新加载模型列表
+            loadModels();
+        }
+    });
 })();
 
 // 新手引导
@@ -1673,8 +1692,6 @@
     
     // 页面加载完成后显示引导（从Supabase加载配置）
     if (typeof window.ToolsGuide !== 'undefined') {
-        setTimeout(function() {
-            window.ToolsGuide.show('xiaohongshu');
-        }, 300);
+        window.ToolsGuide.show('xiaohongshu');
     }
 })();

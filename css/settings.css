@@ -105,6 +105,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 24px;
+  min-height: 65px;
+  box-sizing: border-box;
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -978,4 +980,57 @@
 
 .image-upload-wrapper.compact .image-upload-area span {
   font-size: 13px;
+}
+
+/* ========== 用户反馈列表 ========== */
+
+.feedback-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.feedback-item {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: background 0.2s ease;
+}
+
+.feedback-item:last-child {
+  border-bottom: none;
+}
+
+.feedback-item:hover {
+  background: var(--bg);
+}
+
+.feedback-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.feedback-time {
+  color: var(--text-sub);
+}
+
+.feedback-contact {
+  padding: 2px 8px;
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 4px;
+  color: var(--accent);
+  font-size: 12px;
+}
+
+.feedback-text {
+  font-size: 14px;
+  color: var(--text-main);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
 }

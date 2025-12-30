@@ -1526,8 +1526,6 @@
   
   // 页面加载完成后显示引导（从Supabase加载配置）
   if (typeof window.ToolsGuide !== 'undefined') {
-    setTimeout(function() {
-      window.ToolsGuide.show('product-assistant');
-    }, 300);
+    window.ToolsGuide.show('product-assistant');
   }
 })();

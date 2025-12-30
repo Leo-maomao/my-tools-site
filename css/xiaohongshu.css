@@ -1129,15 +1129,17 @@
   padding: 0;
   margin-left: 6px;
   background: transparent;
-  border: 1px solid var(--accent-light);
+  border: 1px solid transparent;
   border-radius: 4px;
-  color: var(--accent);
+  color: var(--text-muted);
   cursor: pointer;
   transition: all 0.2s ease;
   vertical-align: middle;
 }
 
 .btn-ai-optimize:hover {
+  border-color: var(--accent-light);
+  color: var(--accent);
   box-shadow: 0 2px 8px rgba(255, 107, 107, 0.35);
 }
 

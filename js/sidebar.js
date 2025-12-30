@@ -42,8 +42,8 @@
     var adminItems = document.querySelectorAll('[data-require-admin="true"]');
     
     adminItems.forEach(function(item) {
-      // 需要设置为 'flex' 因为 nav-item 使用 flex 布局
-      if (item.classList.contains('nav-item')) {
+      // nav-item 和 platform-card 都使用 flex 布局
+      if (item.classList.contains('nav-item') || item.classList.contains('platform-card')) {
         item.style.display = isAdmin ? 'flex' : 'none';
       } else {
         item.style.display = isAdmin ? '' : 'none';
@@ -62,4 +62,12 @@
   window.addEventListener('toolsUserLoggedIn', updateAdminNavItems);
   window.addEventListener('toolsUserLoggedOut', updateAdminNavItems);
   window.addEventListener('toolsAuthChanged', updateAdminNavItems);
+  
+  // 监听路由切换，更新首页卡片的权限显示
+  window.addEventListener('toolContentLoaded', function(e) {
+    // 首页加载时检查权限（首页的 route key 是空字符串）
+    if (e.detail === '' || e.detail === 'home') {
+      updateAdminNavItems();
+    }
+  });
 })();

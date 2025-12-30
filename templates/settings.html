@@ -15,6 +15,10 @@
         <i class="ri-guide-line"></i>
         <span>引导管理</span>
       </button>
+      <button class="settings-tab" data-tab="feedback" id="settingsFeedbackTab" style="display: none;">
+        <i class="ri-message-3-line"></i>
+        <span>用户反馈</span>
+      </button>
     </div>
 
     <!-- 内容区域 -->
@@ -57,6 +61,26 @@
             <div class="empty-state">
               <i class="ri-guide-line"></i>
               <p>加载中...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 用户反馈页面 -->
+      <div class="settings-panel" id="feedbackPanel">
+        <div class="settings-panel-header">
+          <h2>用户反馈</h2>
+          <button class="btn-secondary" id="refreshFeedbackBtn">
+            <i class="ri-refresh-line"></i>
+            <span>刷新</span>
+          </button>
+        </div>
+        
+        <div class="settings-panel-body">
+          <div class="feedback-list" id="feedbackList">
+            <div class="empty-state">
+              <i class="ri-message-3-line"></i>
+              <p>暂无反馈</p>
             </div>
           </div>
         </div>
