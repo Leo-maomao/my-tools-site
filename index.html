@@ -165,19 +165,45 @@
   <script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
   <script>
     // 51.la 初始化
-    try {
-      if (window.LA) {
-        LA.init({id:"3OV3C1DLozIUagyB",ck:"3OV3C1DLozIUagyB"});
+    var _laInitialized = false;
+    var _laEventQueue = [];
+    
+    function initLA() {
+      if (_laInitialized) return;
+      try {
+        if (window.LA && typeof LA.init === 'function') {
+          LA.init({id:"3OV3C1DLozIUagyB",ck:"3OV3C1DLozIUagyB"});
+          _laInitialized = true;
+          // 处理队列中的事件
+          _laEventQueue.forEach(function(item) {
+            LA.track(item.event, item.params);
+          });
+          _laEventQueue = [];
+        }
+      } catch (e) {
+        console.warn('51.la init error:', e);
       }
-    } catch (e) {}
+    }
+    
+    // 尝试立即初始化
+    initLA();
+    // 如果SDK还没加载完，等加载完再初始化
+    if (!_laInitialized) {
+      document.getElementById('LA_COLLECT').onload = initLA;
+    }
     
     // 埋点工具函数
     function trackEvent(eventName, params) {
       try {
-        if (window.LA && typeof LA.track === 'function') {
+        if (_laInitialized && window.LA && typeof LA.track === 'function') {
           LA.track(eventName, params || {});
+        } else {
+          // SDK还没准备好，加入队列
+          _laEventQueue.push({ event: eventName, params: params || {} });
         }
-      } catch (e) {}
+      } catch (e) {
+        console.warn('51.la track error:', e);
+      }
     }
     
     // 暴露到全局
