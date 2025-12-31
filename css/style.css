@@ -864,6 +864,27 @@ body:has(.dev-tools) {
   padding: 6px 12px;
 }
 
+/* ========== 毛毛的其他产品 ========== */
+
+.other-products-section {
+  margin-top: 48px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-sub);
+  margin-bottom: 20px;
+}
+
+.platform-card--nav .platform-icon {
+  color: #6366f1;
+}
+
+.platform-card--blog .platform-icon {
+  color: #f59e0b;
+}
+
 /* ========== 首页底部提示 ========== */
 
 .home-tip {
