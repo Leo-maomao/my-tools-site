@@ -230,8 +230,10 @@
     var wechatQrImage = document.getElementById('wechatQrImage');
     var wechatQrLoading = document.getElementById('wechatQrLoading');
     
+    var qrCodeLoaded = false;
+    
     async function loadWechatQrCode() {
-      if (!supabase) return;
+      if (!supabase || qrCodeLoaded) return;
       try {
         var result = await supabase
           .from('config')
@@ -243,17 +245,23 @@
           wechatQrImage.src = result.data.value;
           wechatQrImage.style.display = 'block';
           wechatQrLoading.style.display = 'none';
-          wechatQrFloat.style.display = 'block';
+          qrCodeLoaded = true;
+          // 加载完成后显示按钮（而不是直接显示弹窗）
+          var hash = window.location.hash;
+          var isHomePage = !hash || hash === '#' || hash === '#/';
+          if (isHomePage && wechatQrBtn) {
+            wechatQrBtn.style.display = 'flex';
+          }
         }
       } catch (e) {
         console.error('加载二维码失败:', e);
       }
     }
     
-    // 页面加载后加载二维码
+    // 页面加载后预加载二维码
     setTimeout(loadWechatQrCode, 500);
     
-    var hasClosedOnce = false;
+    var hasClosedOnce = true; // 默认为 true，这样点击按钮会显示弹窗
     var hoverTimer = null;
     
     if (wechatQrClose) {
@@ -266,10 +274,8 @@
     
     if (wechatQrBtn) {
       wechatQrBtn.addEventListener('click', function() {
-        if (!hasClosedOnce) {
-          wechatQrBtn.style.display = 'none';
-          wechatQrFloat.style.display = 'block';
-        }
+        wechatQrBtn.style.display = 'none';
+        wechatQrFloat.style.display = 'block';
       });
       
       wechatQrBtn.addEventListener('mouseenter', function() {
@@ -410,12 +416,11 @@
       
       // 隐藏/显示微信相关元素
       if (isHomePage) {
-        // 首页：根据状态显示二维码浮窗或按钮
-        if (hasClosedOnce) {
+        // 首页：显示微信按钮（如果二维码已加载）
+        if (qrCodeLoaded) {
           if (wechatQrBtn) wechatQrBtn.style.display = 'flex';
-          if (wechatQrFloat) wechatQrFloat.style.display = 'none';
         }
-        // 首次加载时 loadWechatQrCode 会处理显示
+        if (wechatQrFloat) wechatQrFloat.style.display = 'none';
       } else {
         // 非首页：隐藏所有微信相关元素
         if (wechatQrBtn) wechatQrBtn.style.display = 'none';
