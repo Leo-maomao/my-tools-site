@@ -40,6 +40,12 @@
   color: rgba(0, 0, 0, 0.88);
   font-size: 14px;
   outline: none;
+  box-shadow: none;
+}
+
+.dev-tools-search input:focus {
+  outline: none;
+  box-shadow: none;
 }
 
 .dev-tools-search input::placeholder {
@@ -166,6 +172,37 @@
   flex: 1;
   padding: 16px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 让工具内容占满整个区域 */
+.dev-tools-body > .tool-row {
+  flex: 1;
+  min-height: 0;
+}
+
+.dev-tools-body > .tool-row > .tool-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.dev-tools-body > .tool-row > .tool-col > .tool-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.dev-tools-body .tool-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.dev-tools-body .tool-textarea {
+  flex: 1;
+  min-height: 200px;
+  resize: none;
 }
 
 /* ========== 卡片容器 ========== */
