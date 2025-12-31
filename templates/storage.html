@@ -1,0 +1,149 @@
+<div class="storage-main">
+<!-- 顶部工具栏 -->
+<div class="storage-header">
+  <div class="storage-title">
+    <i class="ri-folder-cloud-line"></i>
+    <span>文件存储</span>
+  </div>
+  <div class="storage-actions">
+    <button class="storage-btn primary" id="uploadFileBtn">
+      <i class="ri-upload-cloud-line"></i>
+      <span>上传文件</span>
+    </button>
+    <button class="storage-btn" id="addFolderBtn">
+      <i class="ri-folder-add-line"></i>
+      <span>新建文件夹</span>
+    </button>
+  </div>
+</div>
+
+  <!-- 主布局 -->
+  <div class="storage-layout">
+    <!-- 左侧文件夹树 -->
+    <aside class="folder-sidebar">
+      <div class="folder-tree" id="folderTree">
+        <!-- 动态生成 -->
+      </div>
+    </aside>
+
+    <!-- 右侧文件列表 -->
+    <main class="file-main" id="fileMain">
+      <!-- 搜索栏 -->
+      <div class="search-bar">
+        <i class="ri-search-line"></i>
+        <input type="text" id="searchInput" placeholder="搜索文件名...">
+        <button class="clear-search" id="clearSearchBtn" style="display: none;">
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+
+      <!-- 文件列表 -->
+      <div class="file-list" id="fileList">
+        <!-- 动态生成 -->
+      </div>
+
+      <!-- 空状态 -->
+      <div class="empty-state" id="emptyState">
+        <i class="ri-folder-open-line"></i>
+        <p>暂无文件，点击上传</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- 隐藏的文件输入 -->
+<input type="file" id="fileInput" multiple style="display: none;">
+
+<!-- 文件夹弹窗 -->
+<div id="folderModal" class="modal-overlay">
+  <div class="modal-box" style="max-width: 400px;">
+    <div class="modal-header">
+      <h3 id="folderModalTitle">新建文件夹</h3>
+      <button class="modal-close" data-close="folderModal"><i class="ri-close-line"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-input-group">
+        <label>文件夹名称</label>
+        <input type="text" id="folderNameInput" class="modal-input" placeholder="请输入文件夹名称" maxlength="50">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn cancel" data-close="folderModal">取消</button>
+      <button class="modal-btn confirm" id="folderConfirmBtn">确定</button>
+    </div>
+  </div>
+</div>
+
+<!-- 预览弹窗 -->
+<div id="previewModal" class="modal-overlay">
+  <div class="modal-box preview-modal-box">
+    <div class="modal-header">
+      <h3 id="previewFileName">文件预览</h3>
+      <div class="preview-actions">
+        <button class="btn-icon-sm" id="previewCopyBtn" title="复制内容">
+          <i class="ri-file-copy-line"></i>
+        </button>
+        <button class="btn-icon-sm" id="previewDownloadBtn" title="下载文件">
+          <i class="ri-download-line"></i>
+        </button>
+        <button class="modal-close" data-close="previewModal"><i class="ri-close-line"></i></button>
+      </div>
+    </div>
+    <div class="modal-body preview-body" id="previewContent">
+      <!-- 动态生成 -->
+    </div>
+  </div>
+</div>
+
+<!-- 删除确认弹窗 -->
+<div id="deleteModal" class="modal-overlay">
+  <div class="modal-box modal-box--confirm" style="max-width: 360px;">
+    <div class="confirm-content">
+      <div class="confirm-icon danger">
+        <i class="ri-delete-bin-line"></i>
+      </div>
+      <h3 class="confirm-title">确认删除</h3>
+      <p class="confirm-text" id="deleteText">确定要删除此文件吗？此操作不可恢复。</p>
+    </div>
+    <div class="confirm-actions">
+      <button class="confirm-btn cancel" data-close="deleteModal">取消</button>
+      <button class="confirm-btn danger" id="deleteConfirmBtn">删除</button>
+    </div>
+  </div>
+</div>
+
+<!-- 上传进度弹窗 -->
+<div id="uploadProgressModal" class="modal-overlay">
+  <div class="modal-box" style="max-width: 480px;">
+    <div class="modal-header">
+      <h3>上传进度</h3>
+    </div>
+    <div class="modal-body">
+      <div class="upload-progress-list" id="uploadProgressList">
+        <!-- 动态生成 -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 移动文件弹窗 -->
+<div id="moveModal" class="modal-overlay">
+  <div class="modal-box" style="max-width: 400px;">
+    <div class="modal-header">
+      <h3>移动文件</h3>
+      <button class="modal-close" data-close="moveModal"><i class="ri-close-line"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-input-group">
+        <label>目标文件夹</label>
+        <select id="moveFolderSelect" class="modal-input">
+          <!-- 动态生成 -->
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn cancel" data-close="moveModal">取消</button>
+      <button class="modal-btn confirm" id="moveConfirmBtn">移动</button>
+    </div>
+  </div>
+</div>

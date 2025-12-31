@@ -1080,7 +1080,8 @@
         '<h3>毛毛的产品助理</h3>' +
         '<p>我可以帮你分析PRD、回答产品问题</p>' +
         '<div class="pa-welcome-tips">' +
-        '<div class="pa-tip"><i class="ri-file-upload-line"></i><span>上传 Axure HTML 文件，帮你 Review PRD</span></div>' +
+        '<div class="pa-tip"><i class="ri-image-add-line"></i><span>粘贴或上传图片，帮你分析界面</span></div>' +
+        '<div class="pa-tip"><i class="ri-file-code-line"></i><span>上传 Axure HTML 文件，帮你 Review PRD</span></div>' +
         '<div class="pa-tip"><i class="ri-chat-3-line"></i><span>直接提问产品相关问题</span></div>' +
         '</div></div>';
       return;

@@ -60,6 +60,21 @@
       css: 'css/settings.css',
       js: 'js/settings.js',
       init: null
+    },
+    'todo': {
+      name: 'To Do List',
+      template: 'templates/todo.html',
+      css: 'css/todo.css',
+      js: 'js/todo.js',
+      init: null
+    },
+    'storage': {
+      name: '文件存储',
+      template: 'templates/storage.html',
+      css: 'css/storage.css',
+      js: 'js/storage.js',
+      init: null,
+      requireAdmin: true  // 仅管理员可见
     }
   };
 
@@ -122,7 +137,16 @@
       
       // 权限检查：需要管理员权限的路由
       if (config.requireAdmin) {
-        const isAdmin = window.ToolsAuth && window.ToolsAuth.isAdmin();
+        // 使用异步方法检查管理员权限，确保刷新时能正确恢复登录状态
+        let isAdmin = false;
+        if (window.ToolsAuth) {
+          // 优先使用异步检查（更可靠）
+          if (window.ToolsAuth.checkAdmin) {
+            isAdmin = await window.ToolsAuth.checkAdmin();
+          } else {
+            isAdmin = window.ToolsAuth.isAdmin();
+          }
+        }
         if (!isAdmin) {
           console.warn('需要管理员权限访问:', route);
           window.location.hash = '';

@@ -1,0 +1,128 @@
+<div class="todo-main">
+  <!-- 顶部工具栏 -->
+  <div class="todo-header">
+    <div class="todo-title">
+      <i class="ri-checkbox-circle-line"></i>
+      <span>To Do List</span>
+    </div>
+    <div class="todo-actions">
+      <button class="btn btn-primary" id="addTaskBtn">
+        <i class="ri-add-line"></i>
+        <span>添加任务</span>
+      </button>
+      <button class="btn" id="addCategoryBtn">
+        <i class="ri-price-tag-3-line"></i>
+        <span>添加分类</span>
+      </button>
+      <button class="btn" id="clearCompletedBtn">
+        <i class="ri-delete-bin-line"></i>
+        <span>清理已完成</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 看板容器 -->
+  <div class="kanban-container" id="kanbanContainer">
+    <!-- 待处理 -->
+    <div class="kanban-column" data-status="pending">
+      <div class="column-header">
+        <div class="column-title">
+          <span>待处理</span>
+          <span class="task-count" id="pendingCount">0</span>
+        </div>
+      </div>
+      <div class="column-body" id="pendingBody">
+        <!-- 动态生成分类和任务 -->
+      </div>
+    </div>
+
+    <!-- 进行中 -->
+    <div class="kanban-column" data-status="in_progress">
+      <div class="column-header">
+        <div class="column-title">
+          <span>进行中</span>
+          <span class="task-count" id="inProgressCount">0</span>
+        </div>
+      </div>
+      <div class="column-body" id="inProgressBody">
+        <!-- 动态生成分类和任务 -->
+      </div>
+    </div>
+
+    <!-- 已完成 -->
+    <div class="kanban-column completed" data-status="completed">
+      <div class="column-header">
+        <div class="column-title">
+          <span>已完成</span>
+          <span class="task-count" id="completedCount">0</span>
+        </div>
+      </div>
+      <div class="column-body" id="completedBody">
+        <!-- 动态生成分类和任务 -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 分类弹窗 -->
+<div id="categoryModal" class="modal-overlay">
+  <div class="modal-box" style="max-width: 360px;">
+    <div class="modal-header">
+      <h3 id="categoryModalTitle">添加分类</h3>
+      <button class="modal-close" data-close="categoryModal"><i class="ri-close-line"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>分类名称</label>
+        <input type="text" id="categoryNameInput" placeholder="例如：个人、工作" maxlength="20">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" data-close="categoryModal">取消</button>
+      <button class="btn btn-primary" id="categoryConfirmBtn">确定</button>
+    </div>
+  </div>
+</div>
+
+<!-- 任务弹窗 -->
+<div id="taskModal" class="modal-overlay">
+  <div class="modal-box" style="max-width: 400px;">
+    <div class="modal-header">
+      <h3 id="taskModalTitle">添加任务</h3>
+      <button class="modal-close" data-close="taskModal"><i class="ri-close-line"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>任务内容</label>
+        <textarea id="taskContentInput" placeholder="请输入任务内容" rows="3"></textarea>
+      </div>
+      <div class="form-group" id="taskCategoryGroup">
+        <label>分类</label>
+        <select id="taskCategorySelect">
+          <option value="">请选择分类</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" data-close="taskModal">取消</button>
+      <button class="btn btn-primary" id="taskConfirmBtn">确定</button>
+    </div>
+  </div>
+</div>
+
+<!-- 删除确认弹窗 -->
+<div id="deleteConfirmModal" class="modal-overlay">
+  <div class="modal-box" style="max-width: 360px;">
+    <div class="modal-header">
+      <h3>确认删除</h3>
+      <button class="modal-close" data-close="deleteConfirmModal"><i class="ri-close-line"></i></button>
+    </div>
+    <div class="modal-body">
+      <p id="deleteConfirmText">确定要删除吗？</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" data-close="deleteConfirmModal">取消</button>
+      <button class="btn btn-danger" id="deleteConfirmBtn">删除</button>
+    </div>
+  </div>
+</div>

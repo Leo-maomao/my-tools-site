@@ -1,0 +1,416 @@
+/* To Do List 样式 */
+
+/* 主容器 */
+.todo-main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+/* 顶部工具栏 */
+.todo-header {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.todo-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.todo-title i {
+  font-size: 22px;
+  color: var(--accent);
+}
+
+.todo-title span {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.todo-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.todo-header {
+  justify-content: space-between;
+}
+
+/* 看板容器 */
+.kanban-container {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+  padding: 20px 24px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* 看板列 */
+.kanban-column {
+  flex: 1;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  background: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+.kanban-column.completed {
+  opacity: 0.85;
+}
+
+/* 列头 */
+.column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg);
+  flex-shrink: 0;
+}
+
+.column-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.column-title span:first-child {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.task-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #fff;
+  background: var(--accent);
+  border-radius: 11px;
+}
+
+.kanban-column.completed .task-count {
+  background: var(--success);
+}
+
+
+/* 列主体 */
+.column-body {
+  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+
+/* ==================== 分类区块 ==================== */
+.category-section {
+  background: var(--bg);
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+.category-section.uncategorized .category-name {
+  color: var(--text-sub);
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--bg);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.category-header:hover {
+  background: var(--card-bg);
+}
+
+.category-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.category-toggle {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  transition: transform 0.2s;
+}
+
+.category-section.is-collapsed .category-toggle {
+  transform: rotate(-90deg);
+}
+
+.category-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-main);
+  white-space: nowrap;
+}
+
+.category-task-count {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.category-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.category-header:hover .category-actions {
+  opacity: 1;
+}
+
+.category-actions button {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.category-actions button:hover {
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.category-actions button.danger:hover {
+  color: var(--error);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* 分类内容（任务列表） */
+.category-content {
+  padding: 8px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.category-section.is-collapsed .category-content {
+  display: none;
+}
+
+/* 添加任务按钮 */
+.add-task-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.add-task-btn:hover {
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+/* ==================== 任务卡片 ==================== */
+.task-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  cursor: grab;
+  transition: all 0.2s;
+}
+
+.task-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.task-card.is-dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+.task-content {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text-main);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.kanban-column.completed .task-content {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.task-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+}
+
+.task-card:hover .task-actions {
+  opacity: 1;
+}
+
+.task-actions button {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.task-actions button:hover {
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.task-actions button.danger:hover {
+  color: var(--error);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* 空分类提示 */
+.category-empty {
+  padding: 12px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* 空列提示 */
+.column-empty {
+  padding: 24px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+
+/* 弹窗样式使用全局 style.css 中的样式 */
+
+/* 表单 - 使用全局样式，仅设置宽度和间距 */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+}
+
+/* UI.Select 组件全宽 */
+.form-group .ui-select {
+  width: 100%;
+}
+
+.form-group textarea {
+  min-height: 80px;
+  max-height: 120px;
+  resize: none;
+  overflow-y: auto;
+}
+
+/* 文本框滚动条样式 */
+.form-group textarea::-webkit-scrollbar {
+  width: 6px;
+}
+
+.form-group textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.form-group textarea::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+}
+
+.form-group textarea::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* 拖拽相关 */
+.kanban-column.is-dragging-over .column-body {
+  background: var(--accent-bg);
+}
+
+.drag-placeholder {
+  height: 40px;
+  background: var(--accent-bg);
+  border: 2px dashed var(--accent);
+  border-radius: 6px;
+  opacity: 0.5;
+}
