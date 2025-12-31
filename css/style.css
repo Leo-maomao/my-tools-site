@@ -714,6 +714,13 @@ a {
   padding: 8px !important;
 }
 
+/* 研发工具箱 - 全屏布局 */
+.main-content:has(.dev-tools) {
+  padding: 0 !important;
+  height: 100vh;
+  overflow: hidden;
+}
+
 /* 设置页面 - 禁止外部滚动，内部滚动 */
 .main-content:has(.settings-main) {
   padding: 0 !important;
