@@ -386,25 +386,32 @@
 
 /* 下拉选择 */
 .tool-select {
-  height: 32px;
-  padding: 0 11px;
-  border: 1px solid #d9d9d9;
-  border-radius: 6px;
-  background: #fff;
-  color: rgba(0, 0, 0, 0.88);
+  height: 36px;
+  padding: 0 32px 0 12px;
+  border: 1px solid var(--border-subtle, #d9d9d9);
+  border-radius: 8px;
+  background: var(--card-bg, #fff);
+  color: var(--text-main, rgba(0, 0, 0, 0.88));
   font-size: 14px;
   outline: none;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
 }
 
 .tool-select:hover {
-  border-color: #4096ff;
+  border-color: var(--accent, #1677ff);
 }
 
 .tool-select:focus {
-  border-color: #1677ff;
-  box-shadow: 0 0 0 2px rgba(5, 145, 255, 0.1);
+  border-color: var(--accent, #1677ff);
+  box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
 }
 
 /* ========== 按钮 ========== */
@@ -453,6 +460,18 @@
 .tool-btn-default:hover {
   color: #4096ff;
   border-color: #4096ff;
+}
+
+.tool-btn-secondary {
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.tool-btn-secondary:hover {
+  color: #4096ff;
+  border-color: #4096ff;
+  background: #fff;
 }
 
 .tool-btn-text {
@@ -989,7 +1008,8 @@
     color: rgba(255, 255, 255, 0.25);
   }
 
-  .tool-btn-default {
+  .tool-btn-default,
+  .tool-btn-secondary {
     background: #1f1f1f;
     border-color: #424242;
     color: rgba(255, 255, 255, 0.85);

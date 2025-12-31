@@ -57,6 +57,9 @@
   // 初始化
   function init() {
     cacheElements();
+    if (!els.nav || !els.body) {
+      return;
+    }
     bindEvents();
     loadTool(currentTool);
   }
@@ -154,6 +157,13 @@
         </div>
       `;
     }
+    
+    // 初始化全局下拉组件（在 DOM 更新后执行）
+    requestAnimationFrame(() => {
+      if (window.UI && window.UI.Select) {
+        window.UI.Select.init(els.body);
+      }
+    });
   }
 
   // 复制到剪贴板
@@ -2986,15 +2996,10 @@
     };
   }
 
-  // 启动
-  init();
-
   // 监听路由切换
   window.addEventListener('toolContentLoaded', function(e) {
     if (e.detail === 'dev-tools') {
-      cacheElements();
-      bindEvents();
-      loadTool(currentTool);
+      init();
     }
   });
 
