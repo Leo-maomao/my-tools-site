@@ -5,6 +5,7 @@
   height: 100vh;
   background: #f5f5f5;
   overflow: hidden;
+  scrollbar-gutter: stable;
 }
 
 /* ========== 左侧导航栏 ========== */
@@ -147,6 +148,7 @@
   flex-direction: column;
   overflow: hidden;
   background: #fff;
+  scrollbar-gutter: stable;
 }
 
 .dev-tools-header {
@@ -174,14 +176,85 @@
 .dev-tools-body {
   flex: 1;
   padding: 20px;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 /* 工具内容布局 */
 .dev-tools-body .tool-textarea {
   min-height: 180px;
-  resize: vertical;
+  resize: none;
+}
+
+/* 全高度布局 - 让工具占满可用空间 */
+.tool-fullheight {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.tool-fullheight .tool-row {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+  min-height: 0;
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+
+.tool-fullheight .tool-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+
+.tool-fullheight .tool-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  margin-bottom: 0;
+  overflow: hidden;
+}
+
+.tool-fullheight .tool-card > .tool-textarea {
+  flex: 1;
+  min-height: 0;
+  resize: none;
+  overflow-y: auto !important;
+  border-radius: 0 0 8px 8px;
+  border-top: none;
+}
+
+.tool-fullheight .tool-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 12px;
+  overflow: hidden;
+}
+
+.tool-fullheight .tool-card-body .tool-textarea {
+  flex: 1;
+  min-height: 0;
+  resize: none;
+  overflow-y: auto !important;
+}
+
+.tool-fullheight .tool-actions-bar {
+  flex-shrink: 0;
+  margin-top: 12px;
+  position: relative;
+  z-index: 10;
 }
 
 /* ========== 卡片容器 ========== */
@@ -202,6 +275,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
+  min-height: 48px;
+  box-sizing: border-box;
   border-bottom: 1px solid #f0f0f0;
   background: #fafafa;
 }
@@ -351,19 +426,21 @@
   font-family: 'SF Mono', 'Monaco', 'Menlo', 'Consolas', monospace;
   font-size: 13px;
   line-height: 1.6;
-  resize: vertical;
+  resize: none;
   outline: none;
   transition: all 0.2s;
   box-sizing: border-box;
+  overflow-y: auto;
 }
 
 .tool-textarea:hover {
-  border-color: #4096ff;
+  border-color: var(--border-subtle, #d9d9d9);
 }
 
 .tool-textarea:focus {
-  border-color: #1677ff;
-  box-shadow: 0 0 0 2px rgba(5, 145, 255, 0.1);
+  border-color: var(--border-subtle, #d9d9d9);
+  box-shadow: none;
+  outline: none;
 }
 
 .tool-textarea::placeholder {
@@ -770,9 +847,9 @@
 /* ========== 复制成功提示 ========== */
 .copy-toast {
   position: fixed;
-  bottom: 24px;
+  top: 24px;
   left: 50%;
-  transform: translateX(-50%) translateY(100px);
+  transform: translateX(-50%) translateY(-100px);
   padding: 9px 16px;
   background: rgba(0, 0, 0, 0.88);
   color: #fff;

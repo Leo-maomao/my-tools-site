@@ -32,6 +32,7 @@ body {
   background: var(--bg);
   color: var(--text-main);
   -webkit-font-smoothing: antialiased;
+  scrollbar-gutter: stable;
 }
 
 a {
@@ -43,6 +44,7 @@ a {
 .app {
   display: flex;
   min-height: 100vh;
+  scrollbar-gutter: stable;
 }
 
 /* 侧边栏 */
@@ -718,6 +720,11 @@ a {
 .main-content:has(.dev-tools) {
   padding: 0 !important;
   height: 100vh;
+  overflow: hidden;
+}
+
+/* 研发工具箱时禁止 body 滚动 */
+body:has(.dev-tools) {
   overflow: hidden;
 }
 

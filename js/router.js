@@ -89,15 +89,27 @@
     // 获取当前路由
     getCurrentRoute: function() {
       const hash = window.location.hash.slice(1); // 移除 #
+      // 支持嵌套路由格式 dev-tools/json -> dev-tools
+      if (hash.startsWith('dev-tools/')) {
+        return 'dev-tools';
+      }
       return hash || '';
     },
 
     // 加载路由
     loadRoute: async function() {
       const route = this.getCurrentRoute();
+      const hash = window.location.hash.slice(1);
       
       // 路由未改变，不重复加载（设置页面除外，每次都重新加载）
-      if (route === currentRoute && route !== 'settings') return;
+      // 对于 dev-tools，子路由变化不需要重新加载主模块
+      if (route === currentRoute && route !== 'settings') {
+        // dev-tools 子路由变化时，触发内部路由更新
+        if (route === 'dev-tools' && hash.startsWith('dev-tools/')) {
+          window.dispatchEvent(new CustomEvent('devToolsHashChange', { detail: hash }));
+        }
+        return;
+      }
       
       // 检查路由是否存在
       if (!routes.hasOwnProperty(route)) {
