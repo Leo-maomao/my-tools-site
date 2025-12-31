@@ -150,59 +150,38 @@
 }
 
 .dev-tools-header {
-  padding: 16px 24px;
+  padding: 16px 20px;
   background: #fff;
   border-bottom: 1px solid #f0f0f0;
+  flex-shrink: 0;
 }
 
 .dev-tools-header h2 {
   margin: 0 0 4px 0;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: rgba(0, 0, 0, 0.88);
+  line-height: 1.4;
 }
 
 .dev-tools-header p {
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
   color: rgba(0, 0, 0, 0.45);
+  line-height: 1.4;
 }
 
 .dev-tools-body {
   flex: 1;
-  padding: 16px;
+  padding: 20px;
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
+  overflow-x: hidden;
 }
 
-/* 让工具内容占满整个区域 */
-.dev-tools-body > .tool-row {
-  flex: 1;
-  min-height: 0;
-}
-
-.dev-tools-body > .tool-row > .tool-col {
-  display: flex;
-  flex-direction: column;
-}
-
-.dev-tools-body > .tool-row > .tool-col > .tool-card {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.dev-tools-body .tool-card-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
+/* 工具内容布局 */
 .dev-tools-body .tool-textarea {
-  flex: 1;
-  min-height: 200px;
-  resize: none;
+  min-height: 180px;
+  resize: vertical;
 }
 
 /* ========== 卡片容器 ========== */
@@ -211,7 +190,11 @@
   border-radius: 8px;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
   margin-bottom: 16px;
-  overflow: hidden;
+  overflow: visible;
+}
+
+.tool-card:last-child {
+  margin-bottom: 0;
 }
 
 .tool-card-header {
@@ -245,6 +228,9 @@
 
 .tool-card-body {
   padding: 16px;
+  position: relative;
+  z-index: 1;
+  overflow: visible;
 }
 
 /* ========== 分区布局 ========== */

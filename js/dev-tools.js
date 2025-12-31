@@ -158,6 +158,14 @@
       `;
     }
     
+    // 禁用所有输入框的自动填充
+    els.body.querySelectorAll('input, textarea').forEach(el => {
+      el.setAttribute('autocomplete', 'off');
+      el.setAttribute('autocorrect', 'off');
+      el.setAttribute('autocapitalize', 'off');
+      el.setAttribute('spellcheck', 'false');
+    });
+    
     // 初始化全局下拉组件（在 DOM 更新后执行）
     requestAnimationFrame(() => {
       if (window.UI && window.UI.Select) {
@@ -578,15 +586,15 @@
     // 哈希计算
     hash: function() {
       return `
-        <div class="tool-card" style="margin-bottom:16px">
+        <div class="tool-card">
           <div class="tool-card-header">
             <div class="tool-card-title"><i class="ri-edit-line"></i>输入文本</div>
+            <div class="tool-card-extra">
+              <button class="tool-btn tool-btn-primary tool-btn-sm" id="hashCalcBtn"><i class="ri-hashtag"></i>计算哈希值</button>
+            </div>
           </div>
           <div class="tool-card-body">
-            <textarea class="tool-textarea" id="hashInput" placeholder="输入要计算哈希值的文本内容"></textarea>
-            <div style="margin-top:12px">
-              <button class="tool-btn tool-btn-primary" id="hashCalcBtn"><i class="ri-hashtag"></i>计算哈希值</button>
-            </div>
+            <textarea class="tool-textarea" id="hashInput" placeholder="输入要计算哈希值的文本内容" style="min-height:100px"></textarea>
           </div>
         </div>
         
@@ -594,33 +602,33 @@
           <div class="tool-card-header">
             <div class="tool-card-title"><i class="ri-key-2-line"></i>计算结果</div>
           </div>
-          <div class="tool-card-body" style="display:grid;gap:16px">
+          <div class="tool-card-body" style="display:grid;gap:12px">
             <div class="tool-form-item">
               <label class="tool-label">MD5 (32位)</label>
-              <div style="display:flex;gap:8px">
-                <input type="text" class="tool-input" id="hashMd5" readonly style="flex:1;font-family:monospace" placeholder="等待计算...">
-                <button class="tool-btn tool-btn-default tool-btn-icon hash-copy-btn" data-target="hashMd5"><i class="ri-file-copy-line"></i></button>
+              <div style="display:flex;gap:8px;align-items:center">
+                <input type="text" class="tool-input" id="hashMd5" readonly style="flex:1;font-family:monospace;font-size:13px" placeholder="等待计算...">
+                <button class="tool-btn tool-btn-default tool-btn-icon hash-copy-btn" data-target="hashMd5" title="复制"><i class="ri-file-copy-line"></i></button>
               </div>
             </div>
             <div class="tool-form-item">
               <label class="tool-label">SHA-1 (40位)</label>
-              <div style="display:flex;gap:8px">
-                <input type="text" class="tool-input" id="hashSha1" readonly style="flex:1;font-family:monospace" placeholder="等待计算...">
-                <button class="tool-btn tool-btn-default tool-btn-icon hash-copy-btn" data-target="hashSha1"><i class="ri-file-copy-line"></i></button>
+              <div style="display:flex;gap:8px;align-items:center">
+                <input type="text" class="tool-input" id="hashSha1" readonly style="flex:1;font-family:monospace;font-size:13px" placeholder="等待计算...">
+                <button class="tool-btn tool-btn-default tool-btn-icon hash-copy-btn" data-target="hashSha1" title="复制"><i class="ri-file-copy-line"></i></button>
               </div>
             </div>
             <div class="tool-form-item">
               <label class="tool-label">SHA-256 (64位)</label>
-              <div style="display:flex;gap:8px">
-                <input type="text" class="tool-input" id="hashSha256" readonly style="flex:1;font-family:monospace" placeholder="等待计算...">
-                <button class="tool-btn tool-btn-default tool-btn-icon hash-copy-btn" data-target="hashSha256"><i class="ri-file-copy-line"></i></button>
+              <div style="display:flex;gap:8px;align-items:center">
+                <textarea class="tool-input" id="hashSha256" readonly style="flex:1;font-family:monospace;font-size:12px;height:36px;resize:none;line-height:24px;padding-top:5px" placeholder="等待计算..."></textarea>
+                <button class="tool-btn tool-btn-default tool-btn-icon hash-copy-btn" data-target="hashSha256" title="复制"><i class="ri-file-copy-line"></i></button>
               </div>
             </div>
             <div class="tool-form-item">
               <label class="tool-label">SHA-512 (128位)</label>
-              <div style="display:flex;gap:8px">
-                <input type="text" class="tool-input" id="hashSha512" readonly style="flex:1;font-family:monospace;font-size:12px" placeholder="等待计算...">
-                <button class="tool-btn tool-btn-default tool-btn-icon hash-copy-btn" data-target="hashSha512"><i class="ri-file-copy-line"></i></button>
+              <div style="display:flex;gap:8px;align-items:flex-start">
+                <textarea class="tool-input" id="hashSha512" readonly style="flex:1;font-family:monospace;font-size:11px;height:52px;resize:none;line-height:18px;padding-top:5px;word-break:break-all" placeholder="等待计算..."></textarea>
+                <button class="tool-btn tool-btn-default tool-btn-icon hash-copy-btn" data-target="hashSha512" title="复制" style="margin-top:2px"><i class="ri-file-copy-line"></i></button>
               </div>
             </div>
           </div>
