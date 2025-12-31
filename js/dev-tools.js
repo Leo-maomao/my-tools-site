@@ -183,45 +183,62 @@
     // JSON 工具
     json: function() {
       return `
-        <div class="tool-tabs">
-          <button class="tool-tab is-active" data-tab="format">格式化</button>
-          <button class="tool-tab" data-tab="compress">压缩</button>
-          <button class="tool-tab" data-tab="validate">校验</button>
-          <button class="tool-tab" data-tab="convert">转换</button>
-        </div>
-        <div class="tool-columns">
-          <div class="tool-column">
-            <div class="tool-column-label">输入 JSON</div>
-            <textarea class="tool-textarea" id="jsonInput" placeholder='{"name": "test", "value": 123}'></textarea>
+        <div class="tool-row">
+          <!-- 输入区 -->
+          <div class="tool-col">
+            <div class="tool-card">
+              <div class="tool-card-header">
+                <div class="tool-card-title"><i class="ri-edit-line"></i>输入 JSON</div>
+                <div class="tool-card-extra">
+                  <button class="tool-btn tool-btn-text tool-btn-sm" id="jsonClearBtn"><i class="ri-delete-bin-line"></i>清空</button>
+                </div>
+              </div>
+              <div class="tool-card-body">
+                <textarea class="tool-textarea" id="jsonInput" placeholder='输入或粘贴 JSON 内容，例如：
+{
+  "name": "test",
+  "value": 123,
+  "items": ["a", "b", "c"]
+}'></textarea>
+              </div>
+            </div>
           </div>
-          <div class="tool-column">
-            <div class="tool-column-label">输出结果</div>
-            <textarea class="tool-textarea" id="jsonOutput" readonly placeholder="结果将显示在这里"></textarea>
+          
+          <!-- 输出区 -->
+          <div class="tool-col">
+            <div class="tool-card">
+              <div class="tool-card-header">
+                <div class="tool-card-title"><i class="ri-file-text-line"></i>输出结果</div>
+                <div class="tool-card-extra">
+                  <button class="tool-btn tool-btn-text tool-btn-sm" id="jsonCopyBtn"><i class="ri-file-copy-line"></i>复制</button>
+                </div>
+              </div>
+              <div class="tool-card-body">
+                <textarea class="tool-textarea" id="jsonOutput" readonly placeholder="处理结果将显示在这里"></textarea>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="tool-options">
-          <div class="tool-option">
-            <label>缩进空格：</label>
-            <select id="jsonIndent" class="tool-select">
-              <option value="2">2 空格</option>
-              <option value="4">4 空格</option>
-              <option value="tab">Tab</option>
-            </select>
+        
+        <!-- 操作区 -->
+        <div class="tool-card">
+          <div class="tool-card-body">
+            <div class="tool-options" style="margin-bottom: 16px;">
+              <div class="tool-option">
+                <span class="tool-label-inline">缩进格式</span>
+                <select id="jsonIndent" class="tool-select">
+                  <option value="2">2 空格</option>
+                  <option value="4">4 空格</option>
+                  <option value="tab">Tab</option>
+                </select>
+              </div>
+            </div>
+            <div class="tool-btn-group tool-btn-group-center">
+              <button class="tool-btn tool-btn-primary" id="jsonFormatBtn"><i class="ri-code-line"></i>格式化</button>
+              <button class="tool-btn tool-btn-default" id="jsonCompressBtn"><i class="ri-compress-line"></i>压缩</button>
+              <button class="tool-btn tool-btn-default" id="jsonValidateBtn"><i class="ri-checkbox-circle-line"></i>校验</button>
+            </div>
           </div>
-        </div>
-        <div class="tool-actions">
-          <button class="tool-btn tool-btn-primary" id="jsonFormatBtn">
-            <i class="ri-code-line"></i>格式化
-          </button>
-          <button class="tool-btn tool-btn-secondary" id="jsonCompressBtn">
-            <i class="ri-compress-line"></i>压缩
-          </button>
-          <button class="tool-btn tool-btn-secondary" id="jsonCopyBtn">
-            <i class="ri-file-copy-line"></i>复制结果
-          </button>
-          <button class="tool-btn tool-btn-secondary" id="jsonClearBtn">
-            <i class="ri-delete-bin-line"></i>清空
-          </button>
         </div>
       `;
     },
@@ -229,30 +246,38 @@
     // Base64 编解码
     base64: function() {
       return `
-        <div class="tool-tabs">
-          <button class="tool-tab is-active" data-tab="encode">编码</button>
-          <button class="tool-tab" data-tab="decode">解码</button>
-        </div>
-        <div class="tool-columns">
-          <div class="tool-column">
-            <div class="tool-column-label">原文</div>
-            <textarea class="tool-textarea" id="base64Input" placeholder="输入要编码/解码的文本"></textarea>
+        <div class="tool-row">
+          <div class="tool-col">
+            <div class="tool-card">
+              <div class="tool-card-header">
+                <div class="tool-card-title"><i class="ri-edit-line"></i>原始文本</div>
+              </div>
+              <div class="tool-card-body">
+                <textarea class="tool-textarea" id="base64Input" placeholder="输入要编码或解码的文本"></textarea>
+              </div>
+            </div>
           </div>
-          <div class="tool-column">
-            <div class="tool-column-label">结果</div>
-            <textarea class="tool-textarea" id="base64Output" readonly placeholder="结果将显示在这里"></textarea>
+          <div class="tool-col">
+            <div class="tool-card">
+              <div class="tool-card-header">
+                <div class="tool-card-title"><i class="ri-file-text-line"></i>处理结果</div>
+                <div class="tool-card-extra">
+                  <button class="tool-btn tool-btn-text tool-btn-sm" id="base64CopyBtn"><i class="ri-file-copy-line"></i>复制</button>
+                </div>
+              </div>
+              <div class="tool-card-body">
+                <textarea class="tool-textarea" id="base64Output" readonly placeholder="结果将显示在这里"></textarea>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="tool-actions">
-          <button class="tool-btn tool-btn-primary" id="base64EncodeBtn">
-            <i class="ri-lock-line"></i>编码
-          </button>
-          <button class="tool-btn tool-btn-primary" id="base64DecodeBtn">
-            <i class="ri-lock-unlock-line"></i>解码
-          </button>
-          <button class="tool-btn tool-btn-secondary" id="base64CopyBtn">
-            <i class="ri-file-copy-line"></i>复制结果
-          </button>
+        <div class="tool-card">
+          <div class="tool-card-body">
+            <div class="tool-btn-group tool-btn-group-center">
+              <button class="tool-btn tool-btn-primary" id="base64EncodeBtn"><i class="ri-arrow-right-line"></i>编码 (Encode)</button>
+              <button class="tool-btn tool-btn-primary" id="base64DecodeBtn"><i class="ri-arrow-left-line"></i>解码 (Decode)</button>
+            </div>
+          </div>
         </div>
       `;
     },
@@ -260,34 +285,39 @@
     // URL 编解码
     url: function() {
       return `
-        <div class="tool-tabs">
-          <button class="tool-tab is-active" data-tab="encode">编码</button>
-          <button class="tool-tab" data-tab="decode">解码</button>
-          <button class="tool-tab" data-tab="parse">解析</button>
-        </div>
-        <div class="tool-columns">
-          <div class="tool-column">
-            <div class="tool-column-label">输入</div>
-            <textarea class="tool-textarea" id="urlInput" placeholder="输入 URL 或文本"></textarea>
+        <div class="tool-row">
+          <div class="tool-col">
+            <div class="tool-card">
+              <div class="tool-card-header">
+                <div class="tool-card-title"><i class="ri-edit-line"></i>输入内容</div>
+              </div>
+              <div class="tool-card-body">
+                <textarea class="tool-textarea" id="urlInput" placeholder="输入 URL 或需要编码/解码的文本"></textarea>
+              </div>
+            </div>
           </div>
-          <div class="tool-column">
-            <div class="tool-column-label">结果</div>
-            <textarea class="tool-textarea" id="urlOutput" readonly placeholder="结果将显示在这里"></textarea>
+          <div class="tool-col">
+            <div class="tool-card">
+              <div class="tool-card-header">
+                <div class="tool-card-title"><i class="ri-file-text-line"></i>处理结果</div>
+                <div class="tool-card-extra">
+                  <button class="tool-btn tool-btn-text tool-btn-sm" id="urlCopyBtn"><i class="ri-file-copy-line"></i>复制</button>
+                </div>
+              </div>
+              <div class="tool-card-body">
+                <textarea class="tool-textarea" id="urlOutput" readonly placeholder="结果将显示在这里"></textarea>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="tool-actions">
-          <button class="tool-btn tool-btn-primary" id="urlEncodeBtn">
-            <i class="ri-lock-line"></i>编码
-          </button>
-          <button class="tool-btn tool-btn-primary" id="urlDecodeBtn">
-            <i class="ri-lock-unlock-line"></i>解码
-          </button>
-          <button class="tool-btn tool-btn-secondary" id="urlParseBtn">
-            <i class="ri-links-line"></i>解析 URL
-          </button>
-          <button class="tool-btn tool-btn-secondary" id="urlCopyBtn">
-            <i class="ri-file-copy-line"></i>复制
-          </button>
+        <div class="tool-card">
+          <div class="tool-card-body">
+            <div class="tool-btn-group tool-btn-group-center">
+              <button class="tool-btn tool-btn-primary" id="urlEncodeBtn"><i class="ri-arrow-right-line"></i>URL 编码</button>
+              <button class="tool-btn tool-btn-primary" id="urlDecodeBtn"><i class="ri-arrow-left-line"></i>URL 解码</button>
+              <button class="tool-btn tool-btn-default" id="urlParseBtn"><i class="ri-links-line"></i>解析 URL</button>
+            </div>
+          </div>
         </div>
       `;
     },
@@ -297,33 +327,77 @@
       const now = Date.now();
       const nowSec = Math.floor(now / 1000);
       return `
-        <div class="tool-info">
-          <i class="ri-time-line"></i>
-          <div class="tool-info-content">
-            <div class="tool-info-title">当前时间戳</div>
-            <div class="tool-info-text">
-              秒级：<strong id="currentTs">${nowSec}</strong> &nbsp;|&nbsp; 
-              毫秒级：<strong id="currentTsMs">${now}</strong>
-              <button class="tool-btn tool-btn-icon" id="refreshTsBtn" title="刷新"><i class="ri-refresh-line"></i></button>
+        <!-- 当前时间戳卡片 -->
+        <div class="tool-card" style="margin-bottom:16px">
+          <div class="tool-card-header">
+            <div class="tool-card-title"><i class="ri-time-line"></i>当前时间戳</div>
+            <div class="tool-card-extra">
+              <button class="tool-btn tool-btn-text tool-btn-sm" id="refreshTsBtn"><i class="ri-refresh-line"></i>刷新</button>
+            </div>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-row">
+              <div class="tool-col">
+                <div class="tool-statistic">
+                  <div class="tool-statistic-title">秒级 (Unix)</div>
+                  <div class="tool-statistic-value" id="currentTs">${nowSec}</div>
+                </div>
+              </div>
+              <div class="tool-col">
+                <div class="tool-statistic">
+                  <div class="tool-statistic-title">毫秒级 (JavaScript)</div>
+                  <div class="tool-statistic-value" id="currentTsMs">${now}</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div class="tool-columns">
-          <div class="tool-column">
-            <div class="tool-column-label">时间戳 → 时间</div>
-            <div style="display:flex;gap:8px;margin-bottom:12px">
-              <input type="text" class="tool-input" id="tsInput" placeholder="输入时间戳" style="flex:1">
-              <button class="tool-btn tool-btn-primary" id="ts2dateBtn">转换</button>
+
+        <div class="tool-row">
+          <!-- 时间戳转时间 -->
+          <div class="tool-col">
+            <div class="tool-card">
+              <div class="tool-card-header">
+                <div class="tool-card-title"><i class="ri-arrow-right-line"></i>时间戳 → 时间</div>
+              </div>
+              <div class="tool-card-body">
+                <div class="tool-form-item">
+                  <label class="tool-label">输入时间戳</label>
+                  <div style="display:flex;gap:8px;">
+                    <input type="text" class="tool-input" id="tsInput" placeholder="支持秒级或毫秒级时间戳" style="flex:1">
+                    <button class="tool-btn tool-btn-primary" id="ts2dateBtn">转换</button>
+                  </div>
+                </div>
+                <div class="tool-divider"></div>
+                <div class="tool-form-item">
+                  <label class="tool-label">转换结果</label>
+                  <div class="tool-result" id="ts2dateResult">输入时间戳后点击转换</div>
+                </div>
+              </div>
             </div>
-            <div class="tool-result" id="ts2dateResult">-</div>
           </div>
-          <div class="tool-column">
-            <div class="tool-column-label">时间 → 时间戳</div>
-            <div style="display:flex;gap:8px;margin-bottom:12px">
-              <input type="datetime-local" class="tool-input" id="dateInput" style="flex:1">
-              <button class="tool-btn tool-btn-primary" id="date2tsBtn">转换</button>
+          
+          <!-- 时间转时间戳 -->
+          <div class="tool-col">
+            <div class="tool-card">
+              <div class="tool-card-header">
+                <div class="tool-card-title"><i class="ri-arrow-left-line"></i>时间 → 时间戳</div>
+              </div>
+              <div class="tool-card-body">
+                <div class="tool-form-item">
+                  <label class="tool-label">选择日期时间</label>
+                  <div style="display:flex;gap:8px;">
+                    <input type="datetime-local" class="tool-input" id="dateInput" style="flex:1">
+                    <button class="tool-btn tool-btn-primary" id="date2tsBtn">转换</button>
+                  </div>
+                </div>
+                <div class="tool-divider"></div>
+                <div class="tool-form-item">
+                  <label class="tool-label">转换结果</label>
+                  <div class="tool-result" id="date2tsResult">选择时间后点击转换</div>
+                </div>
+              </div>
             </div>
-            <div class="tool-result" id="date2tsResult">-</div>
           </div>
         </div>
       `;
@@ -332,12 +406,13 @@
     // 正则测试
     regex: function() {
       return `
-        <div class="tool-panel" style="margin-bottom:16px">
-          <div class="tool-panel-header">
-            <span class="tool-panel-title">正则表达式</span>
-            <div class="tool-panel-actions">
-              <select class="tool-select" id="regexPreset">
-                <option value="">常用正则</option>
+        <!-- 正则表达式输入卡片 -->
+        <div class="tool-card" style="margin-bottom:16px">
+          <div class="tool-card-header">
+            <div class="tool-card-title"><i class="ri-code-s-slash-line"></i>正则表达式</div>
+            <div class="tool-card-extra">
+              <select class="tool-select" id="regexPreset" style="min-width:120px">
+                <option value="">常用正则预设</option>
                 <option value="^1[3-9]\\d{9}$">手机号</option>
                 <option value="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$">邮箱</option>
                 <option value="^\\d{15}|\\d{18}$">身份证</option>
@@ -347,28 +422,43 @@
               </select>
             </div>
           </div>
-          <div class="tool-panel-body">
-            <div style="display:flex;gap:8px;align-items:center">
-              <span style="color:var(--text-muted)">/</span>
-              <input type="text" class="tool-input" id="regexPattern" placeholder="输入正则表达式" style="flex:1">
-              <span style="color:var(--text-muted)">/</span>
-              <input type="text" class="tool-input" id="regexFlags" value="g" style="width:60px" placeholder="flags">
+          <div class="tool-card-body">
+            <div style="display:flex;gap:8px;align-items:center;background:#fafafa;padding:12px;border-radius:6px;border:1px solid #f0f0f0;">
+              <span style="color:rgba(0,0,0,0.45);font-family:monospace;font-size:16px">/</span>
+              <input type="text" class="tool-input" id="regexPattern" placeholder="输入正则表达式，如: \\d+" style="flex:1;border:none;background:transparent;box-shadow:none;">
+              <span style="color:rgba(0,0,0,0.45);font-family:monospace;font-size:16px">/</span>
+              <input type="text" class="tool-input" id="regexFlags" value="g" style="width:60px;border:none;background:transparent;box-shadow:none;text-align:center;" placeholder="flags">
             </div>
           </div>
         </div>
-        <div class="tool-columns">
-          <div class="tool-column">
-            <div class="tool-column-label">测试文本</div>
-            <textarea class="tool-textarea" id="regexInput" placeholder="输入要测试的文本"></textarea>
+        
+        <div class="tool-row">
+          <div class="tool-col">
+            <div class="tool-card">
+              <div class="tool-card-header">
+                <div class="tool-card-title"><i class="ri-edit-line"></i>测试文本</div>
+              </div>
+              <div class="tool-card-body">
+                <textarea class="tool-textarea" id="regexInput" placeholder="输入要测试的文本，匹配结果将实时高亮显示"></textarea>
+              </div>
+            </div>
           </div>
-          <div class="tool-column">
-            <div class="tool-column-label">匹配结果</div>
-            <div class="tool-result" id="regexOutput" style="min-height:200px;white-space:pre-wrap">-</div>
+          <div class="tool-col">
+            <div class="tool-card">
+              <div class="tool-card-header">
+                <div class="tool-card-title"><i class="ri-checkbox-circle-line"></i>匹配结果</div>
+              </div>
+              <div class="tool-card-body">
+                <div class="tool-result" id="regexOutput" style="min-height:160px;white-space:pre-wrap">输入正则和文本后点击测试</div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="tool-actions">
-          <button class="tool-btn tool-btn-primary" id="regexTestBtn">
-            <i class="ri-search-line"></i>测试匹配
+        
+        <div class="tool-card">
+          <div class="tool-card-body">
+            <div class="tool-btn-group tool-btn-group-center">
+              <button class="tool-btn tool-btn-primary" id="regexTestBtn"><i class="ri-search-line"></i>测试匹配
           </button>
           <button class="tool-btn tool-btn-secondary" id="regexReplaceBtn">
             <i class="ri-exchange-line"></i>替换
@@ -380,49 +470,61 @@
     // UUID 生成
     uuid: function() {
       return `
-        <div class="tool-options">
-          <div class="tool-option">
-            <label>生成数量：</label>
-            <select class="tool-select" id="uuidCount">
-              <option value="1">1 个</option>
-              <option value="5">5 个</option>
-              <option value="10" selected>10 个</option>
-              <option value="20">20 个</option>
-              <option value="50">50 个</option>
-            </select>
+        <div class="tool-card" style="margin-bottom:16px">
+          <div class="tool-card-header">
+            <div class="tool-card-title"><i class="ri-settings-3-line"></i>生成配置</div>
           </div>
-          <div class="tool-option">
-            <label>格式：</label>
-            <select class="tool-select" id="uuidFormat">
-              <option value="default">标准格式</option>
-              <option value="upper">大写</option>
-              <option value="nodash">无横线</option>
-            </select>
+          <div class="tool-card-body">
+            <div class="tool-options">
+              <div class="tool-option">
+                <span class="tool-label-inline">生成数量</span>
+                <select class="tool-select" id="uuidCount">
+                  <option value="1">1 个</option>
+                  <option value="5">5 个</option>
+                  <option value="10" selected>10 个</option>
+                  <option value="20">20 个</option>
+                  <option value="50">50 个</option>
+                </select>
+              </div>
+              <div class="tool-option">
+                <span class="tool-label-inline">输出格式</span>
+                <select class="tool-select" id="uuidFormat">
+                  <option value="default">标准格式 (小写带横线)</option>
+                  <option value="upper">大写格式</option>
+                  <option value="nodash">无横线格式</option>
+                </select>
+              </div>
+            </div>
+            <div class="tool-divider"></div>
+            <div class="tool-btn-group tool-btn-group-center">
+              <button class="tool-btn tool-btn-primary" id="uuidGenerateBtn"><i class="ri-refresh-line"></i>生成 UUID</button>
+              <button class="tool-btn tool-btn-default" id="uuidCopyBtn"><i class="ri-file-copy-line"></i>复制全部</button>
+            </div>
           </div>
         </div>
-        <div class="tool-actions">
-          <button class="tool-btn tool-btn-primary" id="uuidGenerateBtn">
-            <i class="ri-refresh-line"></i>生成 UUID
-          </button>
-          <button class="tool-btn tool-btn-secondary" id="uuidCopyBtn">
-            <i class="ri-file-copy-line"></i>复制全部
-          </button>
+        
+        <div class="tool-card">
+          <div class="tool-card-header">
+            <div class="tool-card-title"><i class="ri-list-check-2"></i>生成结果</div>
+          </div>
+          <div class="tool-card-body">
+            <div class="tool-result" id="uuidOutput" style="min-height:200px;font-family:monospace">点击上方"生成 UUID"按钮开始生成</div>
+          </div>
         </div>
-        <div class="tool-result" id="uuidOutput" style="min-height:200px">点击"生成 UUID"按钮</div>
       `;
     },
 
     // Cron 表达式
     cron: function() {
       return `
-        <div class="tool-panel" style="margin-bottom:16px">
-          <div class="tool-panel-header">
-            <span class="tool-panel-title">Cron 表达式</span>
-            <div class="tool-panel-actions">
-              <select class="tool-select" id="cronPreset">
-                <option value="">常用表达式</option>
+        <div class="tool-card" style="margin-bottom:16px">
+          <div class="tool-card-header">
+            <div class="tool-card-title"><i class="ri-calendar-schedule-line"></i>Cron 表达式</div>
+            <div class="tool-card-extra">
+              <select class="tool-select" id="cronPreset" style="min-width:130px">
+                <option value="">常用表达式预设</option>
                 <option value="* * * * *">每分钟</option>
-                <option value="0 * * * *">每小时</option>
+                <option value="0 * * * *">每小时整点</option>
                 <option value="0 0 * * *">每天 0 点</option>
                 <option value="0 0 * * 1">每周一 0 点</option>
                 <option value="0 0 1 * *">每月 1 号 0 点</option>
@@ -432,15 +534,16 @@
               </select>
             </div>
           </div>
-          <div class="tool-panel-body">
-            <input type="text" class="tool-input" id="cronInput" value="0 0 * * *" style="width:100%;font-family:monospace;font-size:16px;text-align:center">
+          <div class="tool-card-body">
+            <input type="text" class="tool-input tool-input-lg" id="cronInput" value="0 0 * * *" style="width:100%;font-family:monospace;font-size:18px;text-align:center;letter-spacing:4px">
           </div>
         </div>
-        <div class="tool-info">
+        
+        <div class="tool-alert tool-alert-info" style="margin-bottom:16px">
           <i class="ri-information-line"></i>
-          <div class="tool-info-content">
-            <div class="tool-info-title">格式说明</div>
-            <div class="tool-info-text" style="font-family:monospace">
+          <div class="tool-alert-content">
+            <div class="tool-alert-title">Cron 格式说明</div>
+            <div class="tool-alert-desc" style="font-family:monospace;line-height:1.8">
               ┌──────── 分钟 (0-59)<br>
               │ ┌────── 小时 (0-23)<br>
               │ │ ┌──── 日期 (1-31)<br>
@@ -450,48 +553,65 @@
             </div>
           </div>
         </div>
-        <div class="tool-actions">
-          <button class="tool-btn tool-btn-primary" id="cronParseBtn">
-            <i class="ri-calendar-line"></i>解析表达式
-          </button>
+        
+        <div class="tool-card">
+          <div class="tool-card-body">
+            <div class="tool-btn-group tool-btn-group-center" style="margin-bottom:16px">
+              <button class="tool-btn tool-btn-primary" id="cronParseBtn"><i class="ri-search-line"></i>解析表达式</button>
+            </div>
+            <div class="tool-result" id="cronOutput" style="min-height:120px">输入或选择 Cron 表达式后点击解析</div>
+          </div>
         </div>
-        <div class="tool-result" id="cronOutput" style="min-height:150px">输入 Cron 表达式后点击解析</div>
       `;
     },
 
     // 哈希计算
     hash: function() {
       return `
-        <div class="tool-column">
-          <div class="tool-column-label">输入文本</div>
-          <textarea class="tool-textarea" id="hashInput" placeholder="输入要计算哈希的文本"></textarea>
+        <div class="tool-card" style="margin-bottom:16px">
+          <div class="tool-card-header">
+            <div class="tool-card-title"><i class="ri-edit-line"></i>输入文本</div>
+          </div>
+          <div class="tool-card-body">
+            <textarea class="tool-textarea" id="hashInput" placeholder="输入要计算哈希值的文本内容"></textarea>
+            <div style="margin-top:12px">
+              <button class="tool-btn tool-btn-primary" id="hashCalcBtn"><i class="ri-hashtag"></i>计算哈希值</button>
+            </div>
+          </div>
         </div>
-        <div class="tool-actions">
-          <button class="tool-btn tool-btn-primary" id="hashCalcBtn">
-            <i class="ri-hashtag"></i>计算哈希
-          </button>
-        </div>
-        <div class="tool-panel" style="margin-top:16px">
-          <div class="tool-panel-body" style="display:grid;gap:12px">
-            <div style="display:flex;align-items:center;gap:8px">
-              <span style="width:80px;font-weight:500;color:var(--text-secondary)">MD5</span>
-              <input type="text" class="tool-input" id="hashMd5" readonly style="flex:1;font-family:monospace">
-              <button class="tool-btn tool-btn-icon hash-copy-btn" data-target="hashMd5"><i class="ri-file-copy-line"></i></button>
+        
+        <div class="tool-card">
+          <div class="tool-card-header">
+            <div class="tool-card-title"><i class="ri-key-2-line"></i>计算结果</div>
+          </div>
+          <div class="tool-card-body" style="display:grid;gap:16px">
+            <div class="tool-form-item">
+              <label class="tool-label">MD5 (32位)</label>
+              <div style="display:flex;gap:8px">
+                <input type="text" class="tool-input" id="hashMd5" readonly style="flex:1;font-family:monospace" placeholder="等待计算...">
+                <button class="tool-btn tool-btn-default tool-btn-icon hash-copy-btn" data-target="hashMd5"><i class="ri-file-copy-line"></i></button>
+              </div>
             </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <span style="width:80px;font-weight:500;color:var(--text-secondary)">SHA-1</span>
-              <input type="text" class="tool-input" id="hashSha1" readonly style="flex:1;font-family:monospace">
-              <button class="tool-btn tool-btn-icon hash-copy-btn" data-target="hashSha1"><i class="ri-file-copy-line"></i></button>
+            <div class="tool-form-item">
+              <label class="tool-label">SHA-1 (40位)</label>
+              <div style="display:flex;gap:8px">
+                <input type="text" class="tool-input" id="hashSha1" readonly style="flex:1;font-family:monospace" placeholder="等待计算...">
+                <button class="tool-btn tool-btn-default tool-btn-icon hash-copy-btn" data-target="hashSha1"><i class="ri-file-copy-line"></i></button>
+              </div>
             </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <span style="width:80px;font-weight:500;color:var(--text-secondary)">SHA-256</span>
-              <input type="text" class="tool-input" id="hashSha256" readonly style="flex:1;font-family:monospace">
-              <button class="tool-btn tool-btn-icon hash-copy-btn" data-target="hashSha256"><i class="ri-file-copy-line"></i></button>
+            <div class="tool-form-item">
+              <label class="tool-label">SHA-256 (64位)</label>
+              <div style="display:flex;gap:8px">
+                <input type="text" class="tool-input" id="hashSha256" readonly style="flex:1;font-family:monospace" placeholder="等待计算...">
+                <button class="tool-btn tool-btn-default tool-btn-icon hash-copy-btn" data-target="hashSha256"><i class="ri-file-copy-line"></i></button>
+              </div>
             </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <span style="width:80px;font-weight:500;color:var(--text-secondary)">SHA-512</span>
-              <input type="text" class="tool-input" id="hashSha512" readonly style="flex:1;font-family:monospace;font-size:11px">
-              <button class="tool-btn tool-btn-icon hash-copy-btn" data-target="hashSha512"><i class="ri-file-copy-line"></i></button>
+            <div class="tool-form-item">
+              <label class="tool-label">SHA-512 (128位)</label>
+              <div style="display:flex;gap:8px">
+                <input type="text" class="tool-input" id="hashSha512" readonly style="flex:1;font-family:monospace;font-size:12px" placeholder="等待计算...">
+                <button class="tool-btn tool-btn-default tool-btn-icon hash-copy-btn" data-target="hashSha512"><i class="ri-file-copy-line"></i></button>
+              </div>
             </div>
           </div>
         </div>
@@ -501,30 +621,34 @@
     // 进制转换
     radix: function() {
       return `
-        <div class="tool-panel">
-          <div class="tool-panel-body" style="display:grid;gap:16px">
-            <div style="display:flex;align-items:center;gap:12px">
-              <span style="width:80px;font-weight:500;color:var(--text-secondary)">十进制</span>
-              <input type="text" class="tool-input radix-input" id="radix10" data-radix="10" style="flex:1;font-family:monospace" placeholder="0">
-            </div>
-            <div style="display:flex;align-items:center;gap:12px">
-              <span style="width:80px;font-weight:500;color:var(--text-secondary)">二进制</span>
-              <input type="text" class="tool-input radix-input" id="radix2" data-radix="2" style="flex:1;font-family:monospace" placeholder="0">
-            </div>
-            <div style="display:flex;align-items:center;gap:12px">
-              <span style="width:80px;font-weight:500;color:var(--text-secondary)">八进制</span>
-              <input type="text" class="tool-input radix-input" id="radix8" data-radix="8" style="flex:1;font-family:monospace" placeholder="0">
-            </div>
-            <div style="display:flex;align-items:center;gap:12px">
-              <span style="width:80px;font-weight:500;color:var(--text-secondary)">十六进制</span>
-              <input type="text" class="tool-input radix-input" id="radix16" data-radix="16" style="flex:1;font-family:monospace" placeholder="0">
-            </div>
+        <div class="tool-alert tool-alert-info" style="margin-bottom:16px">
+          <i class="ri-information-line"></i>
+          <div class="tool-alert-content">
+            <div class="tool-alert-desc">在任意输入框输入数值，其他进制会自动实时转换</div>
           </div>
         </div>
-        <div class="tool-info" style="margin-top:16px">
-          <i class="ri-information-line"></i>
-          <div class="tool-info-content">
-            <div class="tool-info-text">在任意输入框输入数值，其他进制会自动转换</div>
+        
+        <div class="tool-card">
+          <div class="tool-card-header">
+            <div class="tool-card-title"><i class="ri-exchange-line"></i>进制互转</div>
+          </div>
+          <div class="tool-card-body" style="display:grid;gap:16px">
+            <div class="tool-form-item">
+              <label class="tool-label">十进制 (Decimal)</label>
+              <input type="text" class="tool-input" id="radix10" data-radix="10" style="font-family:monospace;font-size:16px" placeholder="输入十进制数字">
+            </div>
+            <div class="tool-form-item">
+              <label class="tool-label">二进制 (Binary)</label>
+              <input type="text" class="tool-input" id="radix2" data-radix="2" style="font-family:monospace;font-size:16px" placeholder="输入二进制数字">
+            </div>
+            <div class="tool-form-item">
+              <label class="tool-label">八进制 (Octal)</label>
+              <input type="text" class="tool-input" id="radix8" data-radix="8" style="font-family:monospace;font-size:16px" placeholder="输入八进制数字">
+            </div>
+            <div class="tool-form-item">
+              <label class="tool-label">十六进制 (Hexadecimal)</label>
+              <input type="text" class="tool-input" id="radix16" data-radix="16" style="font-family:monospace;font-size:16px" placeholder="输入十六进制数字">
+            </div>
           </div>
         </div>
       `;
@@ -533,30 +657,44 @@
     // 颜色转换
     color: function() {
       return `
-        <div class="tool-panel">
-          <div class="tool-panel-body">
-            <div style="display:flex;gap:16px;align-items:center;margin-bottom:16px">
-              <input type="color" id="colorPicker" value="#2563eb" style="width:60px;height:60px;border:none;cursor:pointer;border-radius:8px">
+        <div class="tool-card">
+          <div class="tool-card-header">
+            <div class="tool-card-title"><i class="ri-palette-line"></i>颜色选择</div>
+          </div>
+          <div class="tool-card-body">
+            <div style="display:flex;gap:24px;align-items:center;margin-bottom:24px">
+              <div class="tool-color-preview" style="width:100px;height:100px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+                <input type="color" id="colorPicker" value="#1677ff" style="width:100%;height:100%;border:none;cursor:pointer;border-radius:12px">
+              </div>
               <div style="flex:1">
-                <div style="font-size:24px;font-weight:600;color:var(--text-primary)" id="colorPreview">#2563EB</div>
-                <div style="font-size:13px;color:var(--text-muted)">点击左侧色块选择颜色</div>
+                <div style="font-size:32px;font-weight:600;color:rgba(0,0,0,0.88);font-family:monospace" id="colorPreview">#1677FF</div>
+                <div style="font-size:14px;color:rgba(0,0,0,0.45);margin-top:4px">点击左侧色块或输入颜色值</div>
               </div>
             </div>
-            <div style="display:grid;gap:12px">
-              <div style="display:flex;align-items:center;gap:8px">
-                <span style="width:60px;font-weight:500;color:var(--text-secondary)">HEX</span>
-                <input type="text" class="tool-input color-input" id="colorHex" data-type="hex" value="#2563EB" style="flex:1;font-family:monospace">
-                <button class="tool-btn tool-btn-icon color-copy-btn" data-target="colorHex"><i class="ri-file-copy-line"></i></button>
+            
+            <div class="tool-divider"></div>
+            
+            <div style="display:grid;gap:16px;margin-top:16px">
+              <div class="tool-form-item">
+                <label class="tool-label">HEX</label>
+                <div style="display:flex;gap:8px">
+                  <input type="text" class="tool-input" id="colorHex" data-type="hex" value="#1677FF" style="flex:1;font-family:monospace;font-size:16px">
+                  <button class="tool-btn tool-btn-default tool-btn-icon color-copy-btn" data-target="colorHex"><i class="ri-file-copy-line"></i></button>
+                </div>
               </div>
-              <div style="display:flex;align-items:center;gap:8px">
-                <span style="width:60px;font-weight:500;color:var(--text-secondary)">RGB</span>
-                <input type="text" class="tool-input color-input" id="colorRgb" data-type="rgb" value="rgb(37, 99, 235)" style="flex:1;font-family:monospace">
-                <button class="tool-btn tool-btn-icon color-copy-btn" data-target="colorRgb"><i class="ri-file-copy-line"></i></button>
+              <div class="tool-form-item">
+                <label class="tool-label">RGB</label>
+                <div style="display:flex;gap:8px">
+                  <input type="text" class="tool-input" id="colorRgb" data-type="rgb" value="rgb(22, 119, 255)" style="flex:1;font-family:monospace;font-size:16px">
+                  <button class="tool-btn tool-btn-default tool-btn-icon color-copy-btn" data-target="colorRgb"><i class="ri-file-copy-line"></i></button>
+                </div>
               </div>
-              <div style="display:flex;align-items:center;gap:8px">
-                <span style="width:60px;font-weight:500;color:var(--text-secondary)">HSL</span>
-                <input type="text" class="tool-input color-input" id="colorHsl" data-type="hsl" value="hsl(217, 83%, 53%)" style="flex:1;font-family:monospace">
-                <button class="tool-btn tool-btn-icon color-copy-btn" data-target="colorHsl"><i class="ri-file-copy-line"></i></button>
+              <div class="tool-form-item">
+                <label class="tool-label">HSL</label>
+                <div style="display:flex;gap:8px">
+                  <input type="text" class="tool-input" id="colorHsl" data-type="hsl" value="hsl(212, 100%, 54%)" style="flex:1;font-family:monospace;font-size:16px">
+                  <button class="tool-btn tool-btn-default tool-btn-icon color-copy-btn" data-target="colorHsl"><i class="ri-file-copy-line"></i></button>
+                </div>
               </div>
             </div>
           </div>
@@ -567,45 +705,51 @@
     // 文本处理
     text: function() {
       return `
-        <div class="tool-tabs">
-          <button class="tool-tab is-active" data-tab="dedupe">去重</button>
-          <button class="tool-tab" data-tab="sort">排序</button>
-          <button class="tool-tab" data-tab="stats">统计</button>
-        </div>
-        <div class="tool-columns">
-          <div class="tool-column">
-            <div class="tool-column-label">输入文本</div>
-            <textarea class="tool-textarea" id="textInput" placeholder="每行一个，或用特定分隔符分隔"></textarea>
+        <div class="tool-row">
+          <div class="tool-col">
+            <div class="tool-card">
+              <div class="tool-card-header">
+                <div class="tool-card-title"><i class="ri-edit-line"></i>输入文本</div>
+              </div>
+              <div class="tool-card-body">
+                <textarea class="tool-textarea" id="textInput" placeholder="输入要处理的文本，每行一个或用分隔符分隔"></textarea>
+              </div>
+            </div>
           </div>
-          <div class="tool-column">
-            <div class="tool-column-label">处理结果</div>
-            <textarea class="tool-textarea" id="textOutput" readonly placeholder="结果将显示在这里"></textarea>
+          <div class="tool-col">
+            <div class="tool-card">
+              <div class="tool-card-header">
+                <div class="tool-card-title"><i class="ri-file-text-line"></i>处理结果</div>
+                <div class="tool-card-extra">
+                  <button class="tool-btn tool-btn-text tool-btn-sm" id="textCopyBtn"><i class="ri-file-copy-line"></i>复制</button>
+                </div>
+              </div>
+              <div class="tool-card-body">
+                <textarea class="tool-textarea" id="textOutput" readonly placeholder="处理结果将显示在这里"></textarea>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="tool-options">
-          <div class="tool-option">
-            <label>分隔符：</label>
-            <select class="tool-select" id="textSeparator">
-              <option value="\\n">换行符</option>
-              <option value=",">逗号</option>
-              <option value=";">分号</option>
-              <option value="\\t">Tab</option>
-            </select>
+        
+        <div class="tool-card">
+          <div class="tool-card-body">
+            <div class="tool-options" style="margin-bottom:16px">
+              <div class="tool-option">
+                <span class="tool-label-inline">分隔符</span>
+                <select class="tool-select" id="textSeparator">
+                  <option value="\\n">换行符</option>
+                  <option value=",">逗号</option>
+                  <option value=";">分号</option>
+                  <option value="\\t">Tab</option>
+                </select>
+              </div>
+            </div>
+            <div class="tool-btn-group tool-btn-group-center">
+              <button class="tool-btn tool-btn-primary" id="textDedupeBtn"><i class="ri-filter-line"></i>去重</button>
+              <button class="tool-btn tool-btn-default" id="textSortBtn"><i class="ri-sort-asc"></i>排序</button>
+              <button class="tool-btn tool-btn-default" id="textStatsBtn"><i class="ri-bar-chart-line"></i>统计</button>
+            </div>
           </div>
-        </div>
-        <div class="tool-actions">
-          <button class="tool-btn tool-btn-primary" id="textDedupeBtn">
-            <i class="ri-filter-line"></i>去重
-          </button>
-          <button class="tool-btn tool-btn-secondary" id="textSortBtn">
-            <i class="ri-sort-asc"></i>排序
-          </button>
-          <button class="tool-btn tool-btn-secondary" id="textStatsBtn">
-            <i class="ri-bar-chart-line"></i>统计
-          </button>
-          <button class="tool-btn tool-btn-secondary" id="textCopyBtn">
-            <i class="ri-file-copy-line"></i>复制
-          </button>
         </div>
       `;
     },
@@ -613,14 +757,15 @@
     // 随机生成
     random: function() {
       return `
-        <div class="tool-panel">
-          <div class="tool-panel-header">
-            <span class="tool-panel-title">随机字符串</span>
+        <!-- 随机字符串 -->
+        <div class="tool-card" style="margin-bottom:16px">
+          <div class="tool-card-header">
+            <div class="tool-card-title"><i class="ri-text"></i>随机字符串</div>
           </div>
-          <div class="tool-panel-body">
-            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+          <div class="tool-card-body">
+            <div class="tool-options" style="margin-bottom:16px">
               <div class="tool-option">
-                <label>长度：</label>
+                <span class="tool-label-inline">长度</span>
                 <input type="number" class="tool-input" id="randomLength" value="16" min="1" max="100" style="width:80px">
               </div>
               <div class="tool-option">
@@ -640,31 +785,37 @@
                 <label for="randomSymbols">特殊字符</label>
               </div>
             </div>
-            <div style="display:flex;gap:8px">
-              <input type="text" class="tool-input" id="randomOutput" readonly style="flex:1;font-family:monospace">
-              <button class="tool-btn tool-btn-primary" id="randomGenerateBtn">生成</button>
-              <button class="tool-btn tool-btn-icon" id="randomCopyBtn"><i class="ri-file-copy-line"></i></button>
+            <div class="tool-divider"></div>
+            <div style="display:flex;gap:8px;margin-top:16px">
+              <input type="text" class="tool-input tool-input-lg" id="randomOutput" readonly style="flex:1;font-family:monospace" placeholder="点击生成按钮">
+              <button class="tool-btn tool-btn-primary tool-btn-lg" id="randomGenerateBtn">生成</button>
+              <button class="tool-btn tool-btn-default tool-btn-icon tool-btn-lg" id="randomCopyBtn"><i class="ri-file-copy-line"></i></button>
             </div>
           </div>
         </div>
-        <div class="tool-panel" style="margin-top:16px">
-          <div class="tool-panel-header">
-            <span class="tool-panel-title">随机数字</span>
+        
+        <!-- 随机数字 -->
+        <div class="tool-card">
+          <div class="tool-card-header">
+            <div class="tool-card-title"><i class="ri-hashtag"></i>随机数字</div>
           </div>
-          <div class="tool-panel-body">
-            <div style="display:flex;gap:12px;margin-bottom:12px">
+          <div class="tool-card-body">
+            <div class="tool-options" style="margin-bottom:16px">
               <div class="tool-option">
-                <label>最小值：</label>
+                <span class="tool-label-inline">最小值</span>
                 <input type="number" class="tool-input" id="randomMin" value="1" style="width:100px">
               </div>
               <div class="tool-option">
-                <label>最大值：</label>
+                <span class="tool-label-inline">最大值</span>
                 <input type="number" class="tool-input" id="randomMax" value="100" style="width:100px">
               </div>
             </div>
-            <div style="display:flex;gap:8px">
-              <input type="text" class="tool-input" id="randomNumOutput" readonly style="flex:1;font-family:monospace;font-size:24px;text-align:center">
-              <button class="tool-btn tool-btn-primary" id="randomNumGenerateBtn">生成</button>
+            <div class="tool-divider"></div>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:16px">
+              <div class="tool-statistic" style="flex:1;padding:0">
+                <div class="tool-statistic-value" id="randomNumOutput" style="font-size:36px">-</div>
+              </div>
+              <button class="tool-btn tool-btn-primary tool-btn-lg" id="randomNumGenerateBtn">生成随机数</button>
             </div>
           </div>
         </div>
@@ -695,20 +846,32 @@
       ];
       
       const typeColors = {
-        success: '#22c55e',
-        redirect: '#f59e0b',
-        client: '#ef4444',
-        server: '#8b5cf6'
+        success: '#52c41a',
+        redirect: '#faad14',
+        client: '#ff4d4f',
+        server: '#722ed1'
+      };
+      
+      const typeLabels = {
+        success: '成功响应 (2xx)',
+        redirect: '重定向 (3xx)',
+        client: '客户端错误 (4xx)',
+        server: '服务端错误 (5xx)'
       };
       
       return `
-        <div style="display:grid;gap:8px">
-          ${codes.map(c => `
-            <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg-secondary);border-radius:8px;border-left:3px solid ${typeColors[c.type]}">
-              <span style="font-family:monospace;font-size:16px;font-weight:600;color:${typeColors[c.type]};width:50px">${c.code}</span>
-              <span style="color:var(--text-primary)">${c.desc}</span>
-            </div>
-          `).join('')}
+        <div class="tool-card">
+          <div class="tool-card-header">
+            <div class="tool-card-title"><i class="ri-information-line"></i>HTTP 状态码速查</div>
+          </div>
+          <div class="tool-card-body" style="display:grid;gap:8px">
+            ${codes.map(c => `
+              <div style="display:flex;align-items:center;gap:16px;padding:12px 16px;background:#fafafa;border-radius:8px;border-left:4px solid ${typeColors[c.type]}">
+                <span style="font-family:monospace;font-size:18px;font-weight:600;color:${typeColors[c.type]};width:50px">${c.code}</span>
+                <span style="color:rgba(0,0,0,0.88);flex:1">${c.desc}</span>
+              </div>
+            `).join('')}
+          </div>
         </div>
       `;
     },
@@ -739,18 +902,22 @@
       ];
       
       return `
-        <div class="dev-tools-search" style="margin-bottom:16px;background:var(--bg-secondary);border-radius:8px">
-          <i class="ri-search-line"></i>
-          <input type="text" id="portSearch" placeholder="搜索端口或服务...">
-        </div>
-        <div id="portList" style="display:grid;gap:8px">
-          ${ports.map(p => `
-            <div class="port-item" data-search="${p.port} ${p.service} ${p.desc}".toLowerCase() style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg-secondary);border-radius:8px">
-              <span style="font-family:monospace;font-size:14px;font-weight:600;color:var(--accent);width:80px">${p.port}</span>
-              <span style="font-weight:500;color:var(--text-primary);width:120px">${p.service}</span>
-              <span style="color:var(--text-muted);flex:1">${p.desc}</span>
+        <div class="tool-card">
+          <div class="tool-card-header">
+            <div class="tool-card-title"><i class="ri-plug-line"></i>常用端口速查</div>
+            <div class="tool-card-extra">
+              <input type="text" class="tool-input" id="portSearch" placeholder="搜索端口或服务..." style="width:200px">
             </div>
-          `).join('')}
+          </div>
+          <div class="tool-card-body" id="portList" style="display:grid;gap:8px">
+            ${ports.map(p => `
+              <div class="port-item" data-search="${p.port} ${p.service} ${p.desc}".toLowerCase() style="display:flex;align-items:center;gap:16px;padding:12px 16px;background:#fafafa;border-radius:8px;transition:background 0.2s">
+                <span style="font-family:monospace;font-size:16px;font-weight:600;color:#1677ff;width:90px">${p.port}</span>
+                <span style="font-weight:500;color:rgba(0,0,0,0.88);width:130px">${p.service}</span>
+                <span style="color:rgba(0,0,0,0.65);flex:1">${p.desc}</span>
+              </div>
+            `).join('')}
+          </div>
         </div>
       `;
     },
@@ -758,20 +925,39 @@
     // XML 工具
     xml: function() {
       return `
-        <div class="tool-columns">
-          <div class="tool-column">
-            <div class="tool-column-label">输入 XML</div>
-            <textarea class="tool-textarea" id="xmlInput" placeholder='<root><item>Hello</item></root>'></textarea>
+        <div class="tool-row">
+          <div class="tool-col">
+            <div class="tool-card">
+              <div class="tool-card-header">
+                <div class="tool-card-title"><i class="ri-code-line"></i>输入 XML</div>
+              </div>
+              <div class="tool-card-body">
+                <textarea class="tool-textarea" id="xmlInput" placeholder='<root>
+  <item>Hello</item>
+</root>'></textarea>
+              </div>
+            </div>
           </div>
-          <div class="tool-column">
-            <div class="tool-column-label">输出结果</div>
-            <textarea class="tool-textarea" id="xmlOutput" readonly placeholder="结果将显示在这里"></textarea>
+          <div class="tool-col">
+            <div class="tool-card">
+              <div class="tool-card-header">
+                <div class="tool-card-title"><i class="ri-file-text-line"></i>输出结果</div>
+                <div class="tool-card-extra">
+                  <button class="tool-btn tool-btn-text tool-btn-sm" id="xmlCopyBtn"><i class="ri-file-copy-line"></i>复制</button>
+                </div>
+              </div>
+              <div class="tool-card-body">
+                <textarea class="tool-textarea" id="xmlOutput" readonly placeholder="处理结果将显示在这里"></textarea>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="tool-actions">
-          <button class="tool-btn tool-btn-primary" id="xmlFormatBtn"><i class="ri-code-line"></i>格式化</button>
-          <button class="tool-btn tool-btn-secondary" id="xmlCompressBtn"><i class="ri-compress-line"></i>压缩</button>
-          <button class="tool-btn tool-btn-secondary" id="xmlToJsonBtn"><i class="ri-exchange-line"></i>转 JSON</button>
+        <div class="tool-card">
+          <div class="tool-card-body">
+            <div class="tool-btn-group tool-btn-group-center">
+              <button class="tool-btn tool-btn-primary" id="xmlFormatBtn"><i class="ri-code-line"></i>格式化</button>
+              <button class="tool-btn tool-btn-default" id="xmlCompressBtn"><i class="ri-compress-line"></i>压缩</button>
+              <button class="tool-btn tool-btn-default" id="xmlToJsonBtn"><i class="ri-exchange-line"></i>转 JSON</button>
           <button class="tool-btn tool-btn-secondary" id="xmlCopyBtn"><i class="ri-file-copy-line"></i>复制</button>
         </div>
       `;
