@@ -82,15 +82,22 @@
       const item = e.target.closest('.tool-item');
       if (item) {
         e.preventDefault();
+        e.stopPropagation();
         const tool = item.dataset.tool;
         if (tool) {
           switchTool(tool);
+          // 确保焦点不会跳到搜索框
+          if (document.activeElement === els.search) {
+            els.search.blur();
+          }
         }
+        return;
       }
 
       // 分类折叠
       const header = e.target.closest('.category-header');
       if (header) {
+        e.preventDefault();
         const category = header.closest('.dev-tools-category');
         category.classList.toggle('is-collapsed');
       }
@@ -158,12 +165,15 @@
       `;
     }
     
-    // 禁用所有输入框的自动填充
+    // 禁用所有输入框的自动填充（使用更强的禁用方式）
     els.body.querySelectorAll('input, textarea').forEach(el => {
-      el.setAttribute('autocomplete', 'off');
+      el.setAttribute('autocomplete', 'new-password');
       el.setAttribute('autocorrect', 'off');
       el.setAttribute('autocapitalize', 'off');
       el.setAttribute('spellcheck', 'false');
+      el.setAttribute('data-form-type', 'other');
+      el.setAttribute('data-lpignore', 'true'); // LastPass
+      el.setAttribute('data-1p-ignore', 'true'); // 1Password
     });
     
     // 初始化全局下拉组件（在 DOM 更新后执行）
