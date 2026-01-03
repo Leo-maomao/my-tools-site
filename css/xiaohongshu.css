@@ -102,6 +102,7 @@
 .xhs-content-input {
   display: flex;
   flex-direction: column;
+  min-height: 0; /* 允许flex收缩 */
 }
 
 .input-card {
@@ -113,14 +114,15 @@
   display: flex;
   flex-direction: column;
   overflow: hidden; /* 不显示滚动条，让内部元素控制 */
+  gap: 12px; /* 统一间距 */
 }
 
 .input-card .form-group {
-  margin-bottom: 12px;
+  flex-shrink: 0; /* 固定高度的表单组不收缩 */
 }
 
 .input-card .form-group:last-of-type {
-  margin-bottom: 16px;
+  margin-bottom: 0;
 }
 
 .input-card textarea {
@@ -131,16 +133,15 @@
 /* 可编辑内容区域（支持粘贴图片） - 占据剩余空间 */
 .content-editor {
   width: 100%;
-  flex: 1 1 auto; /* 占据剩余空间 */
-  min-height: 150px; /* 最小高度 */
-  height: 100%; /* 占满父容器 */
+  flex: 1 1 0; /* 占据剩余空间，基础大小为0 */
+  min-height: 0; /* 允许flex收缩 */
   padding: 12px 14px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   font-size: 14px;
   font-family: inherit;
   line-height: 1.6;
-  overflow-y: auto;
+  overflow-y: auto; /* 内部滚动 */
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -148,6 +149,27 @@
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+/* 自定义滚动条样式 */
+.content-editor::-webkit-scrollbar {
+  width: 10px; /* 6px滚动条 + 4px右边距 */
+}
+
+.content-editor::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 12px 4px 12px 0; /* 上12px 右4px 下12px 左0 */
+}
+
+.content-editor::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+  border-right: 4px solid transparent; /* 右侧距离边框4px */
+  background-clip: padding-box;
+}
+
+.content-editor::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }
 
 .content-editor:empty::before {
@@ -166,24 +188,55 @@
 
 /* 正文内容区域 - 包含 content-editor 的 form-group */
 .input-card .form-group-content {
-  flex: 1;
+  flex: 1 1 0; /* 占据剩余空间 */
   display: flex;
   flex-direction: column;
-  min-height: 0;
+  min-height: 0; /* 允许flex收缩 */
+  gap: 8px;
+}
+
+.input-card .form-group-content label {
+  flex-shrink: 0;
 }
 
 /* 正文描述区域 - 包含 textarea 的 form-group */
 .input-card .form-group-desc {
-  flex: 1;
+  flex: 1 1 0; /* 占据剩余空间 */
   display: flex;
   flex-direction: column;
-  min-height: 0;
+  min-height: 0; /* 允许flex收缩 */
+  gap: 8px;
+}
+
+.input-card .form-group-desc label {
+  flex-shrink: 0;
 }
 
 .input-card #xhsDesc {
-  flex: 1; /* 占据表单组剩余空间 */
+  flex: 1 1 0; /* 占据表单组剩余空间 */
   min-height: 0; /* 允许flex收缩 */
   resize: none; /* 禁止手动调整，自动占满 */
+}
+
+/* 发布内容滚动条样式 */
+.input-card #xhsDesc::-webkit-scrollbar {
+  width: 10px; /* 6px滚动条 + 4px右边距 */
+}
+
+.input-card #xhsDesc::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 12px 4px 12px 0; /* 上12px 右4px 下12px 左0 */
+}
+
+.input-card #xhsDesc::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+  border-right: 4px solid transparent; /* 右侧距离边框4px */
+  background-clip: padding-box;
+}
+
+.input-card #xhsDesc::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }
 
 .form-row {
@@ -196,8 +249,7 @@
 }
 
 .input-card .btn-generate {
-  margin-top: 8px;
-  flex-shrink: 0;
+  flex-shrink: 0; /* 不收缩 */
 }
 
 /* 旧布局兼容 */

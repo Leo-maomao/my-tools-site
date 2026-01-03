@@ -908,16 +908,22 @@
     }
 
 
-    // 从contentEditor解析内容（文字和图片）
+    // 从contentEditor解析内容（文字和图片，识别格式）
     function parseEditorContent() {
         var items = [];
         var childNodes = elements.contentEditor.childNodes;
 
-        function processNode(node) {
+        function processNode(node, parentStyle) {
+            parentStyle = parentStyle || {};
+
             if (node.nodeType === Node.TEXT_NODE) {
                 var text = node.textContent;
                 if (text.trim()) {
-                    items.push({ type: 'text', text: text });
+                    items.push({
+                        type: 'text',
+                        text: text,
+                        style: parentStyle
+                    });
                 }
             } else if (node.nodeType === Node.ELEMENT_NODE) {
                 if (node.tagName === 'IMG') {
@@ -925,17 +931,42 @@
                     img.src = node.src;
                     items.push({ type: 'image', img: img, src: node.src });
                 } else if (node.tagName === 'BR') {
-                    items.push({ type: 'text', text: '\n' });
+                    items.push({ type: 'text', text: '\n', style: {} });
+                } else if (/^H[1-6]$/.test(node.tagName)) {
+                    // 标题元素
+                    var level = parseInt(node.tagName.charAt(1));
+                    var style = {
+                        isHeading: true,
+                        headingLevel: level,
+                        fontSize: level === 1 ? 1.5 : (level === 2 ? 1.3 : 1.2),
+                        bold: true
+                    };
+                    for (var i = 0; i < node.childNodes.length; i++) {
+                        processNode(node.childNodes[i], style);
+                    }
+                    items.push({ type: 'text', text: '\n', style: {} });
+                } else if (node.tagName === 'STRONG' || node.tagName === 'B') {
+                    // 粗体
+                    var style = {};
+                    for (var key in parentStyle) {
+                        if (parentStyle.hasOwnProperty(key)) {
+                            style[key] = parentStyle[key];
+                        }
+                    }
+                    style.bold = true;
+                    for (var i = 0; i < node.childNodes.length; i++) {
+                        processNode(node.childNodes[i], style);
+                    }
                 } else if (node.tagName === 'DIV' || node.tagName === 'P') {
                     // 块级元素，递归处理子节点后添加换行
                     for (var i = 0; i < node.childNodes.length; i++) {
-                        processNode(node.childNodes[i]);
+                        processNode(node.childNodes[i], parentStyle);
                     }
-                    items.push({ type: 'text', text: '\n' });
+                    items.push({ type: 'text', text: '\n', style: {} });
                 } else {
                     // 其他元素，递归处理子节点
                     for (var i = 0; i < node.childNodes.length; i++) {
-                        processNode(node.childNodes[i]);
+                        processNode(node.childNodes[i], parentStyle);
                     }
                 }
             }
@@ -950,7 +981,7 @@
 
     // 生成图片
     function generateImages() {
-        var coverTitle = elements.coverTitle.value.trim();
+        var coverTitle = elements.coverTitle.value; // 不trim，保留用户的换行
         var editorContent = parseEditorContent();
         var hasContent = editorContent.some(function(item) {
             return (item.type === 'text' && item.text.trim()) || item.type === 'image';
@@ -1038,16 +1069,17 @@
 
         // 设置文字样式
         ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
+        ctx.textBaseline = 'middle'; // 使用 middle 确保垂直精确居中
 
         // 文字换行处理
         var lines = wrapText(ctx, title, area.width);
         var lineHeight = fontSize * cfg.titleLineHeight;
         var totalTextHeight = lines.length * lineHeight;
 
-        // 垂直居中
-        var startY = area.y + (area.height - totalTextHeight) / 2;
+        // 计算完全居中的起始位置（水平+垂直）
         var centerX = area.x + area.width / 2;
+        var centerY = area.y + area.height / 2;
+        var startY = centerY - (totalTextHeight / 2) + (lineHeight / 2);
 
         // 绘制文字（描边 + 填充）
         lines.forEach(function(line, index) {
@@ -1125,14 +1157,14 @@
         ctx.textBaseline = 'top';
         ctx.fillStyle = cfg.textColor;
 
-        // 分割段落并处理图片
+        // 分割段落并处理图片和格式
         var allItems = [];
 
         contentItems.forEach(function(item) {
             if (item.type === 'image') {
                 allItems.push({ type: 'image', img: item.img });
             } else {
-                // 文本段落
+                // 文本段落（带样式）
                 var paragraphs = item.text.split(/\n+/);
                 paragraphs.forEach(function(para, pIndex) {
                     if (para.trim() === '') return;
@@ -1141,6 +1173,7 @@
                         allItems.push({
                             type: 'text',
                             text: line,
+                            style: item.style || {},
                             isLastOfParagraph: lIndex === lines.length - 1 && pIndex < paragraphs.length - 1
                         });
                     });
@@ -1187,15 +1220,35 @@
                     y += drawHeight + paragraphSpacing;
                     currentIdx++;
                 } else {
-                    // 绘制文字
-                    if (y + lineHeight > textY + textHeight) {
+                    // 绘制文字（应用样式）
+                    var style = item.style || {};
+                    var currentFontSize = fontSize;
+                    var currentLineHeight = lineHeight;
+
+                    // 应用字号样式
+                    if (style.fontSize) {
+                        currentFontSize = fontSize * style.fontSize;
+                        currentLineHeight = currentFontSize * cfg.lineHeight;
+                    }
+
+                    if (y + currentLineHeight > textY + textHeight) {
                         break;
                     }
+
+                    // 设置字体（粗体）
+                    var fontWeight = style.bold ? 'bold' : 'normal';
+                    ctx.font = fontWeight + ' ' + cfg.textFont.replace('{size}', currentFontSize);
+
                     ctx.fillText(item.text, textX, y);
-                    y += lineHeight;
-                    if (item.isLastOfParagraph) {
+                    y += currentLineHeight;
+
+                    // 标题后额外间距
+                    if (style.isHeading) {
+                        y += paragraphSpacing;
+                    } else if (item.isLastOfParagraph) {
                         y += paragraphSpacing;
                     }
+
                     currentIdx++;
                 }
             }
@@ -1206,27 +1259,39 @@
         return images;
     }
 
-    // 文字换行处理
+    // 文字换行处理（支持手动换行符 \n）
     function wrapText(ctx, text, maxWidth) {
         var lines = [];
-        var currentLine = '';
 
-        for (var i = 0; i < text.length; i++) {
-            var char = text[i];
-            var testLine = currentLine + char;
-            var metrics = ctx.measureText(testLine);
+        // 先按手动换行符分割
+        var paragraphs = text.split('\n');
 
-            if (metrics.width > maxWidth && currentLine.length > 0) {
-                lines.push(currentLine);
-                currentLine = char;
-            } else {
-                currentLine = testLine;
+        paragraphs.forEach(function(paragraph) {
+            // 如果是空段落，添加空行
+            if (paragraph === '') {
+                lines.push('');
+                return;
             }
-        }
 
-        if (currentLine) {
-            lines.push(currentLine);
-        }
+            // 对每个段落进行自动换行
+            var currentLine = '';
+            for (var i = 0; i < paragraph.length; i++) {
+                var char = paragraph[i];
+                var testLine = currentLine + char;
+                var metrics = ctx.measureText(testLine);
+
+                if (metrics.width > maxWidth && currentLine.length > 0) {
+                    lines.push(currentLine);
+                    currentLine = char;
+                } else {
+                    currentLine = testLine;
+                }
+            }
+
+            if (currentLine) {
+                lines.push(currentLine);
+            }
+        });
 
         return lines;
     }
