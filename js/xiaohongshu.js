@@ -178,6 +178,7 @@
         bgMarkIcon: document.getElementById('bgMarkIcon'),
         bgMarkText: document.getElementById('bgMarkText'),
         deleteBgBtn: document.getElementById('deleteBgBtn'),
+        textAlignSelector: document.getElementById('textAlignSelector'),
 
         // 发布信息
         xhsTitle: document.getElementById('xhsTitle'),
@@ -217,6 +218,7 @@
         // 用户标记的区域（相对于原图的比例）
         coverArea: null,      // { x, y, width, height } 比例值 0-1
         bgArea: null,         // { x, y, width, height } 比例值 0-1
+        textAlign: 'left',    // 正文文字对齐方式: left/center/right
         // AI功能
         selectedModel: null,  // 当前选中的模型
         allModels: [],        // 所有可用模型
@@ -361,6 +363,19 @@
         elements.deleteBgBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             deleteTemplate('bg');
+        });
+
+        // 文字对齐按钮
+        document.querySelectorAll('.align-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var align = this.getAttribute('data-align');
+                state.textAlign = align;
+                // 更新按钮状态
+                document.querySelectorAll('.align-btn').forEach(function(b) {
+                    b.classList.remove('is-active');
+                });
+                this.classList.add('is-active');
+            });
         });
 
         // AI优化按钮事件
@@ -817,6 +832,7 @@
             elements.bgUploadArea.classList.remove('has-image');
             elements.markBgArea.style.display = 'none';
             elements.deleteBgBtn.style.display = 'none';
+            elements.textAlignSelector.style.display = 'none';
             elements.bgTemplateInput.value = '';
             updateMarkButtonState('bg', false);
             Storage.remove('xhs_bg_template');
@@ -902,78 +918,52 @@
                 elements.bgUploadArea.classList.add('has-image');
                 elements.markBgArea.style.display = 'flex';
                 elements.deleteBgBtn.style.display = 'flex';
+                elements.textAlignSelector.style.display = 'block';
             }
         };
         img.src = imageData;
     }
 
 
-    // 从contentEditor解析内容（文字和图片，识别格式）
+    // 从contentEditor解析内容（简化版：使用innerText）
     function parseEditorContent() {
         var items = [];
-        var childNodes = elements.contentEditor.childNodes;
 
-        function processNode(node, parentStyle) {
-            parentStyle = parentStyle || {};
+        // 获取纯文本（包含换行符）
+        var text = elements.contentEditor.innerText || elements.contentEditor.textContent || '';
 
-            if (node.nodeType === Node.TEXT_NODE) {
-                var text = node.textContent;
-                if (text.trim()) {
+        // 按段落分割：连续非空行 = 一个段落，空行 = 段落分隔符
+        var lines = text.split('\n');
+        var currentParagraph = [];
+
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+
+            if (line.trim() === '') {
+                // 空行：先提交当前段落
+                if (currentParagraph.length > 0) {
                     items.push({
-                        type: 'text',
-                        text: text,
-                        style: parentStyle
+                        type: 'paragraph',
+                        text: currentParagraph.join('\n'),  // 段落内的行用\n连接
+                        style: {}
                     });
+                    currentParagraph = [];
                 }
-            } else if (node.nodeType === Node.ELEMENT_NODE) {
-                if (node.tagName === 'IMG') {
-                    var img = new Image();
-                    img.src = node.src;
-                    items.push({ type: 'image', img: img, src: node.src });
-                } else if (node.tagName === 'BR') {
-                    items.push({ type: 'text', text: '\n', style: {} });
-                } else if (/^H[1-6]$/.test(node.tagName)) {
-                    // 标题元素
-                    var level = parseInt(node.tagName.charAt(1));
-                    var style = {
-                        isHeading: true,
-                        headingLevel: level,
-                        fontSize: level === 1 ? 1.5 : (level === 2 ? 1.3 : 1.2),
-                        bold: true
-                    };
-                    for (var i = 0; i < node.childNodes.length; i++) {
-                        processNode(node.childNodes[i], style);
-                    }
-                    items.push({ type: 'text', text: '\n', style: {} });
-                } else if (node.tagName === 'STRONG' || node.tagName === 'B') {
-                    // 粗体
-                    var style = {};
-                    for (var key in parentStyle) {
-                        if (parentStyle.hasOwnProperty(key)) {
-                            style[key] = parentStyle[key];
-                        }
-                    }
-                    style.bold = true;
-                    for (var i = 0; i < node.childNodes.length; i++) {
-                        processNode(node.childNodes[i], style);
-                    }
-                } else if (node.tagName === 'DIV' || node.tagName === 'P') {
-                    // 块级元素，递归处理子节点后添加换行
-                    for (var i = 0; i < node.childNodes.length; i++) {
-                        processNode(node.childNodes[i], parentStyle);
-                    }
-                    items.push({ type: 'text', text: '\n', style: {} });
-                } else {
-                    // 其他元素，递归处理子节点
-                    for (var i = 0; i < node.childNodes.length; i++) {
-                        processNode(node.childNodes[i], parentStyle);
-                    }
-                }
+                // 添加空行标记
+                items.push({ type: 'emptyLine' });
+            } else {
+                // 非空行：加入当前段落
+                currentParagraph.push(line);
             }
         }
 
-        for (var i = 0; i < childNodes.length; i++) {
-            processNode(childNodes[i]);
+        // 处理最后的段落
+        if (currentParagraph.length > 0) {
+            items.push({
+                type: 'paragraph',
+                text: currentParagraph.join('\n'),
+                style: {}
+            });
         }
 
         return items;
@@ -984,7 +974,7 @@
         var coverTitle = elements.coverTitle.value; // 不trim，保留用户的换行
         var editorContent = parseEditorContent();
         var hasContent = editorContent.some(function(item) {
-            return (item.type === 'text' && item.text.trim()) || item.type === 'image';
+            return (item.type === 'paragraph' && item.text.trim()) || item.type === 'image';
         });
 
         if (!state.coverTemplate && !state.bgTemplate) {
@@ -1153,28 +1143,30 @@
 
         // 设置文字样式
         ctx.font = cfg.textFont.replace('{size}', fontSize);
-        ctx.textAlign = 'left';
+        ctx.textAlign = state.textAlign; // 使用用户选择的对齐方式
         ctx.textBaseline = 'top';
         ctx.fillStyle = cfg.textColor;
 
-        // 分割段落并处理图片和格式
+        // 处理内容项：段落自动换行
         var allItems = [];
 
         contentItems.forEach(function(item) {
-            if (item.type === 'image') {
-                allItems.push({ type: 'image', img: item.img });
-            } else {
-                // 文本段落（带样式）
-                var paragraphs = item.text.split(/\n+/);
-                paragraphs.forEach(function(para, pIndex) {
-                    if (para.trim() === '') return;
-                    var lines = wrapText(ctx, para, textWidth);
-                    lines.forEach(function(line, lIndex) {
+            if (item.type === 'emptyLine') {
+                // 空行直接添加
+                allItems.push({ type: 'text', text: '', style: {}, isEmptyLine: true });
+            } else if (item.type === 'paragraph') {
+                // 段落处理：保留段落内的手动换行
+                var paragraphLines = item.text.split('\n');
+                paragraphLines.forEach(function(paraLine, pIndex) {
+                    // 对每行进行自动换行
+                    var wrappedLines = wrapText(ctx, paraLine, textWidth);
+                    wrappedLines.forEach(function(line, lIndex) {
                         allItems.push({
                             type: 'text',
                             text: line,
                             style: item.style || {},
-                            isLastOfParagraph: lIndex === lines.length - 1 && pIndex < paragraphs.length - 1
+                            // 只有段落的最后一个paraLine的最后一行才添加段落间距
+                            isLastOfParagraph: (pIndex === paragraphLines.length - 1) && (lIndex === wrappedLines.length - 1)
                         });
                     });
                 });
@@ -1190,22 +1182,22 @@
             // 绘制背景
             ctx.drawImage(state.bgTemplate, 0, 0, canvas.width, canvas.height);
             ctx.font = cfg.textFont.replace('{size}', fontSize);
-            ctx.textAlign = 'left';
+            ctx.textAlign = state.textAlign; // 使用用户选择的对齐方式
             ctx.textBaseline = 'top';
             ctx.fillStyle = cfg.textColor;
 
             // 绘制本页内容
             var y = textY;
 
-            while (currentIdx < allItems.length && y < textY + textHeight) {
+            while (currentIdx < allItems.length) {
                 var item = allItems[currentIdx];
 
                 if (item.type === 'image') {
                     // 绘制图片（居中）
                     var img = item.img;
                     var imgRatio = img.width / img.height;
-                    var drawHeight = Math.min(maxImageHeight, textHeight - (y - textY) - lineHeight);
-                    if (drawHeight < lineHeight * 2) {
+                    var drawHeight = Math.min(maxImageHeight, textHeight - (y - textY));
+                    if (drawHeight < lineHeight * 2 || y + lineHeight > textY + textHeight) {
                         // 本页空间不够，换页
                         break;
                     }
@@ -1231,25 +1223,51 @@
                         currentLineHeight = currentFontSize * cfg.lineHeight;
                     }
 
+                    // 检查是否超出区域底部
                     if (y + currentLineHeight > textY + textHeight) {
                         break;
                     }
 
-                    // 设置字体（粗体）
-                    var fontWeight = style.bold ? 'bold' : 'normal';
-                    ctx.font = fontWeight + ' ' + cfg.textFont.replace('{size}', currentFontSize);
+                    // 空行直接占据一行高度
+                    if (item.isEmptyLine) {
+                        y += currentLineHeight;
+                        currentIdx++;
+                    } else {
+                        // 设置字体（粗体）
+                        var fontWeight = style.bold ? 'bold' : 'normal';
+                        ctx.font = fontWeight + ' ' + cfg.textFont.replace('{size}', currentFontSize);
 
-                    ctx.fillText(item.text, textX, y);
-                    y += currentLineHeight;
+                        // 根据对齐方式计算X坐标
+                        var drawX;
+                        if (state.textAlign === 'center') {
+                            drawX = textX + textWidth / 2;
+                        } else if (state.textAlign === 'right') {
+                            drawX = textX + textWidth;
+                        } else {
+                            drawX = textX;
+                        }
 
-                    // 标题后额外间距
-                    if (style.isHeading) {
-                        y += paragraphSpacing;
-                    } else if (item.isLastOfParagraph) {
-                        y += paragraphSpacing;
+                        ctx.fillText(item.text, drawX, y);
+                        y += currentLineHeight;
+
+                        // 段落间距：只有在下一行还能放得下时才添加
+                        if (style.isHeading || item.isLastOfParagraph) {
+                            // 检查是否还有下一项，以及添加间距后是否还有空间
+                            var hasNextItem = (currentIdx + 1) < allItems.length;
+                            if (hasNextItem) {
+                                // 预判：如果添加间距后下一行还能放得下，才添加间距
+                                if (y + paragraphSpacing + lineHeight <= textY + textHeight) {
+                                    y += paragraphSpacing;
+                                }
+                                // 否则不添加间距，让下一行在新页面开始
+                            } else {
+                                // 没有下一项了，可以安全添加间距（虽然没用）
+                                y += paragraphSpacing;
+                            }
+                        }
+
+                        currentIdx++;
                     }
-
-                    currentIdx++;
                 }
             }
 
@@ -1259,39 +1277,27 @@
         return images;
     }
 
-    // 文字换行处理（支持手动换行符 \n）
+    // 文字换行处理
     function wrapText(ctx, text, maxWidth) {
         var lines = [];
+        var currentLine = '';
 
-        // 先按手动换行符分割
-        var paragraphs = text.split('\n');
+        for (var i = 0; i < text.length; i++) {
+            var char = text[i];
+            var testLine = currentLine + char;
+            var metrics = ctx.measureText(testLine);
 
-        paragraphs.forEach(function(paragraph) {
-            // 如果是空段落，添加空行
-            if (paragraph === '') {
-                lines.push('');
-                return;
-            }
-
-            // 对每个段落进行自动换行
-            var currentLine = '';
-            for (var i = 0; i < paragraph.length; i++) {
-                var char = paragraph[i];
-                var testLine = currentLine + char;
-                var metrics = ctx.measureText(testLine);
-
-                if (metrics.width > maxWidth && currentLine.length > 0) {
-                    lines.push(currentLine);
-                    currentLine = char;
-                } else {
-                    currentLine = testLine;
-                }
-            }
-
-            if (currentLine) {
+            if (metrics.width > maxWidth && currentLine.length > 0) {
                 lines.push(currentLine);
+                currentLine = char;
+            } else {
+                currentLine = testLine;
             }
-        });
+        }
+
+        if (currentLine) {
+            lines.push(currentLine);
+        }
 
         return lines;
     }
@@ -1548,10 +1554,6 @@
 
     function openAreaMarker(type) {
         areaMarkerState.type = type;
-        areaMarkerState.rect = null;
-        areaMarkerState.selection.classList.remove('is-active');
-        areaMarkerState.confirmBtn.disabled = true;
-        areaMarkerState.centerBtn.disabled = true;
 
         // 设置标题
         var title = type === 'cover' ? '标记标题区域' : '标记正文区域';
@@ -1570,6 +1572,32 @@
         areaMarkerState.canvas.width = img.width * scale;
         areaMarkerState.canvas.height = img.height * scale;
         areaMarkerState.ctx.drawImage(img, 0, 0, areaMarkerState.canvas.width, areaMarkerState.canvas.height);
+
+        // 检查是否已有标记区域
+        var savedArea = type === 'cover' ? state.coverArea : state.bgArea;
+        if (savedArea) {
+            // 将保存的比例值转换为画布坐标
+            areaMarkerState.rect = {
+                x: savedArea.x * img.width * scale,
+                y: savedArea.y * img.height * scale,
+                width: savedArea.width * img.width * scale,
+                height: savedArea.height * img.height * scale
+            };
+            areaMarkerState.selection.classList.add('is-active');
+            areaMarkerState.confirmBtn.disabled = false;
+            areaMarkerState.centerBtn.disabled = false;
+
+            // 延迟更新显示，确保DOM已准备好
+            setTimeout(function() {
+                updateSelectionDisplay();
+            }, 0);
+        } else {
+            // 没有保存的区域，重置状态
+            areaMarkerState.rect = null;
+            areaMarkerState.selection.classList.remove('is-active');
+            areaMarkerState.confirmBtn.disabled = true;
+            areaMarkerState.centerBtn.disabled = true;
+        }
 
         areaMarkerState.modal.classList.add('is-open');
         document.body.style.overflow = 'hidden';
