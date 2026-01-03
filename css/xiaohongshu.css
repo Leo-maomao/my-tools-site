@@ -182,8 +182,21 @@
   max-width: 100%;
   height: auto;
   border-radius: 6px;
-  margin: 8px 0;
   display: block;
+  border: 2px solid transparent;
+  transition: border-color 0.2s ease;
+  margin: 8px 0;
+  cursor: default;
+  user-select: all; /* 确保可以被选中 */
+}
+
+.content-editor img:hover {
+  border-color: var(--accent);
+}
+
+.content-editor img:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* 正文内容区域 - 包含 content-editor 的 form-group */
@@ -477,16 +490,49 @@
   justify-content: space-between;
   margin-bottom: 16px;
   flex-shrink: 0;
+  min-height: 32px; /* 固定最小高度，防止抖动 */
 }
 
 .preview-header h3 {
   font-size: 15px;
   font-weight: 600;
+  flex-shrink: 0; /* 标题不收缩 */
 }
 
 .preview-actions {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  gap: 8px; /* 减小间距，确保一行显示 */
+  flex-wrap: nowrap; /* 不换行 */
+  flex-shrink: 0; /* 不收缩 */
+}
+
+.checkbox-all {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-sub);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap; /* 不换行 */
+}
+
+.checkbox-all input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.selected-count {
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 500;
+  white-space: nowrap; /* 不换行 */
+  flex-shrink: 0;
+  min-width: 60px; /* 固定最小宽度，防止数字变化时推动其他元素 */
+  text-align: center;
 }
 
 .btn-action {
@@ -551,12 +597,11 @@
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: box-shadow 0.2s ease;
 }
 
 .preview-item:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .preview-item img {
@@ -575,6 +620,21 @@
   color: #fff;
   font-size: 11px;
   border-radius: 4px;
+}
+
+.preview-item-checkbox {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  z-index: 2;
+  accent-color: var(--accent);
+}
+
+.preview-item.is-selected {
+  box-shadow: 0 0 0 2px var(--accent);
 }
 
 .preview-item-download {
@@ -754,6 +814,57 @@
   background: var(--accent);
   border-color: var(--accent);
   color: white;
+}
+
+/* 图片大小选择器 */
+.image-size-selector {
+  margin-top: 10px;
+  padding: 10px;
+  background: var(--bg);
+  border-radius: var(--radius-md);
+}
+
+.image-size-selector label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-sub);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.image-size-selector label span {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.image-size-selector input[type="range"] {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border-subtle);
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.image-size-selector input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.image-size-selector input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* 区域标记模态框 */

@@ -219,6 +219,7 @@
         coverArea: null,      // { x, y, width, height } 比例值 0-1
         bgArea: null,         // { x, y, width, height } 比例值 0-1
         textAlign: 'left',    // 正文文字对齐方式: left/center/right
+        imageSize: 68,        // 正文图片大小（百分比）
         // AI功能
         selectedModel: null,  // 当前选中的模型
         allModels: [],        // 所有可用模型
@@ -377,6 +378,16 @@
                 this.classList.add('is-active');
             });
         });
+
+        // 图片大小滑块
+        var imageSizeSlider = document.getElementById('imageSizeSlider');
+        var imageSizeValue = document.getElementById('imageSizeValue');
+        if (imageSizeSlider) {
+            imageSizeSlider.addEventListener('input', function() {
+                state.imageSize = parseInt(this.value);
+                imageSizeValue.textContent = this.value + '%';
+            });
+        }
 
         // AI优化按钮事件
         document.querySelectorAll('.btn-ai-optimize').forEach(function(btn) {
@@ -833,6 +844,7 @@
             elements.markBgArea.style.display = 'none';
             elements.deleteBgBtn.style.display = 'none';
             elements.textAlignSelector.style.display = 'none';
+            document.getElementById('imageSizeSelector').style.display = 'none';
             elements.bgTemplateInput.value = '';
             updateMarkButtonState('bg', false);
             Storage.remove('xhs_bg_template');
@@ -854,6 +866,16 @@
                 reader.onload = function(event) {
                     var img = document.createElement('img');
                     img.src = event.target.result;
+                    img.style.maxWidth = '100%';
+                    img.style.height = 'auto';
+                    img.contentEditable = 'false';
+                    img.draggable = false;
+
+                    // 设置初始宽度为编辑器宽度的 100%（填满）
+                    var editorWidth = elements.contentEditor.offsetWidth - 28;
+                    var initialWidth = editorWidth;
+                    img.style.width = initialWidth + 'px';
+
                     // 插入图片到光标位置
                     var selection = window.getSelection();
                     if (selection.rangeCount > 0) {
@@ -919,52 +941,153 @@
                 elements.markBgArea.style.display = 'flex';
                 elements.deleteBgBtn.style.display = 'flex';
                 elements.textAlignSelector.style.display = 'block';
+                document.getElementById('imageSizeSelector').style.display = 'block';
             }
         };
         img.src = imageData;
     }
 
 
-    // 从contentEditor解析内容（简化版：使用innerText）
+    // 从contentEditor解析内容（支持文字和图片）
     function parseEditorContent() {
         var items = [];
 
-        // 获取纯文本（包含换行符）
-        var text = elements.contentEditor.innerText || elements.contentEditor.textContent || '';
+        // 检查是否有图片
+        var hasImages = elements.contentEditor.querySelectorAll('img').length > 0;
 
-        // 按段落分割：连续非空行 = 一个段落，空行 = 段落分隔符
-        var lines = text.split('\n');
-        var currentParagraph = [];
+        if (!hasImages) {
+            // 没有图片，使用简单的文本解析（保证空行正常）
+            var text = elements.contentEditor.innerText || elements.contentEditor.textContent || '';
+            var lines = text.split('\n');
+            var currentParagraph = [];
 
-        for (var i = 0; i < lines.length; i++) {
-            var line = lines[i];
-
-            if (line.trim() === '') {
-                // 空行：先提交当前段落
-                if (currentParagraph.length > 0) {
-                    items.push({
-                        type: 'paragraph',
-                        text: currentParagraph.join('\n'),  // 段落内的行用\n连接
-                        style: {}
-                    });
-                    currentParagraph = [];
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i];
+                if (line.trim() === '') {
+                    if (currentParagraph.length > 0) {
+                        items.push({
+                            type: 'paragraph',
+                            text: currentParagraph.join('\n'),
+                            style: {}
+                        });
+                        currentParagraph = [];
+                    }
+                    items.push({ type: 'emptyLine' });
+                } else {
+                    currentParagraph.push(line);
                 }
-                // 添加空行标记
-                items.push({ type: 'emptyLine' });
-            } else {
-                // 非空行：加入当前段落
-                currentParagraph.push(line);
+            }
+
+            if (currentParagraph.length > 0) {
+                items.push({
+                    type: 'paragraph',
+                    text: currentParagraph.join('\n'),
+                    style: {}
+                });
+            }
+
+            return items;
+        }
+
+        // 有图片，需要遍历 DOM
+        var textLines = []; // 收集文本行（包括空行）
+
+        // 提交文本行到 items
+        function flushTextLines() {
+            if (textLines.length === 0) return;
+
+            var currentParagraph = [];
+            for (var i = 0; i < textLines.length; i++) {
+                var line = textLines[i];
+                if (line.trim() === '') {
+                    // 空行
+                    if (currentParagraph.length > 0) {
+                        items.push({
+                            type: 'paragraph',
+                            text: currentParagraph.join('\n'),
+                            style: {}
+                        });
+                        currentParagraph = [];
+                    }
+                    items.push({ type: 'emptyLine' });
+                } else {
+                    currentParagraph.push(line);
+                }
+            }
+
+            if (currentParagraph.length > 0) {
+                items.push({
+                    type: 'paragraph',
+                    text: currentParagraph.join('\n'),
+                    style: {}
+                });
+            }
+
+            textLines = [];
+        }
+
+        // 递归处理节点（支持嵌套的图片）
+        function processNode(node) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                // 文本节点：按换行符分割
+                var text = node.textContent;
+                if (text) {
+                    var lines = text.split('\n');
+                    for (var j = 0; j < lines.length; j++) {
+                        textLines.push(lines[j]);
+                    }
+                }
+            } else if (node.nodeType === Node.ELEMENT_NODE) {
+                if (node.tagName === 'IMG') {
+                    // 图片：先提交文本，再添加图片
+                    flushTextLines();
+
+                    var img = new Image();
+                    img.src = node.src;
+                    if (node.style.width) {
+                        img.displayWidth = parseInt(node.style.width);
+                    }
+                    items.push({ type: 'image', img: img, src: node.src });
+                } else if (node.tagName === 'BR') {
+                    // BR标签代表换行
+                    textLines.push('');
+                } else if (node.tagName === 'DIV' || node.tagName === 'P') {
+                    // 块级元素：检查是否包含图片
+                    var hasImg = node.querySelector('img');
+                    if (hasImg) {
+                        // 包含图片，递归处理子节点
+                        for (var k = 0; k < node.childNodes.length; k++) {
+                            processNode(node.childNodes[k]);
+                        }
+                        // 块级元素结束后添加换行
+                        if (textLines.length > 0 && textLines[textLines.length - 1] !== '') {
+                            textLines.push('');
+                        }
+                    } else {
+                        // 不包含图片，直接提取文本
+                        var text = node.innerText || node.textContent || '';
+                        if (text) {
+                            var lines = text.split('\n');
+                            for (var j = 0; j < lines.length; j++) {
+                                textLines.push(lines[j]);
+                            }
+                        } else {
+                            // 空的 DIV/P 代表空行
+                            textLines.push('');
+                        }
+                    }
+                }
             }
         }
 
-        // 处理最后的段落
-        if (currentParagraph.length > 0) {
-            items.push({
-                type: 'paragraph',
-                text: currentParagraph.join('\n'),
-                style: {}
-            });
+        // 遍历编辑器的直接子节点
+        var childNodes = elements.contentEditor.childNodes;
+        for (var i = 0; i < childNodes.length; i++) {
+            processNode(childNodes[i]);
         }
+
+        // 提交剩余的文本
+        flushTextLines();
 
         return items;
     }
@@ -981,44 +1104,75 @@
             alert('请至少上传一个模板图片');
             return;
         }
-        
-        // 埋点：小红书图片生成
-        if (typeof trackEvent === 'function') {
-            trackEvent('xhs_generate', {
-                has_cover: !!(state.coverTemplate && coverTitle),
-                has_content: !!(state.bgTemplate && hasContent)
+
+        // 检查是否有图片需要等待加载
+        var imagesToLoad = editorContent.filter(function(item) {
+            return item.type === 'image';
+        });
+
+        if (imagesToLoad.length > 0) {
+            // 有图片，需要等待所有图片加载完成
+            var loadedCount = 0;
+            var allLoaded = function() {
+                loadedCount++;
+                if (loadedCount === imagesToLoad.length) {
+                    // 所有图片加载完成，开始生成
+                    doGenerate();
+                }
+            };
+
+            imagesToLoad.forEach(function(item) {
+                if (item.img.complete && item.img.naturalWidth > 0) {
+                    allLoaded();
+                } else {
+                    item.img.onload = allLoaded;
+                    item.img.onerror = allLoaded;
+                }
             });
+        } else {
+            // 没有图片，直接生成
+            doGenerate();
         }
 
-        state.generatedImages = [];
-        elements.previewContainer.innerHTML = '';
-
-        // 生成封面图
-        if (state.coverTemplate && coverTitle) {
-            var coverImage = generateCoverImage(coverTitle);
-            state.generatedImages.push({ type: 'cover', data: coverImage, name: '封面图' });
-        }
-
-        // 生成正文图
-        if (state.bgTemplate && hasContent) {
-            var contentImages = generateContentImages(editorContent);
-            contentImages.forEach(function(img, index) {
-                state.generatedImages.push({
-                    type: 'content',
-                    data: img,
-                    name: '正文图 ' + (index + 1)
+        function doGenerate() {
+            // 埋点：小红书图片生成
+            if (typeof trackEvent === 'function') {
+                trackEvent('xhs_generate', {
+                    has_cover: !!(state.coverTemplate && coverTitle),
+                    has_content: !!(state.bgTemplate && hasContent)
                 });
-            });
+            }
+
+            state.generatedImages = [];
+            elements.previewContainer.innerHTML = '';
+
+            // 生成封面图
+            if (state.coverTemplate && coverTitle) {
+                var coverImage = generateCoverImage(coverTitle);
+                state.generatedImages.push({ type: 'cover', data: coverImage, name: '封面图' });
+            }
+
+            // 生成正文图
+            if (state.bgTemplate && hasContent) {
+                var contentImages = generateContentImages(editorContent);
+                contentImages.forEach(function(img, index) {
+                    state.generatedImages.push({
+                        type: 'content',
+                        data: img,
+                        name: '正文图 ' + (index + 1)
+                    });
+                });
+            }
+
+            // 显示预览
+            renderPreview();
+
+            // 更新复制区域
+            updateCopySection();
+
+            // 启用下载按钮
+            elements.downloadAllBtn.disabled = state.generatedImages.length === 0;
         }
-
-        // 显示预览
-        renderPreview();
-
-        // 更新复制区域
-        updateCopySection();
-
-        // 启用下载按钮
-        elements.downloadAllBtn.disabled = state.generatedImages.length === 0;
     }
 
     // 生成封面图
@@ -1170,11 +1324,14 @@
                         });
                     });
                 });
+            } else if (item.type === 'image') {
+                // 图片直接添加
+                allItems.push({ type: 'image', img: item.img });
             }
         });
 
-        // 图片最大高度（区域高度的40%）
-        var maxImageHeight = textHeight * 0.4;
+        // 图片最大高度（不限制，让图片完整显示）
+        var maxImageHeight = textHeight * 2; // 允许图片超过一页高度
         var images = [];
         var currentIdx = 0;
 
@@ -1195,22 +1352,49 @@
                 if (item.type === 'image') {
                     // 绘制图片（居中）
                     var img = item.img;
-                    var imgRatio = img.width / img.height;
-                    var drawHeight = Math.min(maxImageHeight, textHeight - (y - textY));
-                    if (drawHeight < lineHeight * 2 || y + lineHeight > textY + textHeight) {
-                        // 本页空间不够，换页
-                        break;
+
+                    // 等待图片加载完成
+                    if (!img.complete || img.naturalWidth === 0) {
+                        // 图片未加载，跳过
+                        currentIdx++;
+                        continue;
                     }
-                    var drawWidth = drawHeight * imgRatio;
-                    if (drawWidth > textWidth) {
-                        drawWidth = textWidth;
-                        drawHeight = drawWidth / imgRatio;
+
+                    var imgRatio = img.naturalWidth / img.naturalHeight;
+
+                    // 图片使用用户设置的大小（默认68%）
+                    var drawWidth = textWidth * (state.imageSize / 100);
+                    var drawHeight = drawWidth / imgRatio;
+
+                    // 检查图片高度是否超出剩余空间
+                    var remainingHeight = textY + textHeight - y;
+                    if (drawHeight > remainingHeight) {
+                        // 如果在页面顶部，按照剩余空间调整高度
+                        if (y === textY || remainingHeight >= textHeight * 0.5) {
+                            drawHeight = Math.min(remainingHeight - 20, textHeight * 0.8); // 留20px边距，且不超过区域80%
+                            drawWidth = drawHeight * imgRatio;
+                            // 确保宽度不超过用户设置的大小
+                            var maxWidth = textWidth * (state.imageSize / 100);
+                            if (drawWidth > maxWidth) {
+                                drawWidth = maxWidth;
+                                drawHeight = drawWidth / imgRatio;
+                            }
+                        } else {
+                            // 不在顶部且空间不够，换页
+                            break;
+                        }
                     }
-                    // 居中绘制
+
+                    // 绘制图片
                     var imgX = textX + (textWidth - drawWidth) / 2;
                     ctx.drawImage(img, imgX, y, drawWidth, drawHeight);
                     y += drawHeight + paragraphSpacing;
                     currentIdx++;
+
+                    // 如果绘制后超出页面，下一项从新页开始
+                    if (y > textY + textHeight) {
+                        break;
+                    }
                 } else {
                     // 绘制文字（应用样式）
                     var style = item.style || {};
@@ -1228,9 +1412,9 @@
                         break;
                     }
 
-                    // 空行直接占据一行高度
+                    // 空行：添加段落间距（不是行高）
                     if (item.isEmptyLine) {
-                        y += currentLineHeight;
+                        y += paragraphSpacing;
                         currentIdx++;
                     } else {
                         // 设置字体（粗体）
@@ -1250,20 +1434,26 @@
                         ctx.fillText(item.text, drawX, y);
                         y += currentLineHeight;
 
-                        // 段落间距：只有在下一行还能放得下时才添加
+                        // 段落间距：只在段落末尾且下一项不是空行时添加
                         if (style.isHeading || item.isLastOfParagraph) {
-                            // 检查是否还有下一项，以及添加间距后是否还有空间
-                            var hasNextItem = (currentIdx + 1) < allItems.length;
-                            if (hasNextItem) {
-                                // 预判：如果添加间距后下一行还能放得下，才添加间距
-                                if (y + paragraphSpacing + lineHeight <= textY + textHeight) {
+                            // 检查下一项是否是空行
+                            var nextItem = allItems[currentIdx + 1];
+                            var nextIsEmptyLine = nextItem && nextItem.isEmptyLine;
+
+                            if (!nextIsEmptyLine) {
+                                // 下一项不是空行，添加段落间距
+                                var hasNextItem = (currentIdx + 1) < allItems.length;
+                                if (hasNextItem) {
+                                    // 预判：如果添加间距后下一行还能放得下，才添加间距
+                                    if (y + paragraphSpacing + lineHeight <= textY + textHeight) {
+                                        y += paragraphSpacing;
+                                    }
+                                } else {
+                                    // 没有下一项了，可以安全添加间距
                                     y += paragraphSpacing;
                                 }
-                                // 否则不添加间距，让下一行在新页面开始
-                            } else {
-                                // 没有下一项了，可以安全添加间距（虽然没用）
-                                y += paragraphSpacing;
                             }
+                            // 如果下一项是空行，不添加间距（由空行自己添加）
                         }
 
                         currentIdx++;
