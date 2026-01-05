@@ -1,0 +1,409 @@
+/* ============================================
+   Modal 弹窗组件
+   现代化设计风格
+   ============================================ */
+
+/* 遮罩层 */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: var(--modal-overlay-bg, rgba(15, 23, 42, 0.6));
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-overlay.modal-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* 弹窗主体 */
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: var(--modal-max-width, 480px);
+  max-height: calc(100vh - 3rem);
+  background: var(--modal-bg, linear-gradient(145deg, #ffffff 0%, #f8fafc 100%));
+  border-radius: var(--modal-radius, 1rem);
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.03),
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 40px 60px -15px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  transform: scale(0.92) translateY(10px);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-overlay.modal-open .modal {
+  transform: scale(1) translateY(0);
+}
+
+/* 尺寸变体 */
+.modal-sm {
+  --modal-max-width: 360px;
+}
+
+.modal-lg {
+  --modal-max-width: 640px;
+}
+
+.modal-xl {
+  --modal-max-width: 900px;
+}
+
+.modal-full {
+  --modal-max-width: calc(100vw - 2rem);
+  max-height: calc(100vh - 2rem);
+}
+
+/* 头部 */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  background: transparent;
+  border-bottom: 1px solid var(--modal-border, rgba(0, 0, 0, 0.06));
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
+  letter-spacing: -0.01em;
+}
+
+/* 关闭按钮 */
+.modal-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0.5rem;
+  color: var(--text-muted, #94a3b8);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.modal-close:hover {
+  background-color: var(--bg-hover, rgba(0, 0, 0, 0.04));
+  color: var(--text-primary, #0f172a);
+  transform: rotate(90deg);
+}
+
+.modal-close svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  stroke-width: 2.5;
+}
+
+.modal-close-absolute {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1;
+}
+
+/* 内容区 */
+.modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  max-height: calc(100vh - 220px);
+  color: var(--text-secondary, #475569);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+/* 滚动条 */
+.modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb, #cbd5e1);
+  border-radius: 3px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover, #94a3b8);
+}
+
+/* 底部 */
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  background: var(--modal-footer-bg, rgba(248, 250, 252, 0.8));
+  border-top: 1px solid var(--modal-border, rgba(0, 0, 0, 0.06));
+}
+
+.modal-footer .btn {
+  min-width: 90px;
+}
+
+/* ============================================
+   确认对话框样式 - 现代化设计
+   ============================================ */
+
+.modal-confirm {
+  text-align: center;
+  border-radius: 1.25rem;
+}
+
+.modal-confirm-body {
+  padding: 2rem 2rem 1.5rem;
+}
+
+.modal-confirm-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 1.25rem;
+  border-radius: 50%;
+  position: relative;
+}
+
+/* 图标外圈动画 */
+.modal-confirm-icon::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  opacity: 0.3;
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+}
+
+.modal-confirm-icon svg {
+  width: 2rem;
+  height: 2rem;
+  stroke-width: 2;
+}
+
+/* 图标颜色变体 */
+.modal-confirm-icon-warning {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.2) 100%);
+  color: var(--color-warning, #f59e0b);
+}
+
+.modal-confirm-icon-warning::before {
+  background: var(--color-warning, #f59e0b);
+}
+
+.modal-confirm-icon-danger {
+  background: linear-gradient(135deg, rgba(248, 113, 113, 0.15) 0%, rgba(239, 68, 68, 0.2) 100%);
+  color: var(--color-danger, #ef4444);
+}
+
+.modal-confirm-icon-danger::before {
+  background: var(--color-danger, #ef4444);
+}
+
+.modal-confirm-icon-success {
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.15) 0%, rgba(16, 185, 129, 0.2) 100%);
+  color: var(--color-success, #10b981);
+}
+
+.modal-confirm-icon-success::before {
+  background: var(--color-success, #10b981);
+}
+
+.modal-confirm-icon-info {
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.15) 0%, rgba(59, 130, 246, 0.2) 100%);
+  color: var(--color-info, #3b82f6);
+}
+
+.modal-confirm-icon-info::before {
+  background: var(--color-info, #3b82f6);
+}
+
+.modal-confirm-title {
+  margin: 0 0 0.625rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
+  letter-spacing: -0.01em;
+}
+
+.modal-confirm-text {
+  margin: 0;
+  color: var(--text-secondary, #64748b);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.modal-confirm-footer {
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.25rem 2rem 1.75rem;
+  background: transparent;
+  border-top: none;
+}
+
+.modal-confirm-footer .btn {
+  min-width: 110px;
+  padding: 0.625rem 1.5rem;
+  font-weight: 500;
+  border-radius: 0.625rem;
+}
+
+/* 按钮样式增强 */
+.modal-confirm-footer .btn-outline {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  color: var(--text-secondary, #64748b);
+}
+
+.modal-confirm-footer .btn-outline:hover {
+  background: var(--bg-hover, #f1f5f9);
+  border-color: var(--border-hover, #cbd5e1);
+  color: var(--text-primary, #0f172a);
+}
+
+.modal-confirm-footer .btn-primary {
+  background: linear-gradient(135deg, var(--color-primary, #3b82f6) 0%, var(--color-primary-dark, #2563eb) 100%);
+  border: none;
+  color: #ffffff;
+  box-shadow: 0 2px 8px -2px rgba(59, 130, 246, 0.4);
+}
+
+.modal-confirm-footer .btn-primary:hover {
+  box-shadow: 0 4px 12px -2px rgba(59, 130, 246, 0.5);
+  transform: translateY(-1px);
+}
+
+.modal-confirm-footer .btn-danger {
+  background: linear-gradient(135deg, var(--color-danger, #ef4444) 0%, #dc2626 100%);
+  border: none;
+  color: #ffffff;
+  box-shadow: 0 2px 8px -2px rgba(239, 68, 68, 0.4);
+}
+
+.modal-confirm-footer .btn-danger:hover {
+  box-shadow: 0 4px 12px -2px rgba(239, 68, 68, 0.5);
+  transform: translateY(-1px);
+}
+
+/* ============================================
+   响应式适配
+   ============================================ */
+
+@media (max-width: 640px) {
+  .modal-overlay {
+    padding: 0.5rem;
+    align-items: flex-end;
+  }
+  
+  .modal {
+    --modal-max-width: 100%;
+    border-radius: 1rem 1rem 0 0;
+    transform: translateY(100%);
+  }
+  
+  .modal-overlay.modal-open .modal {
+    transform: translateY(0);
+  }
+  
+  .modal-confirm {
+    border-radius: 1.25rem 1.25rem 0 0;
+  }
+  
+  .modal-footer,
+  .modal-confirm-footer {
+    flex-direction: column-reverse;
+    gap: 0.625rem;
+  }
+  
+  .modal-footer .btn,
+  .modal-confirm-footer .btn {
+    width: 100%;
+  }
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .modal {
+    background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+  }
+  
+  .modal-header {
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+  
+  .modal-title {
+    color: #f1f5f9;
+  }
+  
+  .modal-close {
+    color: #64748b;
+  }
+  
+  .modal-close:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #f1f5f9;
+  }
+  
+  .modal-body {
+    color: #94a3b8;
+  }
+  
+  .modal-footer {
+    background: rgba(15, 23, 42, 0.6);
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+  
+  .modal-confirm-title {
+    color: #f1f5f9;
+  }
+  
+  .modal-confirm-text {
+    color: #94a3b8;
+  }
+  
+  .modal-confirm-footer .btn-outline {
+    background: #1e293b;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+  }
+  
+  .modal-confirm-footer .btn-outline:hover {
+    background: #334155;
+    color: #f1f5f9;
+  }
+}

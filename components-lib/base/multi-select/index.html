@@ -1,0 +1,119 @@
+<!-- Multi-Select 多选下拉组件 -->
+
+<!-- 基础多选 -->
+<div class="multi-select" style="max-width: 300px;">
+  <div class="multi-select-trigger">
+    <div class="multi-select-tags">
+      <span class="multi-select-placeholder">请选择标签</span>
+    </div>
+    <svg class="multi-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="m6 9 6 6 6-6"/>
+    </svg>
+  </div>
+</div>
+
+<!-- 已选中状态 -->
+<div class="multi-select" style="max-width: 300px;">
+  <div class="multi-select-trigger">
+    <div class="multi-select-tags">
+      <span class="multi-select-tag">
+        <span class="multi-select-tag-text">前端开发</span>
+        <button class="multi-select-tag-remove" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </span>
+      <span class="multi-select-tag">
+        <span class="multi-select-tag-text">React</span>
+        <button class="multi-select-tag-remove" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </span>
+      <span class="multi-select-tag">
+        <span class="multi-select-tag-text">TypeScript</span>
+        <button class="multi-select-tag-remove" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </span>
+    </div>
+    <svg class="multi-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="m6 9 6 6 6-6"/>
+    </svg>
+  </div>
+</div>
+
+<!-- 展开状态 -->
+<div class="multi-select multi-select-open" style="max-width: 320px;">
+  <div class="multi-select-trigger">
+    <div class="multi-select-tags">
+      <span class="multi-select-tag">
+        <span class="multi-select-tag-text">前端开发</span>
+        <button class="multi-select-tag-remove" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </span>
+      <span class="multi-select-tag">
+        <span class="multi-select-tag-text">后端开发</span>
+        <button class="multi-select-tag-remove" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </span>
+    </div>
+    <svg class="multi-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="m6 9 6 6 6-6"/>
+    </svg>
+  </div>
+  <div class="multi-select-dropdown" style="position: relative; opacity: 1; visibility: visible; transform: none;">
+    <div class="multi-select-search">
+      <input type="text" class="multi-select-search-input" placeholder="搜索...">
+    </div>
+    <ul class="multi-select-options">
+      <li class="multi-select-option multi-select-option-selected">
+        <span class="multi-select-checkbox">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+        </span>
+        <span class="multi-select-option-text">前端开发</span>
+      </li>
+      <li class="multi-select-option multi-select-option-selected">
+        <span class="multi-select-checkbox">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+        </span>
+        <span class="multi-select-option-text">后端开发</span>
+      </li>
+      <li class="multi-select-option">
+        <span class="multi-select-checkbox">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+        </span>
+        <span class="multi-select-option-text">UI/UX 设计</span>
+      </li>
+      <li class="multi-select-option">
+        <span class="multi-select-checkbox">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+        </span>
+        <span class="multi-select-option-text">产品经理</span>
+      </li>
+    </ul>
+    <div class="multi-select-actions">
+      <button class="multi-select-action" type="button">全选</button>
+      <button class="multi-select-action" type="button">清空</button>
+    </div>
+  </div>
+</div>
+

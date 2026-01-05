@@ -1,0 +1,32 @@
+<!-- 基础搜索框 -->
+<div class="search" style="max-width: 280px;">
+  <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="11" cy="11" r="8"/>
+    <path d="m21 21-4.35-4.35"/>
+  </svg>
+  <input type="text" class="search-input" placeholder="搜索...">
+</div>
+
+<!-- 带边框样式 -->
+<div class="search search-bordered" style="max-width: 280px;">
+  <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="11" cy="11" r="8"/>
+    <path d="m21 21-4.35-4.35"/>
+  </svg>
+  <input type="text" class="search-input" placeholder="搜索文章、标签...">
+</div>
+
+<!-- 带搜索建议（展开状态） -->
+<div style="display: flex; flex-direction: column; gap: 0; max-width: 280px;">
+  <div class="search" style="width: 100%;">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/>
+      <path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input type="text" class="search-input" placeholder="搜索..." value="设计">
+  </div>
+  <div style="background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-top: 4px; overflow: hidden;">
+    <div style="padding: 8px 12px; cursor: pointer; font-size: 14px;"><span style="color: #3b82f6; font-weight: 500;">设计</span>规范文档</div>
+    <div style="padding: 8px 12px; cursor: pointer; font-size: 14px; background: rgba(0,0,0,0.03);">UI <span style="color: #3b82f6; font-weight: 500;">设计</span>系统</div>
+  </div>
+</div>

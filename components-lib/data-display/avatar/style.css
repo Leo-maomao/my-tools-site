@@ -1,0 +1,186 @@
+/* ============================================
+   Avatar 头像组件
+   ============================================ */
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--avatar-size, 2.5rem);
+  height: var(--avatar-size, 2.5rem);
+  font-size: var(--avatar-font-size, 1rem);
+  font-weight: 500;
+  color: var(--avatar-color, #ffffff);
+  background-color: var(--avatar-bg, var(--color-primary, #3b82f6));
+  border-radius: var(--avatar-radius, 50%);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 尺寸变体 */
+.avatar-xs {
+  --avatar-size: 1.5rem;
+  --avatar-font-size: 0.625rem;
+}
+
+.avatar-sm {
+  --avatar-size: 2rem;
+  --avatar-font-size: 0.75rem;
+}
+
+.avatar-lg {
+  --avatar-size: 3rem;
+  --avatar-font-size: 1.25rem;
+}
+
+.avatar-xl {
+  --avatar-size: 4rem;
+  --avatar-font-size: 1.5rem;
+}
+
+.avatar-2xl {
+  --avatar-size: 5rem;
+  --avatar-font-size: 2rem;
+}
+
+/* 形状变体 */
+.avatar-square {
+  --avatar-radius: var(--border-radius-md, 0.5rem);
+}
+
+/* 颜色变体 */
+.avatar-secondary {
+  --avatar-bg: var(--color-secondary, #6b7280);
+}
+
+.avatar-success {
+  --avatar-bg: var(--color-success, #10b981);
+}
+
+.avatar-warning {
+  --avatar-bg: var(--color-warning, #f59e0b);
+}
+
+.avatar-danger {
+  --avatar-bg: var(--color-danger, #ef4444);
+}
+
+/* 带边框 */
+.avatar-bordered {
+  border: 2px solid var(--avatar-border, var(--bg-card, #ffffff));
+  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
+}
+
+/* ============================================
+   头像组
+   ============================================ */
+
+.avatar-group {
+  display: flex;
+  align-items: center;
+}
+
+.avatar-group .avatar {
+  margin-left: calc(var(--avatar-size, 2.5rem) * -0.3);
+  border: 2px solid var(--bg-card, #ffffff);
+  transition: transform 0.15s ease;
+}
+
+.avatar-group .avatar:first-child {
+  margin-left: 0;
+}
+
+.avatar-group .avatar:hover {
+  transform: translateY(-2px);
+  z-index: 1;
+}
+
+/* 更多计数 */
+.avatar-group-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--avatar-size, 2.5rem);
+  height: var(--avatar-size, 2.5rem);
+  margin-left: calc(var(--avatar-size, 2.5rem) * -0.3);
+  font-size: calc(var(--avatar-font-size, 1rem) * 0.875);
+  font-weight: 500;
+  color: var(--text-secondary, #6b7280);
+  background-color: var(--bg-secondary, #f8fafc);
+  border: 2px solid var(--bg-card, #ffffff);
+  border-radius: 50%;
+}
+
+/* ============================================
+   带状态
+   ============================================ */
+
+.avatar-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.avatar-status {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: calc(var(--avatar-size, 2.5rem) * 0.3);
+  height: calc(var(--avatar-size, 2.5rem) * 0.3);
+  border: 2px solid var(--bg-card, #ffffff);
+  border-radius: 50%;
+}
+
+.avatar-status-online {
+  background-color: var(--color-success, #10b981);
+}
+
+.avatar-status-offline {
+  background-color: var(--text-muted, #9ca3af);
+}
+
+.avatar-status-busy {
+  background-color: var(--color-danger, #ef4444);
+}
+
+.avatar-status-away {
+  background-color: var(--color-warning, #f59e0b);
+}
+
+/* ============================================
+   带文字信息
+   ============================================ */
+
+.avatar-with-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatar-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.avatar-name {
+  font-weight: 500;
+  color: var(--text-primary, #111827);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.avatar-desc {
+  font-size: 0.8125rem;
+  color: var(--text-muted, #9ca3af);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+

@@ -1,0 +1,115 @@
+.timeline {
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border-color, #e5e7eb);
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 1.5rem;
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -1.5rem;
+  top: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--bg-card, #ffffff);
+  border: 2px solid var(--border-color, #e5e7eb);
+  z-index: 1;
+}
+
+.timeline-item-primary .timeline-dot {
+  border-color: var(--color-primary, #3b82f6);
+  background: var(--color-primary, #3b82f6);
+}
+
+.timeline-item-success .timeline-dot {
+  border-color: var(--color-success, #10b981);
+  background: var(--color-success, #10b981);
+}
+
+.timeline-item-warning .timeline-dot {
+  border-color: var(--color-warning, #f59e0b);
+  background: var(--color-warning, #f59e0b);
+}
+
+.timeline-item-error .timeline-dot {
+  border-color: var(--color-error, #ef4444);
+  background: var(--color-error, #ef4444);
+}
+
+.timeline-content {
+  padding-left: 0.5rem;
+}
+
+.timeline-title {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-primary, #111827);
+  margin-bottom: 0.25rem;
+}
+
+.timeline-desc {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6b7280);
+  line-height: 1.5;
+}
+
+.timeline-time {
+  font-size: 0.75rem;
+  color: var(--text-muted, #9ca3af);
+  margin-top: 0.25rem;
+}
+
+.timeline-alternate {
+  padding-left: 0;
+}
+
+.timeline-alternate::before {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.timeline-alternate .timeline-item {
+  width: 50%;
+  padding-right: 2rem;
+}
+
+.timeline-alternate .timeline-item:nth-child(even) {
+  margin-left: 50%;
+  padding-right: 0;
+  padding-left: 2rem;
+}
+
+.timeline-alternate .timeline-dot {
+  left: auto;
+  right: -6px;
+}
+
+.timeline-alternate .timeline-item:nth-child(even) .timeline-dot {
+  right: auto;
+  left: -6px;
+}
+
+.timeline-alternate .timeline-item:nth-child(odd) .timeline-content {
+  text-align: right;
+  padding-left: 0;
+  padding-right: 0.5rem;
+}
+

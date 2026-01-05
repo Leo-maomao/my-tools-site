@@ -1,0 +1,112 @@
+/* ============================================
+   Grid 网格组件
+   ============================================ */
+
+/* CSS Grid */
+.grid {
+  display: grid;
+  gap: var(--grid-gap, 1rem);
+}
+
+/* 列数 */
+.grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
+.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-cols-5 { grid-template-columns: repeat(5, 1fr); }
+.grid-cols-6 { grid-template-columns: repeat(6, 1fr); }
+
+/* 响应式网格 */
+.grid-responsive {
+  grid-template-columns: repeat(auto-fill, minmax(var(--grid-min-width, 280px), 1fr));
+}
+
+/* 间距变体 */
+.grid-gap-none { --grid-gap: 0; }
+.grid-gap-sm { --grid-gap: 0.5rem; }
+.grid-gap-md { --grid-gap: 1rem; }
+.grid-gap-lg { --grid-gap: 1.5rem; }
+.grid-gap-xl { --grid-gap: 2rem; }
+
+/* 跨列 */
+.col-span-1 { grid-column: span 1; }
+.col-span-2 { grid-column: span 2; }
+.col-span-3 { grid-column: span 3; }
+.col-span-4 { grid-column: span 4; }
+.col-span-5 { grid-column: span 5; }
+.col-span-6 { grid-column: span 6; }
+.col-span-full { grid-column: 1 / -1; }
+
+/* 响应式列数 */
+@media (max-width: 1024px) {
+  .grid-cols-4 { grid-template-columns: repeat(3, 1fr); }
+  .grid-cols-5 { grid-template-columns: repeat(3, 1fr); }
+  .grid-cols-6 { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .grid-cols-3 { grid-template-columns: repeat(2, 1fr); }
+  .grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-cols-5 { grid-template-columns: repeat(2, 1fr); }
+  .grid-cols-6 { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .grid-cols-2,
+  .grid-cols-3,
+  .grid-cols-4,
+  .grid-cols-5,
+  .grid-cols-6 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   Flex Row (12列栅格)
+   ============================================ */
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: calc(var(--row-gap, 1rem) / -2);
+  margin-right: calc(var(--row-gap, 1rem) / -2);
+}
+
+.row > * {
+  padding-left: calc(var(--row-gap, 1rem) / 2);
+  padding-right: calc(var(--row-gap, 1rem) / 2);
+  margin-bottom: var(--row-gap, 1rem);
+}
+
+/* 自动宽度列 */
+.col {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 12列系统 */
+.col-1 { flex: 0 0 8.333%; max-width: 8.333%; }
+.col-2 { flex: 0 0 16.667%; max-width: 16.667%; }
+.col-3 { flex: 0 0 25%; max-width: 25%; }
+.col-4 { flex: 0 0 33.333%; max-width: 33.333%; }
+.col-5 { flex: 0 0 41.667%; max-width: 41.667%; }
+.col-6 { flex: 0 0 50%; max-width: 50%; }
+.col-7 { flex: 0 0 58.333%; max-width: 58.333%; }
+.col-8 { flex: 0 0 66.667%; max-width: 66.667%; }
+.col-9 { flex: 0 0 75%; max-width: 75%; }
+.col-10 { flex: 0 0 83.333%; max-width: 83.333%; }
+.col-11 { flex: 0 0 91.667%; max-width: 91.667%; }
+.col-12 { flex: 0 0 100%; max-width: 100%; }
+
+/* 响应式列 */
+@media (max-width: 768px) {
+  .col-md-12 { flex: 0 0 100%; max-width: 100%; }
+}
+
+@media (max-width: 480px) {
+  [class*="col-"] {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+

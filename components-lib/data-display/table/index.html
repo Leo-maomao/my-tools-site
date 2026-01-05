@@ -1,0 +1,146 @@
+<!-- Table 表格组件 -->
+
+<!-- 基础表格 -->
+<div class="table-wrapper">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>名称</th>
+        <th>状态</th>
+        <th>创建时间</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>项目 A</td>
+        <td><span class="table-status table-status-success">进行中</span></td>
+        <td>2024-01-01</td>
+        <td class="table-cell-actions">
+          <button class="btn btn-sm btn-outline">编辑</button>
+          <button class="btn btn-sm btn-text btn-danger">删除</button>
+        </td>
+      </tr>
+      <tr>
+        <td>项目 B</td>
+        <td><span class="table-status table-status-warning">待审核</span></td>
+        <td>2024-01-02</td>
+        <td class="table-cell-actions">
+          <button class="btn btn-sm btn-outline">编辑</button>
+          <button class="btn btn-sm btn-text btn-danger">删除</button>
+        </td>
+      </tr>
+      <tr>
+        <td>项目 C</td>
+        <td><span class="table-status table-status-danger">已暂停</span></td>
+        <td>2024-01-03</td>
+        <td class="table-cell-actions">
+          <button class="btn btn-sm btn-outline">编辑</button>
+          <button class="btn btn-sm btn-text btn-danger">删除</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 带悬停和斑马纹 -->
+<div class="table-wrapper">
+  <table class="table table-hover table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>用户</th>
+        <th>邮箱</th>
+        <th class="table-cell-number">金额</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>001</td>
+        <td>张三</td>
+        <td>zhangsan@example.com</td>
+        <td class="table-cell-number">¥1,234.56</td>
+      </tr>
+      <tr>
+        <td>002</td>
+        <td>李四</td>
+        <td>lisi@example.com</td>
+        <td class="table-cell-number">¥2,345.67</td>
+      </tr>
+      <tr>
+        <td>003</td>
+        <td>王五</td>
+        <td>wangwu@example.com</td>
+        <td class="table-cell-number">¥3,456.78</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 可排序 -->
+<div class="table-wrapper">
+  <table class="table table-sortable">
+    <thead>
+      <tr>
+        <th data-sort="asc">
+          名称
+          <span class="table-sort-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 14l5-5 5 5z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+          </span>
+        </th>
+        <th>
+          日期
+          <span class="table-sort-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 14l5-5 5 5z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+          </span>
+        </th>
+        <th data-sort="desc">
+          数量
+          <span class="table-sort-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 14l5-5 5 5z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+          </span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>产品 A</td>
+        <td>2024-01-15</td>
+        <td class="table-cell-number">100</td>
+      </tr>
+      <tr>
+        <td>产品 B</td>
+        <td>2024-01-10</td>
+        <td class="table-cell-number">250</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 空状态 -->
+<div class="table-wrapper">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>名称</th>
+        <th>描述</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="2">
+          <div class="table-empty">
+            <svg class="table-empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+            </svg>
+            <p>暂无数据</p>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+

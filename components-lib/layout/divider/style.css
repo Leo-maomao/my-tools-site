@@ -1,0 +1,66 @@
+.divider {
+  display: flex;
+  align-items: center;
+  margin: var(--divider-margin, 1rem) 0;
+  color: var(--text-muted, #9ca3af);
+  font-size: 0.875rem;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: var(--border-color, #e5e7eb);
+}
+
+.divider:empty::before {
+  flex: 1;
+}
+
+.divider:empty::after {
+  display: none;
+}
+
+.divider:not(:empty)::before {
+  margin-right: 1rem;
+}
+
+.divider:not(:empty)::after {
+  margin-left: 1rem;
+}
+
+.divider-vertical {
+  flex-direction: column;
+  width: 1px;
+  height: auto;
+  min-height: 1rem;
+  margin: 0 var(--divider-margin, 1rem);
+  background-color: var(--border-color, #e5e7eb);
+}
+
+.divider-vertical::before,
+.divider-vertical::after {
+  display: none;
+}
+
+.divider-dashed::before,
+.divider-dashed::after,
+.divider-dashed.divider-vertical {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--border-color, #e5e7eb) 0,
+    var(--border-color, #e5e7eb) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+}
+
+.divider-left:not(:empty)::before {
+  flex: 0 0 5%;
+}
+
+.divider-right:not(:empty)::after {
+  flex: 0 0 5%;
+}
+

@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>组件库预览</title>
+  <style>
+    :root {
+      --color-primary: #3b82f6;
+      --color-primary-light: #60a5fa;
+      --color-primary-dark: #2563eb;
+      --color-secondary: #6b7280;
+      --color-success: #10b981;
+      --color-warning: #f59e0b;
+      --color-danger: #ef4444;
+      --color-error: #ef4444;
+      --color-info: #3b82f6;
+      --bg-primary: #f8fafc;
+      --bg-secondary: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-hover: rgba(0, 0, 0, 0.05);
+      --bg-muted: #f3f4f6;
+      --text-primary: #111827;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --border-color: #e5e7eb;
+      --border-radius-sm: 0.25rem;
+      --border-radius-md: 0.5rem;
+      --border-radius-lg: 0.75rem;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --transition-fast: all 0.15s ease;
+      --transition-base: all 0.2s ease;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "PingFang SC", sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      background-color: var(--bg-primary);
+    }
+    
+    .preview-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .preview-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    
+    .preview-header h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .preview-header p {
+      color: var(--text-secondary);
+    }
+    
+    .preview-category {
+      margin-bottom: 3rem;
+    }
+    
+    .preview-category-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--color-primary);
+    }
+    
+    .preview-section {
+      background: var(--bg-card);
+      border-radius: var(--border-radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .preview-section h2 {
+      font-size: 1.125rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .preview-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .preview-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .preview-group:last-child {
+      margin-bottom: 0;
+    }
+    
+    .preview-label {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+    
+    .grid { display: grid; }
+    .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+  </style>
+  
+  <!-- ===== 布局组件 ===== -->
+  <link rel="stylesheet" href="layout/container/style.css">
+  <link rel="stylesheet" href="layout/grid/style.css">
+  <link rel="stylesheet" href="layout/card/style.css">
+  <link rel="stylesheet" href="layout/divider/style.css">
+  <link rel="stylesheet" href="layout/footer/style.css">
+  
+  <!-- ===== 基础组件 ===== -->
+  <link rel="stylesheet" href="base/button/style.css">
+  <link rel="stylesheet" href="base/fab/style.css">
+  <link rel="stylesheet" href="base/input/style.css">
+  <link rel="stylesheet" href="base/textarea/style.css">
+  <link rel="stylesheet" href="base/select/style.css">
+  <link rel="stylesheet" href="base/multi-select/style.css">
+  <link rel="stylesheet" href="base/cascader/style.css">
+  <link rel="stylesheet" href="base/checkbox/style.css">
+  <link rel="stylesheet" href="base/radio/style.css">
+  <link rel="stylesheet" href="base/switch/style.css">
+  
+  <!-- ===== 导航组件 ===== -->
+  <link rel="stylesheet" href="navigation/navbar/style.css">
+  <link rel="stylesheet" href="navigation/menu/style.css">
+  <link rel="stylesheet" href="navigation/breadcrumb/style.css">
+  <link rel="stylesheet" href="navigation/dropdown/style.css">
+  <link rel="stylesheet" href="navigation/tabs/style.css">
+  <link rel="stylesheet" href="navigation/steps/style.css">
+  <link rel="stylesheet" href="navigation/pagination/style.css">
+  <link rel="stylesheet" href="navigation/back-to-top/style.css">
+  
+  <!-- ===== 数据录入 ===== -->
+  <link rel="stylesheet" href="data-entry/form/style.css">
+  <link rel="stylesheet" href="data-entry/search/style.css">
+  <link rel="stylesheet" href="data-entry/upload/style.css">
+  <link rel="stylesheet" href="data-entry/slider/style.css">
+  <link rel="stylesheet" href="data-entry/rate/style.css">
+  
+  <!-- ===== 数据展示 ===== -->
+  <link rel="stylesheet" href="data-display/table/style.css">
+  <link rel="stylesheet" href="data-display/list/style.css">
+  <link rel="stylesheet" href="data-display/tag/style.css">
+  <link rel="stylesheet" href="data-display/badge/style.css">
+  <link rel="stylesheet" href="data-display/avatar/style.css">
+  <link rel="stylesheet" href="data-display/image/style.css">
+  <link rel="stylesheet" href="data-display/carousel/style.css">
+  <link rel="stylesheet" href="data-display/timeline/style.css">
+  <link rel="stylesheet" href="data-display/empty/style.css">
+  <link rel="stylesheet" href="data-display/collapse/style.css">
+  
+  <!-- ===== 反馈组件 ===== -->
+  <link rel="stylesheet" href="feedback/modal/style.css">
+  <link rel="stylesheet" href="feedback/drawer/style.css">
+  <link rel="stylesheet" href="feedback/toast/style.css">
+  <link rel="stylesheet" href="feedback/loading/style.css">
+  <link rel="stylesheet" href="feedback/tooltip/style.css">
+  <link rel="stylesheet" href="feedback/alert/style.css">
+  <link rel="stylesheet" href="feedback/progress/style.css">
+  <link rel="stylesheet" href="feedback/skeleton/style.css">
+</head>
+<body>
+  <div class="preview-container">
+    <header class="preview-header">
+      <h1>🧩 组件库预览</h1>
+      <p>基于 CSS 变量的无主题组件库 · 共 44 个组件</p>
+    </header>
+    
+    <!-- ==================== 布局组件 ==================== -->
+    <div class="preview-category">
+      <h2 class="preview-category-title">📐 布局 Layout</h2>
+      
+      <!-- Grid -->
+      <section class="preview-section">
+        <h2>Grid 网格</h2>
+        <div class="grid grid-cols-4" style="gap: 0.5rem;">
+          <div style="background: var(--color-primary); color: white; padding: 1rem; text-align: center; border-radius: 0.25rem;">1/4</div>
+          <div style="background: var(--color-primary); color: white; padding: 1rem; text-align: center; border-radius: 0.25rem;">1/4</div>
+          <div style="background: var(--color-primary); color: white; padding: 1rem; text-align: center; border-radius: 0.25rem;">1/4</div>
+          <div style="background: var(--color-primary); color: white; padding: 1rem; text-align: center; border-radius: 0.25rem;">1/4</div>
+        </div>
+      </section>
+      
+      <!-- Card -->
+      <section class="preview-section">
+        <h2>Card 卡片</h2>
+        <div class="grid grid-cols-3" style="gap: 1rem;">
+          <div class="card">
+            <div class="card-body">
+              <h3 class="card-title">卡片标题</h3>
+              <p class="card-text">这是卡片的内容描述。</p>
+            </div>
+          </div>
+          <div class="card card-hoverable">
+            <div class="card-body">
+              <h3 class="card-title">可悬浮卡片</h3>
+              <p class="card-text">鼠标悬浮有阴影效果。</p>
+            </div>
+          </div>
+          <div class="card card-bordered">
+            <div class="card-body">
+              <h3 class="card-title">带边框卡片</h3>
+              <p class="card-text">强调边框样式。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Divider -->
+      <section class="preview-section">
+        <h2>Divider 分割线</h2>
+        <div style="max-width: 400px;">
+          <div class="divider"></div>
+          <div class="divider">分割文本</div>
+          <div class="divider divider-dashed">虚线</div>
+          <div style="display: flex; align-items: center; height: 40px;">
+            <span>文本1</span>
+            <div class="divider divider-vertical"></div>
+            <span>文本2</span>
+            <div class="divider divider-vertical"></div>
+            <span>文本3</span>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Footer -->
+      <section class="preview-section">
+        <h2>Footer 页脚</h2>
+        <footer class="footer" style="border-radius: var(--border-radius-md);">
+          <div class="footer-inner">
+            <div class="footer-copyright">© 2024 Your Company. All rights reserved.</div>
+            <nav class="footer-links">
+              <a class="footer-link" href="javascript:void(0)">关于我们</a>
+              <a class="footer-link" href="javascript:void(0)">隐私政策</a>
+              <a class="footer-link" href="javascript:void(0)">联系我们</a>
+            </nav>
+          </div>
+        </footer>
+      </section>
+    </div>
+    
+    <!-- ==================== 基础组件 ==================== -->
+    <div class="preview-category">
+      <h2 class="preview-category-title">🔘 基础 Base</h2>
+      
+      <!-- Button -->
+      <section class="preview-section">
+        <h2>Button 按钮</h2>
+        <div class="preview-group">
+          <div class="preview-label">变体</div>
+          <div class="preview-row">
+            <button class="btn btn-primary">主要按钮</button>
+            <button class="btn btn-secondary">次要按钮</button>
+            <button class="btn btn-outline">轮廓按钮</button>
+            <button class="btn btn-text">文字按钮</button>
+            <button class="btn btn-danger">危险按钮</button>
+            <button class="btn btn-success">成功按钮</button>
+          </div>
+        </div>
+        <div class="preview-group">
+          <div class="preview-label">尺寸</div>
+          <div class="preview-row">
+            <button class="btn btn-primary btn-sm">小按钮</button>
+            <button class="btn btn-primary">默认按钮</button>
+            <button class="btn btn-primary btn-lg">大按钮</button>
+          </div>
+        </div>
+        <div class="preview-group">
+          <div class="preview-label">状态</div>
+          <div class="preview-row">
+            <button class="btn btn-primary btn-loading">加载中</button>
+            <button class="btn btn-primary" disabled>禁用</button>
+            <button class="btn btn-outline" disabled>禁用轮廓</button>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Input -->
+      <section class="preview-section">
+        <h2>Input 输入框</h2>
+        <div class="preview-group">
+          <div class="preview-label">基础</div>
+          <div class="preview-row">
+            <input class="input" type="text" placeholder="默认输入框" style="width: 180px;">
+            <input class="input input-sm" type="text" placeholder="小尺寸" style="width: 140px;">
+            <input class="input input-lg" type="text" placeholder="大尺寸" style="width: 200px;">
+          </div>
+        </div>
+        <div class="preview-group">
+          <div class="preview-label">状态</div>
+          <div class="preview-row">
+            <input class="input" type="text" placeholder="禁用状态" disabled style="width: 150px;">
+            <input class="input input-error" type="text" value="错误状态" style="width: 150px;">
+            <input class="input input-success" type="text" value="成功状态" style="width: 150px;">
+          </div>
+        </div>
+        <div class="preview-group">
+          <div class="preview-label">带图标</div>
+          <div class="preview-row">
+            <div class="input-group" style="width: 200px; position: relative;">
+              <svg style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+              </svg>
+              <input class="input" type="text" placeholder="搜索..." style="padding-left: 34px;">
+            </div>
+            <div class="input-group" style="width: 200px; position: relative;">
+              <svg style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              <input class="input" type="email" placeholder="邮箱地址" style="padding-left: 34px;">
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Textarea -->
+      <section class="preview-section">
+        <h2>Textarea 文本域</h2>
+        <div class="preview-group">
+          <div class="preview-label">固定高度</div>
+          <div class="preview-row">
+            <div class="textarea-box" style="max-width: 400px;">
+              <div class="textarea-content">
+                <textarea class="textarea-input" placeholder="输入内容..."></textarea>
+                <div class="textarea-track">
+                  <div class="textarea-thumb"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="preview-group">
+          <div class="preview-label">可调整大小</div>
+          <div class="preview-row">
+            <div class="textarea-box textarea-box-resizable" style="max-width: 400px;">
+              <div class="textarea-content">
+                <textarea class="textarea-input" placeholder="可拖拽右下角调整高度"></textarea>
+                <div class="textarea-track">
+                  <div class="textarea-thumb"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Select -->
+      <section class="preview-section">
+        <h2>Select 下拉选择</h2>
+        <div class="preview-row" style="align-items: flex-start; gap: 2rem;">
+          <div class="preview-group">
+            <div class="preview-label">点击选择（选中后自动填充）</div>
+            <div class="select" style="width: 180px;">
+              <div class="select-trigger">
+                <span class="select-value" style="color: var(--text-muted);">请选择</span>
+                <svg class="select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
+              </div>
+              <div class="select-dropdown">
+                <div class="select-option">选项一</div>
+                <div class="select-option">选项二</div>
+                <div class="select-option">选项三</div>
+              </div>
+            </div>
+          </div>
+          <div class="preview-group">
+            <div class="preview-label">禁用状态</div>
+            <div class="select select-disabled" style="width: 180px;">
+              <div class="select-trigger">
+                <span class="select-value" style="color: var(--text-muted);">禁用</span>
+                <svg class="select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Multi-Select -->
+      <section class="preview-section">
+        <h2>Multi-Select 多选下拉</h2>
+        <div class="preview-row" style="align-items: flex-start; gap: 2rem; margin-bottom: 320px;">
+          <div class="preview-group">
+            <div class="preview-label">点击展开，支持多选、搜索、全选/清空</div>
+            <div id="multi-select-demo" class="multi-select" style="width: 280px;"></div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Cascader -->
+      <section class="preview-section">
+        <h2>Cascader 级联选择</h2>
+        <div class="preview-row" style="align-items: flex-start; gap: 2rem;">
+          <div class="preview-group">
+            <div class="preview-label">未选择</div>
+            <div class="cascader" style="width: 180px;">
+              <div class="cascader-trigger">
+                <span class="cascader-value cascader-placeholder">请选择</span>
+                <svg class="cascader-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="preview-group">
+            <div class="preview-label">已选择（超长省略）</div>
+            <div class="cascader" style="width: 200px;">
+              <div class="cascader-trigger">
+                <span class="cascader-value">一级菜单 / 二级菜单 / 三级</span>
+                <svg class="cascader-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="preview-group">
+            <div class="preview-label">禁用状态</div>
+            <div class="cascader cascader-disabled" style="width: 180px;">
+              <div class="cascader-trigger">
+                <span class="cascader-value cascader-placeholder">禁用</span>
+                <svg class="cascader-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="preview-group" style="margin-top: 1rem; margin-bottom: 120px;">
+          <div class="preview-label">展开状态（hover 菜单项展开子菜单）</div>
+          <div class="cascader cascader-open" style="width: 180px;">
+            <div class="cascader-trigger">
+              <span class="cascader-value cascader-placeholder">请选择</span>
+              <svg class="cascader-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            </div>
+            <div class="cascader-dropdown">
+              <div class="cascader-item cascader-item-has-children">
+                <span class="cascader-item-text">一级菜单1</span>
+                <div class="cascader-submenu">
+                  <div class="cascader-item cascader-item-has-children">
+                    <span class="cascader-item-text">二级菜单1</span>
+                    <div class="cascader-submenu">
+                      <div class="cascader-item"><span class="cascader-item-text">三级菜单1</span></div>
+                      <div class="cascader-item"><span class="cascader-item-text">三级菜单2</span></div>
+                    </div>
+                  </div>
+                  <div class="cascader-item"><span class="cascader-item-text">二级菜单2</span></div>
+                </div>
+              </div>
+              <div class="cascader-item"><span class="cascader-item-text">一级菜单2</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Checkbox & Radio -->
+      <section class="preview-section">
+        <h2>Checkbox & Radio</h2>
+        <div class="preview-group">
+          <div class="preview-label">复选框</div>
+          <div class="preview-row">
+            <label class="checkbox">
+              <input type="checkbox" class="checkbox-input" checked>
+              <span class="checkbox-box">
+                <svg class="checkbox-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+              </span>
+              <span class="checkbox-label">已选中</span>
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" class="checkbox-input">
+              <span class="checkbox-box">
+                <svg class="checkbox-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+              </span>
+              <span class="checkbox-label">未选中</span>
+            </label>
+            <label class="checkbox checkbox-indeterminate">
+              <input type="checkbox" class="checkbox-input">
+              <span class="checkbox-box">
+                <svg class="checkbox-icon-indeterminate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14"/></svg>
+              </span>
+              <span class="checkbox-label">部分选中</span>
+            </label>
+            <label class="checkbox checkbox-disabled">
+              <input type="checkbox" class="checkbox-input" disabled>
+              <span class="checkbox-box">
+                <svg class="checkbox-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+              </span>
+              <span class="checkbox-label">禁用</span>
+            </label>
+          </div>
+        </div>
+        <div class="preview-group">
+          <div class="preview-label">单选框</div>
+          <div class="preview-row">
+            <label class="radio">
+              <input type="radio" class="radio-input" name="demo" checked>
+              <span class="radio-dot"></span>
+              <span class="radio-label">选项A</span>
+            </label>
+            <label class="radio">
+              <input type="radio" class="radio-input" name="demo">
+              <span class="radio-dot"></span>
+              <span class="radio-label">选项B</span>
+            </label>
+            <label class="radio radio-disabled">
+              <input type="radio" class="radio-input" name="demo2" disabled>
+              <span class="radio-dot"></span>
+              <span class="radio-label">禁用</span>
+            </label>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Switch -->
+      <section class="preview-section">
+        <h2>Switch 开关</h2>
+        <div class="preview-row">
+          <label class="switch"><input type="checkbox" class="switch-input" checked><span class="switch-slider"></span></label>
+          <label class="switch switch-disabled"><input type="checkbox" class="switch-input" disabled><span class="switch-slider"></span></label>
+        </div>
+      </section>
+    </div>
+    
+    <!-- ==================== 导航组件 ==================== -->
+    <div class="preview-category">
+      <h2 class="preview-category-title">🧭 导航 Navigation</h2>
+      
+      <!-- Navbar -->
+      <section class="preview-section">
+        <h2>Navbar 顶部导航</h2>
+        <header class="navbar" style="border-radius: var(--border-radius-md);">
+          <a class="navbar-brand" href="javascript:void(0)">
+            <span style="font-size: 1.5rem;">🧩</span>
+            Brand
+          </a>
+          <nav class="navbar-nav">
+            <a class="navbar-nav-item navbar-nav-item-active" href="javascript:void(0)">首页</a>
+            <a class="navbar-nav-item" href="javascript:void(0)">产品</a>
+            <a class="navbar-nav-item" href="javascript:void(0)">关于</a>
+          </nav>
+          <div class="navbar-actions">
+            <button class="btn btn-outline btn-sm">登录</button>
+            <button class="btn btn-primary btn-sm">注册</button>
+          </div>
+        </header>
+      </section>
+      
+      <!-- Menu -->
+      <section class="preview-section">
+        <h2>Menu 侧边菜单</h2>
+        <nav class="menu" style="max-width: 240px;">
+          <a class="menu-item menu-item-active" href="javascript:void(0)">
+            <svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            </svg>
+            首页
+          </a>
+          <a class="menu-item" href="javascript:void(0)">
+            <svg class="menu-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+            </svg>
+            用户管理
+          </a>
+          <div class="menu-divider"></div>
+          <div class="menu-group">
+            <div class="menu-group-title">设置</div>
+            <a class="menu-item" href="javascript:void(0)">系统设置</a>
+            <a class="menu-item" href="javascript:void(0)">安全设置</a>
+          </div>
+        </nav>
+      </section>
+      
+      <!-- Breadcrumb -->
+      <section class="preview-section">
+        <h2>Breadcrumb 面包屑</h2>
+        <nav class="breadcrumb">
+          <span class="breadcrumb-item">
+            <a href="javascript:void(0)">首页</a>
+            <span class="breadcrumb-separator">/</span>
+          </span>
+          <span class="breadcrumb-item">
+            <a href="javascript:void(0)">产品</a>
+            <span class="breadcrumb-separator">/</span>
+          </span>
+          <span class="breadcrumb-item">详情</span>
+        </nav>
+      </section>
+      
+      <!-- Dropdown -->
+      <section class="preview-section">
+        <h2>Dropdown 下拉菜单</h2>
+        <div class="preview-label">点击选项后自动填充到菜单中</div>
+        <div class="dropdown" data-selectable>
+          <button class="btn btn-primary dropdown-trigger" style="min-width: 140px; justify-content: space-between;">
+            <span class="dropdown-value" style="text-align: left;">请选择</span>
+            <span>▼</span>
+          </button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="javascript:void(0)">菜单项 1</a>
+            <a class="dropdown-item" href="javascript:void(0)">菜单项 2</a>
+            <a class="dropdown-item" href="javascript:void(0)">菜单项 3</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item dropdown-item-danger" href="javascript:void(0)">危险操作</a>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Tabs -->
+      <section class="preview-section">
+        <h2>Tabs 选项卡</h2>
+        <div class="preview-group">
+          <div class="preview-label">默认样式</div>
+          <div class="tabs">
+            <div class="tabs-nav">
+              <button class="tabs-item tabs-item-active">选项卡1</button>
+              <button class="tabs-item">选项卡2</button>
+              <button class="tabs-item">选项卡3</button>
+            </div>
+            <div class="tabs-content">
+              <div class="tabs-panel tabs-panel-active">选项卡1的内容</div>
+            </div>
+          </div>
+        </div>
+        <div class="preview-group">
+          <div class="preview-label">卡片样式</div>
+          <div class="tabs tabs-card">
+            <div class="tabs-nav">
+              <button class="tabs-item tabs-item-active">选项卡1</button>
+              <button class="tabs-item">选项卡2</button>
+              <button class="tabs-item">选项卡3</button>
+            </div>
+          </div>
+        </div>
+        <div class="preview-group">
+          <div class="preview-label">胶囊样式</div>
+          <div class="tabs tabs-pill">
+            <div class="tabs-nav">
+              <button class="tabs-item tabs-item-active">选项卡1</button>
+              <button class="tabs-item">选项卡2</button>
+              <button class="tabs-item">选项卡3</button>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Steps -->
+      <section class="preview-section">
+        <h2>Steps 步骤条</h2>
+        <div class="steps" style="max-width: 500px;">
+          <div class="step step-done">
+            <div class="step-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <div class="step-content">
+              <div class="step-title">填写信息</div>
+            </div>
+          </div>
+          <div class="step step-active">
+            <div class="step-icon">2</div>
+            <div class="step-content">
+              <div class="step-title">确认订单</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-icon">3</div>
+            <div class="step-content">
+              <div class="step-title">完成支付</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Pagination -->
+      <section class="preview-section">
+        <h2>Pagination 分页</h2>
+        <nav class="pagination">
+          <button class="pagination-item" disabled>‹</button>
+          <button class="pagination-item pagination-item-active">1</button>
+          <button class="pagination-item">2</button>
+          <button class="pagination-item">3</button>
+          <span class="pagination-ellipsis">...</span>
+          <button class="pagination-item">10</button>
+          <button class="pagination-item">›</button>
+        </nav>
+      </section>
+      
+      <!-- FAB 悬浮按钮 -->
+      <section class="preview-section">
+        <h2>FAB 悬浮操作按钮</h2>
+        <div class="preview-group">
+          <div class="preview-label">按钮组（统一尺寸、间距）</div>
+          <div style="position: relative; height: 200px; background: var(--bg-secondary); border-radius: 0.5rem;">
+            <div class="fab-group" style="position: absolute;">
+              <button class="fab fab-success" type="button" aria-label="在线客服">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                </svg>
+              </button>
+              <button class="fab" type="button" aria-label="意见反馈">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+              </button>
+              <button class="fab" type="button" aria-label="回到顶部">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="m18 15-6-6-6 6"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="preview-group">
+          <div class="preview-label">单个按钮变体</div>
+          <div class="preview-row">
+            <button class="fab" type="button" style="position: relative;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 15-6-6-6 6"/></svg>
+            </button>
+            <button class="fab fab-primary" type="button" style="position: relative;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+            <button class="fab fab-success" type="button" style="position: relative;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+    
+    <!-- ==================== 数据录入 ==================== -->
+    <div class="preview-category">
+      <h2 class="preview-category-title">📝 数据录入 Data Entry</h2>
+      
+      <!-- Form -->
+      <section class="preview-section">
+        <h2>Form 表单布局</h2>
+        <form class="form" style="max-width: 400px;">
+          <div class="form-item">
+            <label class="form-label form-label-required">用户名</label>
+            <input class="input" type="text" placeholder="请输入用户名">
+            <span class="form-help">4-20个字符</span>
+          </div>
+          <div class="form-item form-item-error">
+            <label class="form-label form-label-required">密码</label>
+            <input class="input" type="password" placeholder="请输入密码">
+            <span class="form-error">密码不能为空</span>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="button">提交</button>
+            <button class="btn btn-outline" type="button">重置</button>
+          </div>
+        </form>
+      </section>
+      
+      <!-- Search -->
+      <section class="preview-section">
+        <h2>Search 搜索</h2>
+        <div class="preview-group">
+          <div class="preview-label">默认样式</div>
+          <div class="search">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input class="search-input" type="text" placeholder="搜索...">
+          </div>
+        </div>
+        <div class="preview-group">
+          <div class="preview-label">带边框样式</div>
+          <div class="search search-bordered">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input class="search-input" type="text" placeholder="搜索...">
+          </div>
+        </div>
+      </section>
+      
+      <!-- Upload -->
+      <section class="preview-section">
+        <h2>Upload 上传</h2>
+        <div class="upload">
+          <label class="upload-trigger">
+            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <span class="upload-text">点击或拖拽上传</span>
+            <span class="upload-hint">支持 jpg、png 格式</span>
+            <input class="upload-input" type="file" accept="image/*">
+          </label>
+        </div>
+      </section>
+      
+      <!-- Slider -->
+      <section class="preview-section">
+        <h2>Slider 滑块</h2>
+        <div class="slider" data-min="0" data-max="100" data-value="30" style="max-width: 300px;">
+          <div class="slider-track"></div>
+          <div class="slider-fill" style="width: 30%"></div>
+          <div class="slider-thumb" style="left: 30%"></div>
+        </div>
+      </section>
+      
+      <!-- Rate -->
+      <section class="preview-section">
+        <h2>Rate 评分</h2>
+        <div class="rate" data-value="3">
+          <svg class="rate-star rate-star-active" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg class="rate-star rate-star-active" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg class="rate-star rate-star-active" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg class="rate-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg class="rate-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+      </section>
+    </div>
+    
+    <!-- ==================== 数据展示 ==================== -->
+    <div class="preview-category">
+      <h2 class="preview-category-title">📊 数据展示 Data Display</h2>
+      
+      <!-- Table -->
+      <section class="preview-section">
+        <h2>Table 表格</h2>
+        <div class="preview-group">
+          <div class="preview-label">带条纹 + 可悬浮</div>
+          <table class="table table-striped table-hoverable">
+            <thead>
+              <tr><th>姓名</th><th>年龄</th><th>职位</th><th>操作</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>张三</td><td>28</td><td>工程师</td><td><button class="btn btn-text btn-sm">编辑</button></td></tr>
+              <tr><td>李四</td><td>32</td><td>设计师</td><td><button class="btn btn-text btn-sm">编辑</button></td></tr>
+              <tr><td>王五</td><td>25</td><td>产品经理</td><td><button class="btn btn-text btn-sm">编辑</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="preview-group">
+          <div class="preview-label">带边框</div>
+          <table class="table table-bordered">
+            <thead>
+              <tr><th>项目</th><th>状态</th><th>进度</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>项目A</td><td><span class="tag tag-success">进行中</span></td><td>60%</td></tr>
+              <tr><td>项目B</td><td><span class="tag tag-warning">待审核</span></td><td>80%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      
+      <!-- List -->
+      <section class="preview-section">
+        <h2>List 列表</h2>
+        <ul class="list list-bordered list-hoverable" style="max-width: 500px;">
+          <li class="list-item">
+            <span class="avatar" style="background: #3b82f6; color: white;">张</span>
+            <div class="list-item-content">
+              <div class="list-item-title">张三</div>
+              <div class="list-item-desc">这是一段描述信息</div>
+            </div>
+            <span class="list-item-meta">3分钟前</span>
+          </li>
+          <li class="list-item">
+            <span class="avatar" style="background: #10b981; color: white;">李</span>
+            <div class="list-item-content">
+              <div class="list-item-title">李四</div>
+              <div class="list-item-desc">另一段描述信息</div>
+            </div>
+            <span class="list-item-meta">1小时前</span>
+          </li>
+        </ul>
+      </section>
+      
+      <!-- Tag & Badge -->
+      <section class="preview-section">
+        <h2>Tag 标签 & Badge 徽标</h2>
+        <div class="preview-group">
+          <div class="preview-label">标签</div>
+          <div class="preview-row">
+            <span class="tag">默认</span>
+            <span class="tag tag-primary">主要</span>
+            <span class="tag tag-success">成功</span>
+            <span class="tag tag-warning">警告</span>
+            <span class="tag tag-danger">危险</span>
+          </div>
+        </div>
+        <div class="preview-group">
+          <div class="preview-label">可关闭标签</div>
+          <div class="preview-row">
+            <span class="tag tag-closable">标签1 <span class="tag-close">×</span></span>
+            <span class="tag tag-primary tag-closable">标签2 <span class="tag-close">×</span></span>
+            <span class="tag tag-success tag-closable">标签3 <span class="tag-close">×</span></span>
+          </div>
+        </div>
+        <div class="preview-group">
+          <div class="preview-label">徽标</div>
+          <div class="preview-row" style="gap: 2rem;">
+            <span class="badge-wrapper">
+              <span class="badge">5</span>
+              <button class="btn">消息</button>
+            </span>
+            <span class="badge-wrapper">
+              <span class="badge badge-dot"></span>
+              <button class="btn">通知</button>
+            </span>
+            <span class="badge-wrapper">
+              <span class="badge badge-success">99+</span>
+              <button class="btn">订单</button>
+            </span>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Avatar -->
+      <section class="preview-section">
+        <h2>Avatar 头像</h2>
+        <div class="preview-group">
+          <div class="preview-label">尺寸 & 形状</div>
+          <div class="preview-row">
+            <span class="avatar avatar-sm">S</span>
+            <span class="avatar">M</span>
+            <span class="avatar avatar-lg">L</span>
+            <span class="avatar" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">头</span>
+            <span class="avatar avatar-square">方</span>
+          </div>
+        </div>
+        <div class="preview-group">
+          <div class="preview-label">头像组</div>
+          <div class="avatar-group">
+            <span class="avatar" style="background: #3b82f6; color: white;">张</span>
+            <span class="avatar" style="background: #10b981; color: white;">李</span>
+            <span class="avatar" style="background: #f59e0b; color: white;">王</span>
+            <span class="avatar" style="background: #ef4444; color: white;">赵</span>
+            <span class="avatar" style="background: #6b7280; color: white;">+5</span>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Image -->
+      <section class="preview-section">
+        <h2>Image 图片</h2>
+        <div class="preview-row">
+          <div class="image image-rounded image-hover-zoom" style="width: 150px; height: 100px;">
+            <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.875rem;">示例图片</div>
+          </div>
+          <div class="image image-circle" style="width: 80px; height: 80px;">
+            <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">头</div>
+          </div>
+          <div class="image image-rounded image-loading" style="width: 150px; height: 100px;">
+            <div class="image-placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <path d="M21 15l-5-5L5 21"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Carousel -->
+      <section class="preview-section">
+        <h2>Carousel 轮播图</h2>
+        <div class="carousel" data-autoplay="5000" style="max-width: 600px;">
+          <div class="carousel-track">
+            <div class="carousel-slide">
+              <div style="height: 200px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: 600;">Slide 1</div>
+            </div>
+            <div class="carousel-slide">
+              <div style="height: 200px; background: linear-gradient(135deg, #10b981, #059669); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: 600;">Slide 2</div>
+            </div>
+            <div class="carousel-slide">
+              <div style="height: 200px; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: 600;">Slide 3</div>
+            </div>
+          </div>
+          <button class="carousel-prev">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <button class="carousel-next">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+          <div class="carousel-indicators">
+            <button class="carousel-dot carousel-dot-active"></button>
+            <button class="carousel-dot"></button>
+            <button class="carousel-dot"></button>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Timeline -->
+      <section class="preview-section">
+        <h2>Timeline 时间线</h2>
+        <div class="timeline" style="max-width: 400px;">
+          <div class="timeline-item timeline-item-primary">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">创建项目</div>
+              <div class="timeline-desc">项目初始化完成</div>
+              <div class="timeline-time">2024-01-01</div>
+            </div>
+          </div>
+          <div class="timeline-item timeline-item-success">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">开发完成</div>
+              <div class="timeline-desc">核心功能开发完毕</div>
+              <div class="timeline-time">2024-01-15</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">测试中</div>
+              <div class="timeline-time">2024-01-20</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Empty -->
+      <section class="preview-section">
+        <h2>Empty 空状态</h2>
+        <div class="empty" style="max-width: 300px; margin: 0 auto;">
+          <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          </svg>
+          <div class="empty-title">暂无数据</div>
+          <div class="empty-desc">当前列表没有任何数据</div>
+        </div>
+      </section>
+      
+      <!-- Collapse -->
+      <section class="preview-section">
+        <h2>Collapse 折叠面板</h2>
+        <div class="collapse" style="max-width: 500px;">
+          <div class="collapse-item collapse-item-active">
+            <div class="collapse-header">
+              <span>第一项</span>
+              <svg class="collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="collapse-content">
+              <div class="collapse-body">这是第一项的内容。</div>
+            </div>
+          </div>
+          <div class="collapse-item">
+            <div class="collapse-header">
+              <span>第二项</span>
+              <svg class="collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="collapse-content">
+              <div class="collapse-body">这是第二项的内容。</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    
+    <!-- ==================== 反馈组件 ==================== -->
+    <div class="preview-category">
+      <h2 class="preview-category-title">💬 反馈 Feedback</h2>
+      
+      <!-- Modal -->
+      <section class="preview-section">
+        <h2>Modal 弹窗</h2>
+        <div class="preview-row">
+          <button class="btn btn-primary" onclick="openDemoModal()">打开弹窗</button>
+          <button class="btn btn-outline" onclick="Modal.confirm({title:'确认操作',content:'确定要执行此操作吗？',type:'warning',onConfirm:()=>Toast.success('已确认')})">确认对话框</button>
+        </div>
+      </section>
+      
+      <!-- Drawer -->
+      <section class="preview-section">
+        <h2>Drawer 抽屉</h2>
+        <div class="preview-row">
+          <button class="btn btn-primary" onclick="openDrawer('right')">右侧抽屉</button>
+          <button class="btn btn-outline" onclick="openDrawer('left')">左侧抽屉</button>
+          <button class="btn btn-outline" onclick="openDrawer('bottom')">底部抽屉</button>
+        </div>
+      </section>
+      
+      <!-- Toast -->
+      <section class="preview-section">
+        <h2>Toast 轻提示</h2>
+        <div class="preview-row">
+          <button class="btn btn-success" onclick="Toast.success('操作成功')">成功</button>
+          <button class="btn btn-danger" onclick="Toast.error('操作失败')">错误</button>
+          <button class="btn btn-outline" onclick="Toast.warning('警告信息')">警告</button>
+          <button class="btn btn-outline" onclick="Toast.info('提示信息')">信息</button>
+        </div>
+      </section>
+      
+      <!-- Loading -->
+      <section class="preview-section">
+        <h2>Loading 加载</h2>
+        <div class="preview-row">
+          <button class="btn btn-primary" onclick="Loading.show('加载中...'); setTimeout(()=>Loading.hide(), 2000)">显示全屏加载</button>
+        </div>
+      </section>
+      
+      <!-- Tooltip -->
+      <section class="preview-section">
+        <h2>Tooltip 文字提示</h2>
+        <div class="preview-row">
+          <span class="tooltip">
+            <button class="btn">上方提示</button>
+            <span class="tooltip-content">这是提示内容</span>
+          </span>
+          <span class="tooltip tooltip-bottom">
+            <button class="btn">下方提示</button>
+            <span class="tooltip-content">这是提示内容</span>
+          </span>
+        </div>
+      </section>
+      
+      <!-- Alert -->
+      <section class="preview-section">
+        <h2>Alert 警告提示</h2>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div class="alert alert-info">
+            <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
+            </svg>
+            <div class="alert-content">这是一条信息提示。</div>
+          </div>
+          <div class="alert alert-success">
+            <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
+            </svg>
+            <div class="alert-content">操作成功！</div>
+          </div>
+          <div class="alert alert-warning">
+            <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <div class="alert-content">请注意检查！</div>
+          </div>
+          <div class="alert alert-error">
+            <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/>
+            </svg>
+            <div class="alert-content">发生错误！</div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Progress -->
+      <section class="preview-section">
+        <h2>Progress 进度条</h2>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div class="progress">
+            <div class="progress-bar" style="width: 60%"></div>
+          </div>
+          <div class="progress progress-success">
+            <div class="progress-bar" style="width: 80%"></div>
+          </div>
+          <div class="progress progress-striped progress-animated">
+            <div class="progress-bar" style="width: 45%"></div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Skeleton -->
+      <section class="preview-section">
+        <h2>Skeleton 骨架屏</h2>
+        <div class="skeleton-card" style="max-width: 400px;">
+          <div class="skeleton-card-header">
+            <div class="skeleton skeleton-avatar"></div>
+            <div style="flex: 1;">
+              <div class="skeleton skeleton-text" style="width: 40%;"></div>
+              <div class="skeleton skeleton-text" style="width: 20%; height: 0.75rem;"></div>
+            </div>
+          </div>
+          <div class="skeleton-card-body">
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text" style="width: 80%;"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+    
+    <footer style="text-align: center; padding: 2rem; color: var(--text-muted);">
+      <p>组件库完整版 · 共 43 个组件</p>
+    </footer>
+  </div>
+  
+  <!-- 示例弹窗 -->
+  <div class="modal-overlay" id="demo-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">弹窗标题</h3>
+        <button class="modal-close" type="button" onclick="closeDemoModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>这是弹窗的内容区域。</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeDemoModal()">取消</button>
+        <button class="btn btn-primary" onclick="closeDemoModal(); Toast.success('已确认')">确认</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 脚本 -->
+  <script src="base/select/script.js"></script>
+  <script src="base/multi-select/script.js"></script>
+  <script src="base/textarea/script.js"></script>
+  <script src="navigation/dropdown/script.js"></script>
+  <script src="navigation/tabs/script.js"></script>
+  <script src="navigation/back-to-top/script.js"></script>
+  <script src="feedback/toast/script.js"></script>
+  <script src="feedback/loading/script.js"></script>
+  <script src="feedback/modal/script.js"></script>
+  <script src="feedback/drawer/script.js"></script>
+  <script src="data-entry/search/script.js"></script>
+  <script src="data-entry/slider/script.js"></script>
+  <script src="data-entry/rate/script.js"></script>
+  <script src="data-display/collapse/script.js"></script>
+  <script src="data-display/carousel/script.js"></script>
+  
+  <script>
+    // 初始化 Multi-Select
+    if (typeof MultiSelect !== 'undefined') {
+      new MultiSelect(document.getElementById('multi-select-demo'), {
+        placeholder: '请选择标签',
+        data: [
+          { value: 'frontend', label: '前端开发' },
+          { value: 'backend', label: '后端开发' },
+          { value: 'uiux', label: 'UI/UX 设计' },
+          { value: 'pm', label: '产品经理' },
+          { value: 'test', label: '测试工程师' },
+          { value: 'devops', label: 'DevOps' }
+        ]
+      });
+    }
+    
+    function openDrawer(position) {
+      Drawer.open({
+        title: position === 'right' ? '右侧抽屉' : position === 'left' ? '左侧抽屉' : '底部抽屉',
+        content: '<p>这是抽屉的内容区域。</p>',
+        position: position
+      });
+    }
+    
+    function openDemoModal() {
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      document.body.style.paddingRight = scrollbarWidth + 'px';
+      document.body.style.overflow = 'hidden';
+      document.getElementById('demo-modal').classList.add('modal-open');
+    }
+    
+    function closeDemoModal() {
+      document.getElementById('demo-modal').classList.remove('modal-open');
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    }
+    
+    document.getElementById('demo-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'demo-modal') closeDemoModal();
+    });
+    
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeDemoModal();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+/* ============================================
+   Drawer 抽屉组件
+   ============================================ */
+
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background-color: var(--drawer-overlay-bg, rgba(15, 23, 42, 0.5));
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.drawer-overlay.drawer-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.drawer {
+  position: fixed;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--drawer-bg, var(--bg-card, #ffffff));
+  box-shadow: var(--drawer-shadow, 0 25px 50px -12px rgba(0, 0, 0, 0.25));
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 位置变体 */
+.drawer-right {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--drawer-width, 400px);
+  max-width: 100%;
+  transform: translateX(100%);
+}
+
+.drawer-left {
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--drawer-width, 400px);
+  max-width: 100%;
+  transform: translateX(-100%);
+}
+
+.drawer-top {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--drawer-height, 300px);
+  max-height: 100%;
+  transform: translateY(-100%);
+}
+
+.drawer-bottom {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--drawer-height, 300px);
+  max-height: 100%;
+  transform: translateY(100%);
+}
+
+/* 打开状态 */
+.drawer-open .drawer-right,
+.drawer-open .drawer-left,
+.drawer-open .drawer-top,
+.drawer-open .drawer-bottom {
+  transform: translate(0);
+}
+
+/* 尺寸变体 */
+.drawer-sm {
+  --drawer-width: 320px;
+  --drawer-height: 240px;
+}
+
+.drawer-lg {
+  --drawer-width: 560px;
+  --drawer-height: 400px;
+}
+
+.drawer-xl {
+  --drawer-width: 720px;
+  --drawer-height: 500px;
+}
+
+.drawer-full {
+  --drawer-width: 100%;
+  --drawer-height: 100%;
+}
+
+/* 头部 */
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--drawer-header-padding, 1rem 1.25rem);
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  flex-shrink: 0;
+}
+
+.drawer-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary, #111827);
+}
+
+.drawer-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: var(--border-radius-md, 0.5rem);
+  color: var(--text-muted, #9ca3af);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.drawer-close:hover {
+  background-color: var(--bg-hover, rgba(0, 0, 0, 0.05));
+  color: var(--text-primary, #111827);
+}
+
+.drawer-close svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* 内容区 */
+.drawer-body {
+  flex: 1;
+  padding: var(--drawer-body-padding, 1.25rem);
+  overflow-y: auto;
+}
+
+.drawer-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.drawer-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.drawer-body::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb, #d1d5db);
+  border-radius: 3px;
+}
+
+/* 底部 */
+.drawer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: var(--drawer-footer-padding, 1rem 1.25rem);
+  border-top: 1px solid var(--border-color, #e5e7eb);
+  flex-shrink: 0;
+}
+
+/* ============================================
+   响应式
+   ============================================ */
+
+@media (max-width: 640px) {
+  .drawer-right,
+  .drawer-left {
+    --drawer-width: 100%;
+  }
+  
+  .drawer-footer {
+    flex-direction: column-reverse;
+  }
+  
+  .drawer-footer .btn {
+    width: 100%;
+  }
+}
+

@@ -1,0 +1,160 @@
+/* ============================================
+   Radio 单选框组件
+   ============================================ */
+
+.radio {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--radio-gap, 0.5rem);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* 隐藏原生单选框 */
+.radio-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 自定义单选框 */
+.radio-dot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--radio-size, 1.125rem);
+  height: var(--radio-size, 1.125rem);
+  background-color: var(--radio-bg, var(--bg-card, #ffffff));
+  border: var(--radio-border-width, 2px) solid var(--radio-border-color, var(--border-color, #d1d5db));
+  border-radius: 50%;
+  transition: var(--transition-base, all 0.2s ease);
+}
+
+.radio-dot::after {
+  content: "";
+  width: 50%;
+  height: 50%;
+  background-color: white;
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.15s ease;
+}
+
+/* 悬停状态 */
+.radio:hover:not(.radio-disabled) .radio-dot {
+  border-color: var(--radio-hover-border, var(--color-primary, #3b82f6));
+}
+
+/* 聚焦状态 */
+.radio-input:focus-visible + .radio-dot {
+  outline: 2px solid var(--color-primary, #3b82f6);
+  outline-offset: 2px;
+}
+
+/* 选中状态 */
+.radio-input:checked + .radio-dot {
+  background-color: var(--radio-checked-bg, var(--color-primary, #3b82f6));
+  border-color: var(--radio-checked-border, var(--color-primary, #3b82f6));
+}
+
+.radio-input:checked + .radio-dot::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* 禁用状态 */
+.radio-disabled {
+  cursor: not-allowed;
+}
+
+.radio-disabled .radio-dot {
+  background-color: var(--radio-disabled-bg, var(--bg-secondary, #f3f4f6));
+  border-color: var(--radio-disabled-border, var(--border-color, #d1d5db));
+}
+
+.radio-disabled .radio-label {
+  color: var(--text-muted, #9ca3af);
+}
+
+.radio-disabled .radio-input:checked + .radio-dot {
+  background-color: var(--radio-disabled-checked-bg, var(--border-color, #d1d5db));
+  border-color: var(--radio-disabled-checked-bg, var(--border-color, #d1d5db));
+}
+
+/* 标签 */
+.radio-label {
+  font-size: var(--radio-label-size, 0.875rem);
+  color: var(--radio-label-color, var(--text-primary, #111827));
+}
+
+/* 单选框组 */
+.radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--radio-group-gap, 1rem);
+}
+
+.radio-group-vertical {
+  flex-direction: column;
+  gap: var(--radio-group-gap-vertical, 0.75rem);
+}
+
+/* 按钮样式单选框组 */
+.radio-button-group {
+  display: inline-flex;
+  border: 1px solid var(--border-color, #d1d5db);
+  border-radius: var(--border-radius-md, 0.5rem);
+  overflow: hidden;
+}
+
+.radio-button {
+  cursor: pointer;
+}
+
+.radio-button .radio-input {
+  position: absolute;
+  opacity: 0;
+}
+
+.radio-button-label {
+  display: block;
+  padding: var(--radio-button-padding-y, 0.5rem) var(--radio-button-padding-x, 1rem);
+  font-size: var(--radio-button-font-size, 0.875rem);
+  color: var(--text-secondary, #6b7280);
+  background-color: var(--bg-card, #ffffff);
+  border-right: 1px solid var(--border-color, #d1d5db);
+  transition: var(--transition-base, all 0.2s ease);
+}
+
+.radio-button:last-child .radio-button-label {
+  border-right: none;
+}
+
+.radio-button:hover .radio-button-label {
+  background-color: var(--bg-hover, #f3f4f6);
+}
+
+.radio-button .radio-input:checked + .radio-button-label {
+  color: var(--color-primary, #3b82f6);
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* 尺寸变体 */
+.radio-sm {
+  --radio-size: 0.875rem;
+  --radio-label-size: 0.75rem;
+}
+
+.radio-lg {
+  --radio-size: 1.375rem;
+  --radio-label-size: 1rem;
+}
+

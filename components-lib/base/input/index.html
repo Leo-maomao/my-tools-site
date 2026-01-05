@@ -1,0 +1,83 @@
+<!-- 基础输入框 -->
+<input type="text" class="input" placeholder="请输入内容">
+
+<!-- 带标签的输入框 -->
+<div class="input-wrapper">
+  <label class="input-label">用户名</label>
+  <input type="text" class="input" placeholder="请输入用户名">
+</div>
+
+<!-- 必填标识 -->
+<div class="input-wrapper">
+  <label class="input-label input-required">邮箱</label>
+  <input type="email" class="input" placeholder="请输入邮箱">
+</div>
+
+<!-- 带前缀图标 -->
+<div class="input-group">
+  <span class="input-prefix">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+  </span>
+  <input type="text" class="input input-with-prefix" placeholder="搜索...">
+</div>
+
+<!-- 带后缀图标 -->
+<div class="input-group">
+  <input type="text" class="input input-with-suffix" placeholder="请输入">
+  <span class="input-suffix">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M9 18l6-6-6-6"/>
+    </svg>
+  </span>
+</div>
+
+<!-- 带清除按钮 -->
+<div class="input-group">
+  <input type="text" class="input input-with-suffix" placeholder="可清除" value="已输入内容">
+  <button class="input-clear" type="button" aria-label="清除">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M18 6L6 18M6 6l12 12"/>
+    </svg>
+  </button>
+</div>
+
+<!-- 密码输入框 -->
+<div class="input-group">
+  <input type="password" class="input input-with-suffix" placeholder="请输入密码">
+  <button class="input-toggle-password" type="button" aria-label="显示密码">
+    <svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+  </button>
+</div>
+
+<!-- 尺寸变体 -->
+<input type="text" class="input input-sm" placeholder="小尺寸">
+<input type="text" class="input" placeholder="默认尺寸">
+<input type="text" class="input input-lg" placeholder="大尺寸">
+
+<!-- 状态 -->
+<input type="text" class="input" placeholder="默认状态">
+<input type="text" class="input input-focus" placeholder="聚焦状态">
+<input type="text" class="input input-error" placeholder="错误状态">
+<input type="text" class="input input-success" placeholder="成功状态">
+<input type="text" class="input" placeholder="禁用状态" disabled>
+<input type="text" class="input" placeholder="只读状态" readonly value="只读内容">
+
+<!-- 带提示信息 -->
+<div class="input-wrapper">
+  <label class="input-label">用户名</label>
+  <input type="text" class="input" placeholder="请输入用户名">
+  <span class="input-hint">用户名长度 4-20 个字符</span>
+</div>
+
+<!-- 带错误信息 -->
+<div class="input-wrapper">
+  <label class="input-label">邮箱</label>
+  <input type="email" class="input input-error" placeholder="请输入邮箱" value="invalid-email">
+  <span class="input-error-message">请输入有效的邮箱地址</span>
+</div>
+

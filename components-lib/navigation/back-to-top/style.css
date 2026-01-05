@@ -1,0 +1,81 @@
+/* ============================================
+   Back to Top 回到顶部组件
+   ============================================ */
+
+.back-to-top {
+  position: fixed;
+  right: var(--back-to-top-right, 1.5rem);
+  bottom: var(--back-to-top-bottom, 1.5rem);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  width: var(--back-to-top-size, 2.75rem);
+  height: var(--back-to-top-size, 2.75rem);
+  padding: 0;
+  background-color: var(--back-to-top-bg, var(--bg-card, #ffffff));
+  border: 1px solid var(--back-to-top-border, var(--border-color, #e5e7eb));
+  border-radius: var(--back-to-top-radius, 8px);
+  box-shadow: var(--back-to-top-shadow, var(--shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1)));
+  color: var(--back-to-top-color, var(--text-secondary, #6b7280));
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+}
+
+.back-to-top:hover {
+  background-color: var(--back-to-top-hover-bg, var(--color-primary, #3b82f6));
+  border-color: var(--back-to-top-hover-bg, var(--color-primary, #3b82f6));
+  color: var(--back-to-top-hover-color, #ffffff);
+  transform: translateY(-2px);
+  box-shadow: var(--back-to-top-hover-shadow, 0 8px 16px rgba(59, 130, 246, 0.3));
+}
+
+.back-to-top:active {
+  transform: translateY(0);
+}
+
+/* 显示状态 */
+.back-to-top-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* 图标 */
+.back-to-top svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* 带文字 */
+.back-to-top-with-text {
+  width: auto;
+  height: auto;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+}
+
+.back-to-top-with-text svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* 圆形 */
+.back-to-top-rounded {
+  --back-to-top-radius: 50%;
+}
+
+/* 响应式 */
+@media (max-width: 640px) {
+  .back-to-top {
+    --back-to-top-right: 1rem;
+    --back-to-top-bottom: 1rem;
+    --back-to-top-size: 2.5rem;
+  }
+}
+

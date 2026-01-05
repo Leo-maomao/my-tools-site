@@ -1,0 +1,47 @@
+/* ============================================
+   Container 容器组件
+   ============================================ */
+
+.container {
+  width: 100%;
+  max-width: var(--container-max-width, 1200px);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--container-padding-x, 1rem);
+  padding-right: var(--container-padding-x, 1rem);
+}
+
+/* 尺寸变体 */
+.container-sm {
+  --container-max-width: 720px;
+}
+
+.container-md {
+  --container-max-width: 960px;
+}
+
+.container-lg {
+  --container-max-width: 1400px;
+}
+
+.container-xl {
+  --container-max-width: 1600px;
+}
+
+.container-fluid {
+  max-width: none;
+}
+
+/* 响应式 padding */
+@media (min-width: 640px) {
+  .container {
+    --container-padding-x: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    --container-padding-x: 2rem;
+  }
+}
+

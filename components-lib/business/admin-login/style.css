@@ -1,0 +1,288 @@
+/* ============================================
+   Admin Login 管理员登录组件
+   支持键盘快捷键触发，Supabase Auth 集成
+   ============================================ */
+
+/* 登录入口触发按钮（隐藏或小图标） */
+.admin-login-trigger {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #9ca3af);
+  cursor: pointer;
+  opacity: 0.3;
+  transition: opacity 0.2s ease;
+  z-index: 100;
+}
+
+.admin-login-trigger:hover {
+  opacity: 1;
+}
+
+.admin-login-trigger svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* 登录弹窗 */
+.admin-login-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s ease;
+}
+
+.admin-login-overlay.admin-login-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.admin-login-modal {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  background: var(--bg-card, #ffffff);
+  border-radius: var(--border-radius-lg, 0.75rem);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+  transform: scale(0.95) translateY(20px);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+
+.admin-login-open .admin-login-modal {
+  transform: scale(1) translateY(0);
+}
+
+/* 关闭按钮 */
+.admin-login-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 0.5rem;
+  color: var(--text-muted, #9ca3af);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.admin-login-close:hover {
+  background-color: var(--bg-hover, rgba(0, 0, 0, 0.05));
+  color: var(--text-primary, #111827);
+}
+
+.admin-login-close svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* 内容区 */
+.admin-login-content {
+  padding: 2.5rem 2rem;
+}
+
+.admin-login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.admin-login-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: 0 auto 1rem;
+  background: linear-gradient(135deg, var(--color-primary, #3b82f6) 0%, var(--color-primary-dark, #2563eb) 100%);
+  border-radius: 50%;
+  color: #ffffff;
+}
+
+.admin-login-icon svg {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.admin-login-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary, #111827);
+}
+
+.admin-login-desc {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-muted, #9ca3af);
+}
+
+/* 表单 */
+.admin-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-login-form .input-wrapper {
+  position: relative;
+}
+
+.admin-login-form .input-icon {
+  position: absolute;
+  left: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1rem;
+  height: 1rem;
+  color: var(--text-muted, #9ca3af);
+  pointer-events: none;
+}
+
+.admin-login-form .input {
+  padding-left: 2.5rem;
+}
+
+.admin-login-form .input-password-toggle {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0.25rem;
+  background: none;
+  border: none;
+  color: var(--text-muted, #9ca3af);
+  cursor: pointer;
+}
+
+.admin-login-form .input-password-toggle:hover {
+  color: var(--text-secondary, #6b7280);
+}
+
+.admin-login-remember {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6b7280);
+}
+
+.admin-login-submit {
+  margin-top: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+}
+
+/* 错误提示 */
+.admin-login-error {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: var(--color-danger, #ef4444);
+  background-color: rgba(239, 68, 68, 0.1);
+  border-radius: var(--border-radius-md, 0.5rem);
+  text-align: center;
+}
+
+/* 加载状态 */
+.admin-login-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.admin-login-loading .loading-spinner {
+  width: 1rem;
+  height: 1rem;
+  border-width: 2px;
+}
+
+/* 快捷键提示 */
+.admin-login-shortcut {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color, #e5e7eb);
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-muted, #9ca3af);
+}
+
+.admin-login-shortcut kbd {
+  display: inline-block;
+  padding: 0.125rem 0.375rem;
+  font-family: inherit;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--text-secondary, #6b7280);
+  background-color: var(--bg-secondary, #f8fafc);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 0.25rem;
+}
+
+/* ============================================
+   已登录状态
+   ============================================ */
+
+.admin-logged-in {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
+  border-radius: var(--border-radius-md, 0.5rem);
+  margin-bottom: 1rem;
+}
+
+.admin-logged-in-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  background-color: var(--color-success, #10b981);
+  border-radius: 50%;
+  color: #ffffff;
+}
+
+.admin-logged-in-icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.admin-logged-in-info {
+  flex: 1;
+}
+
+.admin-logged-in-name {
+  font-weight: 500;
+  color: var(--text-primary, #111827);
+}
+
+.admin-logged-in-email {
+  font-size: 0.8125rem;
+  color: var(--text-muted, #9ca3af);
+}
+
+.admin-logout-btn {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+}
+

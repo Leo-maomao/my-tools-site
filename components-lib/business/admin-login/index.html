@@ -1,0 +1,76 @@
+<!-- Admin Login 管理员登录组件 -->
+
+<!-- 触发按钮（可选，通常隐藏） -->
+<button class="admin-login-trigger" type="button" aria-label="管理员登录">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+    <circle cx="12" cy="12" r="3"/>
+  </svg>
+</button>
+
+<!-- 登录弹窗 -->
+<div class="admin-login-overlay" id="admin-login">
+  <div class="admin-login-modal">
+    <button class="admin-login-close" type="button" aria-label="关闭">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 6L6 18M6 6l12 12"/>
+      </svg>
+    </button>
+    
+    <div class="admin-login-content">
+      <header class="admin-login-header">
+        <div class="admin-login-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+            <polyline points="10 17 15 12 10 7"/>
+            <line x1="15" y1="12" x2="3" y2="12"/>
+          </svg>
+        </div>
+        <h2 class="admin-login-title">管理员登录</h2>
+        <p class="admin-login-desc">请输入您的管理员凭据</p>
+      </header>
+      
+      <form class="admin-login-form" id="admin-login-form">
+        <div class="input-wrapper">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          <input type="email" class="input" name="email" placeholder="邮箱地址" required autocomplete="email">
+        </div>
+        
+        <div class="input-wrapper">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <input type="password" class="input" name="password" placeholder="密码" required autocomplete="current-password">
+          <button type="button" class="input-password-toggle" aria-label="显示密码">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+        
+        <label class="admin-login-remember">
+          <input type="checkbox" name="remember" checked>
+          <span>保持登录状态</span>
+        </label>
+        
+        <div class="admin-login-error" style="display: none;" id="admin-login-error">
+          登录失败，请检查邮箱和密码
+        </div>
+        
+        <button type="submit" class="btn btn-primary admin-login-submit">
+          登录
+        </button>
+      </form>
+      
+      <div class="admin-login-shortcut">
+        按 <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd> 快速打开
+      </div>
+    </div>
+  </div>
+</div>
+

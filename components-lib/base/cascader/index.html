@@ -1,0 +1,45 @@
+<!-- Cascader 级联选择组件 -->
+
+<!-- 基础用法 - 触发器 -->
+<div class="cascader" style="max-width: 280px;">
+  <button class="cascader-trigger" type="button">
+    <span class="cascader-value cascader-placeholder">请选择地区</span>
+    <svg class="cascader-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="m6 9 6 6 6-6"/>
+    </svg>
+  </button>
+</div>
+
+<!-- 已选中状态 -->
+<div class="cascader" style="max-width: 280px;">
+  <button class="cascader-trigger" type="button">
+    <span class="cascader-value">
+      浙江省
+      <span class="cascader-separator">/</span>
+      杭州市
+      <span class="cascader-separator">/</span>
+      西湖区
+    </span>
+    <svg class="cascader-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="m6 9 6 6 6-6"/>
+    </svg>
+  </button>
+</div>
+
+<!-- 展开状态（三级菜单水平展示） -->
+<div class="cascader-preview-container" style="display: flex; gap: 4px; max-width: 500px;">
+  <div class="cascader-preview-menu" style="min-width: 140px; padding: 4px; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+    <div class="cascader-item cascader-item-has-children" style="background: #f3f4f6; color: #3b82f6;">北京市</div>
+    <div class="cascader-item cascader-item-has-children">浙江省</div>
+    <div class="cascader-item cascader-item-has-children">广东省</div>
+  </div>
+  <div class="cascader-preview-menu" style="min-width: 140px; padding: 4px; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+    <div class="cascader-item cascader-item-has-children" style="background: #f3f4f6; color: #3b82f6;">北京市</div>
+  </div>
+  <div class="cascader-preview-menu" style="min-width: 140px; padding: 4px; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+    <div class="cascader-item">东城区</div>
+    <div class="cascader-item">西城区</div>
+    <div class="cascader-item cascader-item-selected">朝阳区</div>
+    <div class="cascader-item">海淀区</div>
+  </div>
+</div>

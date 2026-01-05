@@ -1,0 +1,71 @@
+<!-- 可交互下拉选择 -->
+<div class="select" style="max-width: 220px;">
+  <button class="select-trigger" type="button">
+    <span class="select-value select-placeholder">请选择</span>
+    <svg class="select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="m6 9 6 6 6-6"/>
+    </svg>
+  </button>
+  <div class="select-dropdown">
+    <div class="select-option" data-value="1">选项一</div>
+    <div class="select-option" data-value="2">选项二</div>
+    <div class="select-option" data-value="3">选项三</div>
+    <div class="select-option select-option-disabled" data-value="4">禁用选项</div>
+  </div>
+</div>
+
+<!-- 带标签 -->
+<div style="display: flex; flex-direction: column; gap: 6px; max-width: 200px;">
+  <label style="font-size: 14px; font-weight: 500; color: #374151;">分类</label>
+  <div class="select">
+    <button class="select-trigger" type="button">
+      <span class="select-value select-placeholder">请选择分类</span>
+      <svg class="select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="m6 9 6 6 6-6"/>
+      </svg>
+    </button>
+    <div class="select-dropdown">
+      <div class="select-option" data-value="design">设计</div>
+      <div class="select-option" data-value="dev">开发</div>
+      <div class="select-option" data-value="product">产品</div>
+    </div>
+  </div>
+</div>
+
+<!-- 尺寸变体 -->
+<div style="display: flex; align-items: center; gap: 12px;">
+  <div class="select select-sm" style="width: 140px;">
+    <button class="select-trigger" type="button">
+      <span class="select-value">小尺寸</span>
+      <svg class="select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="m6 9 6 6 6-6"/>
+      </svg>
+    </button>
+    <div class="select-dropdown">
+      <div class="select-option select-option-selected" data-value="sm">小尺寸</div>
+      <div class="select-option" data-value="md">中尺寸</div>
+    </div>
+  </div>
+  <div class="select select-lg" style="width: 160px;">
+    <button class="select-trigger" type="button">
+      <span class="select-value">大尺寸</span>
+      <svg class="select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="m6 9 6 6 6-6"/>
+      </svg>
+    </button>
+    <div class="select-dropdown">
+      <div class="select-option" data-value="md">中尺寸</div>
+      <div class="select-option select-option-selected" data-value="lg">大尺寸</div>
+    </div>
+  </div>
+</div>
+
+<!-- 禁用状态 -->
+<div class="select select-disabled" style="max-width: 200px;">
+  <button class="select-trigger" type="button" disabled>
+    <span class="select-value">禁用状态</span>
+    <svg class="select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="m6 9 6 6 6-6"/>
+    </svg>
+  </button>
+</div>

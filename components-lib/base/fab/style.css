@@ -1,0 +1,114 @@
+/* ============================================
+   FAB 悬浮操作按钮组件
+   ============================================ */
+
+/* 悬浮按钮组容器 */
+.fab-group {
+  position: fixed;
+  right: var(--fab-right, 1.5rem);
+  bottom: var(--fab-bottom, 1.5rem);
+  z-index: var(--fab-z-index, 100);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--fab-gap, 0.75rem);
+}
+
+/* 单个悬浮按钮 */
+.fab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--fab-size, 3rem);
+  height: var(--fab-size, 3rem);
+  padding: 0;
+  background-color: var(--fab-bg, var(--bg-card, #ffffff));
+  border: 1px solid var(--fab-border, var(--border-color, #e5e7eb));
+  border-radius: 50%;
+  box-shadow: var(--fab-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
+  color: var(--fab-color, var(--text-secondary, #6b7280));
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fab:hover {
+  background-color: var(--fab-hover-bg, var(--color-primary, #3b82f6));
+  border-color: var(--fab-hover-bg, var(--color-primary, #3b82f6));
+  color: var(--fab-hover-color, #ffffff);
+  transform: translateY(-2px);
+  box-shadow: var(--fab-hover-shadow, 0 6px 16px rgba(59, 130, 246, 0.3));
+}
+
+.fab:active {
+  transform: translateY(0);
+}
+
+/* 图标 */
+.fab svg,
+.fab img {
+  width: var(--fab-icon-size, 1.25rem);
+  height: var(--fab-icon-size, 1.25rem);
+}
+
+/* 主要按钮（强调色） */
+.fab-primary {
+  background-color: var(--fab-primary-bg, var(--color-primary, #3b82f6));
+  border-color: var(--fab-primary-bg, var(--color-primary, #3b82f6));
+  color: var(--fab-primary-color, #ffffff);
+}
+
+.fab-primary:hover {
+  background-color: var(--fab-primary-hover-bg, var(--color-primary-dark, #2563eb));
+  border-color: var(--fab-primary-hover-bg, var(--color-primary-dark, #2563eb));
+}
+
+/* 成功按钮 */
+.fab-success {
+  background-color: var(--fab-success-bg, var(--color-success, #10b981));
+  border-color: var(--fab-success-bg, var(--color-success, #10b981));
+  color: #ffffff;
+}
+
+.fab-success:hover {
+  background-color: var(--fab-success-hover-bg, #059669);
+  border-color: var(--fab-success-hover-bg, #059669);
+}
+
+/* 隐藏状态（用于回到顶部等需要条件显示的按钮） */
+.fab-hidden {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+}
+
+.fab-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* 尺寸变体 */
+.fab-sm {
+  --fab-size: 2.5rem;
+  --fab-icon-size: 1rem;
+}
+
+.fab-lg {
+  --fab-size: 3.5rem;
+  --fab-icon-size: 1.5rem;
+}
+
+/* 响应式 */
+@media (max-width: 640px) {
+  .fab-group {
+    --fab-right: 1rem;
+    --fab-bottom: 1rem;
+    --fab-gap: 0.5rem;
+  }
+  
+  .fab {
+    --fab-size: 2.75rem;
+    --fab-icon-size: 1.125rem;
+  }
+}
+

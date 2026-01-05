@@ -1,0 +1,116 @@
+.image {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  background: var(--bg-muted, #f3f4f6);
+}
+
+.image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.image-rounded {
+  border-radius: var(--border-radius-md, 0.5rem);
+}
+
+.image-circle {
+  border-radius: 50%;
+}
+
+.image-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-muted, #f3f4f6);
+  color: var(--text-muted, #9ca3af);
+}
+
+.image-placeholder svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.image-loading .image-placeholder {
+  animation: image-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes image-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.image-error .image-placeholder {
+  background: var(--bg-muted, #f3f4f6);
+}
+
+.image-hover-zoom:hover img {
+  transform: scale(1.05);
+}
+
+.image-preview {
+  cursor: zoom-in;
+}
+
+.image-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+  cursor: zoom-out;
+}
+
+.image-overlay-active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.image-overlay img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+}
+
+.image-overlay-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.image-overlay-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.image-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.5rem 0.75rem;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+  color: #ffffff;
+  font-size: 0.875rem;
+}
+

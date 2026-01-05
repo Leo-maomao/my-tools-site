@@ -1,0 +1,146 @@
+/* ============================================
+   Card 卡片组件
+   ============================================ */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--card-bg, var(--bg-card, #ffffff));
+  border: var(--card-border-width, 1px) solid var(--card-border-color, var(--border-color, #e5e7eb));
+  border-radius: var(--card-radius, var(--border-radius-lg, 0.75rem));
+  overflow: hidden;
+  transition: var(--transition-base, all 0.2s ease);
+}
+
+/* 卡片图片 */
+.card-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* 卡片头部 */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--card-header-padding, 1rem 1.25rem);
+  border-bottom: 1px solid var(--card-border-color, var(--border-color, #e5e7eb));
+}
+
+.card-header-title {
+  margin: 0;
+  font-size: var(--card-header-title-size, 1rem);
+  font-weight: 600;
+  color: var(--text-primary, #111827);
+}
+
+/* 卡片主体 */
+.card-body {
+  flex: 1;
+  padding: var(--card-padding, 1.25rem);
+}
+
+/* 卡片标题 */
+.card-title {
+  margin: 0 0 0.5rem 0;
+  font-size: var(--card-title-size, 1.125rem);
+  font-weight: 600;
+  color: var(--card-title-color, var(--text-primary, #111827));
+  line-height: 1.4;
+}
+
+/* 卡片文字 */
+.card-text {
+  margin: 0;
+  font-size: var(--card-text-size, 0.875rem);
+  color: var(--card-text-color, var(--text-secondary, #6b7280));
+  line-height: 1.6;
+}
+
+.card-text + .card-text {
+  margin-top: 0.5rem;
+}
+
+/* 卡片尾部 */
+.card-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: var(--card-footer-padding, 1rem 1.25rem);
+  border-top: 1px solid var(--card-border-color, var(--border-color, #e5e7eb));
+}
+
+/* 可点击卡片 */
+.card-hoverable {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.card-hoverable:hover {
+  box-shadow: var(--card-hover-shadow, var(--shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1)));
+  transform: translateY(-2px);
+}
+
+/* 选中状态 */
+.card-selected {
+  border-color: var(--card-selected-border, var(--color-primary, #3b82f6));
+  box-shadow: 0 0 0 3px var(--card-selected-shadow, rgba(59, 130, 246, 0.1));
+}
+
+/* 无边框 */
+.card-borderless {
+  border: none;
+  box-shadow: var(--card-shadow, var(--shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1)));
+}
+
+/* 带边框强调 */
+.card-bordered {
+  border-width: 2px;
+  border-color: var(--card-bordered-color, var(--color-primary, #3b82f6));
+}
+
+/* 紧凑 */
+.card-compact {
+  --card-padding: 0.75rem;
+  --card-header-padding: 0.625rem 0.75rem;
+  --card-footer-padding: 0.625rem 0.75rem;
+}
+
+/* 水平卡片 */
+.card-horizontal {
+  flex-direction: row;
+}
+
+.card-horizontal .card-image {
+  width: var(--card-horizontal-image-width, 200px);
+  height: auto;
+  object-fit: cover;
+}
+
+/* 卡片组 */
+.card-group {
+  display: flex;
+  gap: var(--card-group-gap, 1rem);
+}
+
+.card-group .card {
+  flex: 1;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .card-horizontal {
+    flex-direction: column;
+  }
+  
+  .card-horizontal .card-image {
+    width: 100%;
+  }
+  
+  .card-group {
+    flex-direction: column;
+  }
+}
+

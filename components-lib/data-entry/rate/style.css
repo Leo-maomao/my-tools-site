@@ -1,0 +1,65 @@
+.rate {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.rate-star {
+  width: 1.25rem;
+  height: 1.25rem;
+  cursor: pointer;
+  color: var(--border-color, #d1d5db);
+  transition: color 0.15s, transform 0.15s;
+}
+
+.rate-star:hover {
+  transform: scale(1.1);
+}
+
+.rate-star-active {
+  color: var(--rate-color, #fbbf24);
+}
+
+.rate-star-half {
+  position: relative;
+}
+
+.rate-star-half::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.rate-text {
+  margin-left: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6b7280);
+}
+
+.rate-sm .rate-star {
+  width: 1rem;
+  height: 1rem;
+}
+
+.rate-lg .rate-star {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.rate-disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.rate-readonly .rate-star {
+  cursor: default;
+}
+
+.rate-readonly .rate-star:hover {
+  transform: none;
+}
+

@@ -1,0 +1,116 @@
+.steps {
+  display: flex;
+  align-items: flex-start;
+}
+
+.step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: calc(50% + 18px);
+  right: calc(-50% + 18px);
+  height: 2px;
+  background: var(--border-color, #e5e7eb);
+}
+
+.step-done:not(:last-child)::after {
+  background: var(--color-primary, #3b82f6);
+}
+
+.step-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: var(--bg-muted, #f3f4f6);
+  color: var(--text-muted, #9ca3af);
+  border: 2px solid var(--border-color, #e5e7eb);
+  position: relative;
+  z-index: 1;
+  transition: all 0.2s;
+}
+
+.step-active .step-icon {
+  background: var(--color-primary, #3b82f6);
+  color: #ffffff;
+  border-color: var(--color-primary, #3b82f6);
+}
+
+.step-done .step-icon {
+  background: var(--color-primary, #3b82f6);
+  color: #ffffff;
+  border-color: var(--color-primary, #3b82f6);
+}
+
+.step-content {
+  margin-top: 0.75rem;
+  text-align: center;
+}
+
+.step-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary, #6b7280);
+}
+
+.step-active .step-title {
+  color: var(--text-primary, #111827);
+}
+
+.step-done .step-title {
+  color: var(--text-primary, #111827);
+}
+
+.step-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted, #9ca3af);
+  margin-top: 0.25rem;
+}
+
+.steps-vertical {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.steps-vertical .step {
+  flex-direction: row;
+  align-items: flex-start;
+  padding-bottom: 1.5rem;
+}
+
+.steps-vertical .step:not(:last-child)::after {
+  top: 28px;
+  left: 13px;
+  right: auto;
+  width: 2px;
+  height: calc(100% - 14px);
+}
+
+.steps-vertical .step-content {
+  margin-top: 0;
+  margin-left: 0.75rem;
+  text-align: left;
+}
+
+.steps-sm .step-icon {
+  width: 24px;
+  height: 24px;
+  font-size: 0.75rem;
+}
+
+.steps-sm .step:not(:last-child)::after {
+  top: 11px;
+}
+

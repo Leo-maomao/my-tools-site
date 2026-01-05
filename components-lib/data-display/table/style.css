@@ -1,0 +1,272 @@
+/* ============================================
+   Table 表格组件
+   ============================================ */
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--table-radius, var(--border-radius-md, 0.5rem));
+  border: 1px solid var(--table-border-color, var(--border-color, #e5e7eb));
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--table-font-size, 0.875rem);
+}
+
+/* 表头 */
+.table thead {
+  background-color: var(--table-header-bg, var(--bg-secondary, #f8fafc));
+}
+
+.table th {
+  padding: var(--table-cell-padding, 0.75rem 1rem);
+  font-weight: 600;
+  color: var(--text-primary, #111827);
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--table-border-color, var(--border-color, #e5e7eb));
+}
+
+/* 表体 */
+.table td {
+  padding: var(--table-cell-padding, 0.75rem 1rem);
+  color: var(--text-secondary, #6b7280);
+  border-bottom: 1px solid var(--table-border-color, var(--border-color, #e5e7eb));
+  vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* 悬停效果 */
+.table-hover tbody tr:hover {
+  background-color: var(--table-hover-bg, var(--bg-hover, rgba(0, 0, 0, 0.02)));
+}
+
+/* 斑马纹 */
+.table-striped tbody tr:nth-child(even) {
+  background-color: var(--table-stripe-bg, var(--bg-secondary, #f8fafc));
+}
+
+/* 可选中 */
+.table-selectable tbody tr {
+  cursor: pointer;
+}
+
+.table-selectable tbody tr.table-row-selected {
+  background-color: var(--table-selected-bg, rgba(59, 130, 246, 0.05));
+}
+
+/* 紧凑模式 */
+.table-compact th,
+.table-compact td {
+  padding: var(--table-compact-padding, 0.5rem 0.75rem);
+}
+
+/* ============================================
+   排序
+   ============================================ */
+
+.table-sortable th {
+  cursor: pointer;
+  user-select: none;
+}
+
+.table-sortable th:hover {
+  background-color: var(--table-sort-hover-bg, rgba(0, 0, 0, 0.03));
+}
+
+.table-sort-icon {
+  display: inline-flex;
+  flex-direction: column;
+  margin-left: 0.25rem;
+  vertical-align: middle;
+  opacity: 0.3;
+}
+
+.table-sort-icon svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.table-sort-icon svg:last-child {
+  margin-top: -4px;
+}
+
+th[data-sort="asc"] .table-sort-icon svg:first-child,
+th[data-sort="desc"] .table-sort-icon svg:last-child {
+  opacity: 1;
+  color: var(--color-primary, #3b82f6);
+}
+
+th[data-sort] .table-sort-icon {
+  opacity: 1;
+}
+
+/* ============================================
+   单元格类型
+   ============================================ */
+
+/* 数字右对齐 */
+.table-cell-number {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 操作按钮 */
+.table-cell-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.table-cell-actions .btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+/* 状态标签 */
+.table-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 9999px;
+}
+
+.table-status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.table-status-success {
+  color: var(--color-success, #10b981);
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.table-status-success::before {
+  background-color: var(--color-success, #10b981);
+}
+
+.table-status-warning {
+  color: var(--color-warning, #f59e0b);
+  background-color: rgba(245, 158, 11, 0.1);
+}
+
+.table-status-warning::before {
+  background-color: var(--color-warning, #f59e0b);
+}
+
+.table-status-danger {
+  color: var(--color-danger, #ef4444);
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.table-status-danger::before {
+  background-color: var(--color-danger, #ef4444);
+}
+
+.table-status-info {
+  color: var(--color-info, #3b82f6);
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.table-status-info::before {
+  background-color: var(--color-info, #3b82f6);
+}
+
+/* ============================================
+   空状态
+   ============================================ */
+
+.table-empty {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--text-muted, #9ca3af);
+}
+
+.table-empty-icon {
+  width: 3rem;
+  height: 3rem;
+  margin: 0 auto 0.75rem;
+  opacity: 0.5;
+}
+
+/* ============================================
+   加载状态
+   ============================================ */
+
+.table-loading {
+  position: relative;
+}
+
+.table-loading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-loading .loading-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+/* ============================================
+   响应式
+   ============================================ */
+
+@media (max-width: 640px) {
+  .table-responsive {
+    display: block;
+  }
+  
+  .table-responsive thead {
+    display: none;
+  }
+  
+  .table-responsive tbody,
+  .table-responsive tr,
+  .table-responsive td {
+    display: block;
+  }
+  
+  .table-responsive tr {
+    margin-bottom: 1rem;
+    border: 1px solid var(--table-border-color, var(--border-color, #e5e7eb));
+    border-radius: var(--border-radius-md, 0.5rem);
+  }
+  
+  .table-responsive td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.625rem 0.875rem;
+    border-bottom: 1px solid var(--table-border-color, var(--border-color, #e5e7eb));
+  }
+  
+  .table-responsive td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--text-primary, #111827);
+    margin-right: 1rem;
+  }
+  
+  .table-responsive td:last-child {
+    border-bottom: none;
+  }
+}
+

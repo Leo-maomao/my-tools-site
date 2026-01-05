@@ -1,0 +1,50 @@
+<!-- 不同位置 -->
+<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: center; padding: 40px 20px;">
+  <span class="tooltip">
+    <button class="btn">上</button>
+    <span class="tooltip-content">上方提示</span>
+  </span>
+  <span class="tooltip tooltip-bottom">
+    <button class="btn">下</button>
+    <span class="tooltip-content">下方提示</span>
+  </span>
+  <span class="tooltip tooltip-left">
+    <button class="btn">左</button>
+    <span class="tooltip-content">左侧提示</span>
+  </span>
+  <span class="tooltip tooltip-right">
+    <button class="btn">右</button>
+    <span class="tooltip-content">右侧提示</span>
+  </span>
+</div>
+
+<!-- 浅色主题 -->
+<div style="display: flex; gap: 16px; align-items: center; justify-content: center; padding: 40px 20px;">
+  <span class="tooltip tooltip-light">
+    <button class="btn">浅色主题</button>
+    <span class="tooltip-content">浅色提示文字</span>
+  </span>
+</div>
+
+<!-- 多行文本 -->
+<div style="display: flex; gap: 16px; align-items: center; justify-content: center; padding: 80px 20px;">
+  <span class="tooltip tooltip-multiline" style="position: relative;">
+    <button class="btn">多行文本</button>
+    <span class="tooltip-content" style="width: 200px; white-space: normal; text-align: left;">这是一段较长的提示文字，用于演示多行文本的显示效果。支持自动换行。</span>
+  </span>
+</div>
+
+<!-- 无箭头 -->
+<div style="display: flex; gap: 16px; align-items: center; justify-content: center; padding: 40px 20px;">
+  <span class="tooltip tooltip-no-arrow">
+    <button class="btn">无箭头</button>
+    <span class="tooltip-content">无箭头提示</span>
+  </span>
+</div>
+
+<!-- 使用 data-tooltip 属性 -->
+<div style="display: flex; gap: 16px; align-items: center; justify-content: center; padding: 40px 20px;">
+  <button class="btn" data-tooltip="快捷方式：使用 data-tooltip 属性">
+    悬停查看
+  </button>
+</div>

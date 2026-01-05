@@ -1,0 +1,63 @@
+<!-- 基础标签页 -->
+<div class="tabs">
+  <nav class="tabs-nav" role="tablist">
+    <button class="tabs-item tabs-item-active" role="tab" aria-selected="true">首页</button>
+    <button class="tabs-item" role="tab">用户</button>
+    <button class="tabs-item" role="tab">服务</button>
+    <button class="tabs-item tabs-item-disabled" role="tab" disabled>设置</button>
+  </nav>
+  <div class="tabs-content">
+    <div class="tabs-panel tabs-panel-active" role="tabpanel">
+      首页内容区域
+    </div>
+  </div>
+</div>
+
+<!-- 带图标和徽标 -->
+<div class="tabs">
+  <nav class="tabs-nav" role="tablist">
+    <button class="tabs-item tabs-item-active" role="tab" aria-selected="true">
+      <svg class="tabs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9,22 9,12 15,12 15,22"/>
+      </svg>
+      首页
+    </button>
+    <button class="tabs-item" role="tab">
+      <svg class="tabs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      用户
+      <span class="tabs-item-badge">5</span>
+    </button>
+    <button class="tabs-item" role="tab">
+      <svg class="tabs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+        <path d="M2 17l10 5 10-5"/>
+        <path d="M2 12l10 5 10-5"/>
+      </svg>
+      服务
+    </button>
+    <button class="tabs-item tabs-item-disabled" role="tab" disabled>设置</button>
+  </nav>
+</div>
+
+<!-- 卡片式 -->
+<div class="tabs tabs-card">
+  <nav class="tabs-nav" role="tablist">
+    <button class="tabs-item tabs-item-active" role="tab">全部</button>
+    <button class="tabs-item" role="tab">进行中</button>
+    <button class="tabs-item" role="tab">已完成</button>
+  </nav>
+</div>
+
+<!-- 胶囊式 -->
+<div class="tabs tabs-pill">
+  <nav class="tabs-nav" role="tablist">
+    <button class="tabs-item tabs-item-active" role="tab">日</button>
+    <button class="tabs-item" role="tab">周</button>
+    <button class="tabs-item" role="tab">月</button>
+    <button class="tabs-item" role="tab">年</button>
+  </nav>
+</div>

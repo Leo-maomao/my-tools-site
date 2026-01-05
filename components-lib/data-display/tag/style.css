@@ -1,0 +1,142 @@
+/* ============================================
+   Tag 标签组件
+   ============================================ */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: var(--tag-padding-y, 0.25rem) var(--tag-padding-x, 0.5rem);
+  font-size: var(--tag-font-size, 0.75rem);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--tag-color, var(--text-secondary, #6b7280));
+  background-color: var(--tag-bg, var(--bg-secondary, #f3f4f6));
+  border: 1px solid var(--tag-border, transparent);
+  border-radius: var(--tag-radius, 0.25rem);
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+/* 颜色变体 */
+.tag-primary {
+  --tag-color: var(--color-primary, #3b82f6);
+  --tag-bg: rgba(59, 130, 246, 0.1);
+}
+
+.tag-success {
+  --tag-color: var(--color-success, #10b981);
+  --tag-bg: rgba(16, 185, 129, 0.1);
+}
+
+.tag-warning {
+  --tag-color: var(--color-warning, #f59e0b);
+  --tag-bg: rgba(245, 158, 11, 0.1);
+}
+
+.tag-danger {
+  --tag-color: var(--color-danger, #ef4444);
+  --tag-bg: rgba(239, 68, 68, 0.1);
+}
+
+.tag-info {
+  --tag-color: var(--color-info, #3b82f6);
+  --tag-bg: rgba(59, 130, 246, 0.1);
+}
+
+/* 轮廓样式 */
+.tag-outline {
+  --tag-bg: transparent;
+  --tag-border: currentColor;
+}
+
+/* 尺寸变体 */
+.tag-sm {
+  --tag-padding-y: 0.125rem;
+  --tag-padding-x: 0.375rem;
+  --tag-font-size: 0.625rem;
+}
+
+.tag-lg {
+  --tag-padding-y: 0.375rem;
+  --tag-padding-x: 0.75rem;
+  --tag-font-size: 0.875rem;
+}
+
+/* 圆角 */
+.tag-rounded {
+  --tag-radius: 9999px;
+}
+
+/* 图标 */
+.tag-icon {
+  width: 0.875em;
+  height: 0.875em;
+  flex-shrink: 0;
+}
+
+/* 可关闭 */
+.tag-closable {
+  padding-right: 0.25rem;
+}
+
+.tag-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  padding: 0;
+  margin-left: 0.125rem;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tag-close:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.tag-close svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+/* 标签组 */
+.tag-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* 可选中标签 */
+.tag-checkable {
+  cursor: pointer;
+}
+
+.tag-checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.tag-checkable:hover {
+  --tag-bg: var(--bg-hover, rgba(0, 0, 0, 0.08));
+}
+
+.tag-checkbox:checked + .tag-text {
+  color: var(--color-primary, #3b82f6);
+}
+
+.tag-checkable:has(.tag-checkbox:checked) {
+  --tag-color: var(--color-primary, #3b82f6);
+  --tag-bg: rgba(59, 130, 246, 0.1);
+  --tag-border: var(--color-primary, #3b82f6);
+}
+
