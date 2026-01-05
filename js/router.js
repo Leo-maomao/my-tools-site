@@ -4,79 +4,8 @@
 (function() {
   'use strict';
 
-  // 路由配置
-  const routes = {
-    '': {
-      name: '首页',
-      template: 'templates/home.html',
-      init: null
-    },
-    'xiaohongshu': {
-      name: '小红书',
-      template: 'templates/xiaohongshu.html',
-      css: 'css/xiaohongshu.css',
-      js: 'js/xiaohongshu.js',
-      init: null
-    },
-    'product-assistant': {
-      name: '产品助理',
-      template: 'templates/product-assistant.html',
-      css: 'css/product-assistant.css',
-      js: 'js/product-assistant.js',
-      init: null
-    },
-    'daily-report': {
-      name: '报告小助手',
-      template: 'templates/daily-report.html',
-      css: 'css/daily-report.css',
-      js: 'js/daily-report.js',
-      init: null
-    },
-    'drama-workshop': {
-      name: '短剧工坊',
-      template: 'templates/drama-workshop.html',
-      css: 'css/drama-workshop.css',
-      js: 'js/drama-workshop.js',
-      init: null,
-      requireAdmin: true  // 仅管理员可见
-    },
-    'fund-assistant': {
-      name: '基金助手',
-      template: 'templates/fund-assistant.html',
-      css: 'css/fund-assistant.css',
-      js: 'js/fund-assistant.js',
-      init: null
-    },
-    'dev-tools': {
-      name: '研发工具箱',
-      template: 'templates/dev-tools.html',
-      css: 'css/dev-tools.css',
-      js: 'js/dev-tools.js',
-      init: null
-    },
-    'settings': {
-      name: '设置',
-      template: 'templates/settings.html',
-      css: 'css/settings.css',
-      js: 'js/settings.js',
-      init: null
-    },
-    'todo': {
-      name: 'To Do List',
-      template: 'templates/todo.html',
-      css: 'css/todo.css',
-      js: 'js/todo.js',
-      init: null
-    },
-    'storage': {
-      name: '文件存储',
-      template: 'templates/storage.html',
-      css: 'css/storage.css',
-      js: 'js/storage.js',
-      init: null,
-      requireAdmin: true  // 仅管理员可见
-    }
-  };
+  // 路由配置 - 从 ToolsConfig 动态生成
+  const routes = window.ToolsConfig ? window.ToolsConfig.generateRoutes() : {};
 
   let currentRoute = null; // 初始值设为 null，确保首次加载会触发路由
   let loadedScripts = {};
@@ -108,6 +37,10 @@
       if (hash.startsWith('dev-tools/')) {
         return 'dev-tools';
       }
+      // 支持嵌套路由格式 component-lib/category/component -> component-lib
+      if (hash.startsWith('component-lib/')) {
+        return 'component-lib';
+      }
       return hash || '';
     },
 
@@ -117,11 +50,15 @@
       const hash = window.location.hash.slice(1);
       
       // 路由未改变，不重复加载（设置页面除外，每次都重新加载）
-      // 对于 dev-tools，子路由变化不需要重新加载主模块
+      // 对于 dev-tools 和 component-lib，子路由变化不需要重新加载主模块
       if (route === currentRoute && route !== 'settings') {
         // dev-tools 子路由变化时，触发内部路由更新
         if (route === 'dev-tools' && hash.startsWith('dev-tools/')) {
           window.dispatchEvent(new CustomEvent('devToolsHashChange', { detail: hash }));
+        }
+        // component-lib 子路由变化时，触发内部路由更新
+        if (route === 'component-lib' && hash.startsWith('component-lib/')) {
+          window.dispatchEvent(new CustomEvent('componentLibHashChange', { detail: hash }));
         }
         return;
       }

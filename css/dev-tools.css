@@ -9,10 +9,10 @@
 
 /* ========== 左侧导航栏 ========== */
 .dev-tools-sidebar {
-  width: 220px;
-  min-width: 220px;
-  background: #fff;
-  border-right: 1px solid #f0f0f0;
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -20,27 +20,32 @@
 
 /* 搜索框 */
 .dev-tools-search {
-  padding: 16px;
-  border-bottom: 1px solid #f0f0f0;
+  height: 40px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #fff;
+  flex-shrink: 0;
 }
 
 .dev-tools-search i {
-  color: rgba(0, 0, 0, 0.45);
-  font-size: 14px;
+  color: var(--text-muted);
+  font-size: 16px;
+  flex-shrink: 0;
+  line-height: 1;
 }
 
 .dev-tools-search input {
   flex: 1;
+  min-width: 0;
   border: none;
   background: transparent;
-  color: rgba(0, 0, 0, 0.88);
-  font-size: 14px;
+  font-size: 13px;
+  color: var(--text-primary);
   outline: none;
-  box-shadow: none;
+  height: 100%;
+  padding: 0;
 }
 
 .dev-tools-search input:focus {
@@ -49,7 +54,31 @@
 }
 
 .dev-tools-search input::placeholder {
-  color: rgba(0, 0, 0, 0.25);
+  color: var(--text-muted);
+}
+
+.dev-tools-search .search-clear {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 14px;
+  transition: var(--transition-fast);
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.dev-tools-search .search-clear:hover {
+  color: var(--text-primary);
+}
+
+.dev-tools-search.has-value .search-clear {
+  display: flex;
 }
 
 /* 导航区域 */
@@ -61,39 +90,38 @@
 
 /* 工具分类 */
 .dev-tools-category {
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 
-.category-header {
+.dev-tools-category .category-header {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 16px 10px 12px;
-  color: rgba(0, 0, 0, 0.88);
-  font-size: 14px;
-  font-weight: 500;
+  padding: 10px 16px;
   cursor: pointer;
-  transition: all 0.2s;
-  user-select: none;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  transition: var(--transition-fast);
 }
 
-.category-header:hover {
-  background: rgba(0, 0, 0, 0.04);
+.dev-tools-category .category-header:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
 }
 
-.category-header i:first-child {
+.dev-tools-category .category-header i:first-child {
   font-size: 16px;
-  color: #1677ff;
+  color: var(--color-primary);
 }
 
-.category-header span {
+.dev-tools-category .category-header span {
   flex: 1;
 }
 
-.category-header .arrow {
-  font-size: 12px;
-  color: rgba(0, 0, 0, 0.45);
-  transition: transform 0.2s;
+.dev-tools-category .category-header .arrow {
+  font-size: 14px;
+  transition: transform 0.2s ease;
 }
 
 .dev-tools-category.is-collapsed .category-header .arrow {
@@ -106,38 +134,37 @@
 
 /* 工具项 */
 .category-items {
-  padding: 2px 0 2px 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .tool-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: block;
   padding: 8px 16px 8px 40px;
-  color: rgba(0, 0, 0, 0.65);
-  font-size: 14px;
+  font-size: 13px;
+  color: var(--text-secondary);
   text-decoration: none;
-  transition: all 0.2s;
+  transition: var(--transition-fast);
 }
 
 .tool-item:hover {
-  color: rgba(0, 0, 0, 0.88);
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--bg-hover);
+  color: var(--text-primary);
 }
 
 .tool-item.is-active {
-  color: #1677ff;
-  background: #e6f4ff;
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--color-primary);
   font-weight: 500;
 }
 
 .tool-item i {
   font-size: 14px;
-  opacity: 0.8;
+  margin-right: 8px;
 }
 
 .tool-item.is-active i {
-  opacity: 1;
+  color: var(--color-primary);
 }
 
 /* ========== 右侧内容区 ========== */
@@ -150,25 +177,27 @@
 }
 
 .dev-tools-header {
-  padding: 16px 20px;
+  height: 40px;
+  padding: 0 20px;
   background: #fff;
   border-bottom: 1px solid #f0f0f0;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .dev-tools-header h2 {
-  margin: 0 0 4px 0;
-  font-size: 18px;
+  margin: 0;
+  font-size: 14px;
   font-weight: 600;
   color: rgba(0, 0, 0, 0.88);
-  line-height: 1.4;
 }
 
 .dev-tools-header p {
   margin: 0;
-  font-size: 13px;
+  font-size: 12px;
   color: rgba(0, 0, 0, 0.45);
-  line-height: 1.4;
 }
 
 .dev-tools-body {
@@ -410,6 +439,12 @@
   height: 40px;
   padding: 6px 11px;
   font-size: 16px;
+}
+
+/* 确保 datetime-local 输入框高度一致 */
+input[type="datetime-local"].tool-input {
+  height: 32px;
+  line-height: 32px;
 }
 
 /* 文本域 */
@@ -933,10 +968,10 @@
 
   .dev-tools-sidebar {
     width: 100%;
-    min-width: 100%;
-    max-height: 50vh;
+    height: auto;
+    max-height: 200px;
     border-right: none;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--border-color);
   }
 
   .tool-row {
@@ -969,64 +1004,15 @@
 }
 
 /* ========== 深色模式适配 ========== */
+/* 使用 CSS 变量自动适配，无需额外覆盖侧边栏样式 */
 @media (prefers-color-scheme: dark) {
-  .dev-tools {
-    background: #141414;
-  }
-
-  .dev-tools-sidebar {
-    background: #1f1f1f;
-    border-color: #303030;
-  }
-
-  .dev-tools-search {
-    border-color: #303030;
-  }
-
-  .dev-tools-search i {
-    color: rgba(255, 255, 255, 0.45);
-  }
-
-  .dev-tools-search input {
-    color: rgba(255, 255, 255, 0.85);
-  }
-
-  .dev-tools-search input::placeholder {
-    color: rgba(255, 255, 255, 0.25);
-  }
-
-  .category-header {
-    color: rgba(255, 255, 255, 0.85);
-  }
-
-  .category-header:hover {
-    background: rgba(255, 255, 255, 0.04);
-  }
-
-  .category-header .arrow {
-    color: rgba(255, 255, 255, 0.45);
-  }
-
-  .tool-item {
-    color: rgba(255, 255, 255, 0.65);
-  }
-
-  .tool-item:hover {
-    color: rgba(255, 255, 255, 0.85);
-    background: rgba(255, 255, 255, 0.04);
-  }
-
-  .tool-item.is-active {
-    background: rgba(22, 119, 255, 0.15);
-  }
-
   .dev-tools-content {
-    background: #141414;
+    background: var(--bg-primary);
   }
 
   .dev-tools-header {
-    background: #1f1f1f;
-    border-color: #303030;
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
   }
 
   .dev-tools-header h2 {

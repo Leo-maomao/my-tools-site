@@ -3,110 +3,16 @@
   <p>好用的小工具合集</p>
 </div>
 
-<div class="platform-grid">
-  <a href="#xiaohongshu" class="platform-card platform-card--xhs">
-    <div class="platform-icon">
-      <svg class="xhs-logo-icon xhs-logo-icon-lg" width="32" height="20" viewBox="0 0 200 120"><rect fill="#ff2442" rx="60" width="200" height="120"/><text x="100" y="82" text-anchor="middle" fill="#fff" font-size="52" font-weight="bold" font-family="sans-serif">小红书</text></svg>
-    </div>
-    <div class="platform-info">
-      <h3>小红书助手</h3>
-      <p>生成封面图和正文图，支持自动分页</p>
-    </div>
-  </a>
-
-  <a href="#product-assistant" class="platform-card platform-card--assistant">
-    <div class="platform-icon">
-      <i class="ri-robot-line"></i>
-    </div>
-    <div class="platform-info">
-      <h3>产品助理</h3>
-      <p>AI 辅助生成原型图和 PRD</p>
-    </div>
-  </a>
-
-  <a href="#daily-report" class="platform-card platform-card--report">
-    <div class="platform-icon">
-      <i class="ri-file-text-line"></i>
-    </div>
-    <div class="platform-info">
-      <h3>报告小助手</h3>
-      <p>AI 帮你写报告，支持日报/周报/季报/年报</p>
-    </div>
-  </a>
-
-  <a href="#fund-assistant" class="platform-card platform-card--fund">
-    <div class="platform-icon">
-      <i class="ri-funds-line"></i>
-    </div>
-    <div class="platform-info">
-      <h3>基金助手</h3>
-      <p>实时查看基金净值和涨跌，管理自选基金</p>
-    </div>
-  </a>
-
-  <a href="#dev-tools" class="platform-card platform-card--dev">
-    <div class="platform-icon">
-      <i class="ri-code-box-line"></i>
-    </div>
-    <div class="platform-info">
-      <h3>研发工具箱</h3>
-      <p>JSON/编码解码/时间戳/正则等 30+ 开发工具</p>
-    </div>
-  </a>
-
-  <a href="#todo" class="platform-card platform-card--todo">
-    <div class="platform-icon">
-      <i class="ri-checkbox-circle-line"></i>
-    </div>
-    <div class="platform-info">
-      <h3>To Do List</h3>
-      <p>待办事项管理，支持分类和状态流转</p>
-    </div>
-  </a>
-
-  <a href="#storage" class="platform-card platform-card--storage" data-require-admin="true" style="display: none;">
-    <div class="platform-icon">
-      <i class="ri-folder-cloud-line"></i>
-    </div>
-    <div class="platform-info">
-      <h3>文件存储</h3>
-      <p>简易网盘，支持文件上传下载和分类管理</p>
-    </div>
-  </a>
-
-  <a href="#drama-workshop" class="platform-card platform-card--drama" data-require-admin="true" style="display: none;">
-    <div class="platform-icon">
-      <i class="ri-movie-2-line"></i>
-    </div>
-    <div class="platform-info">
-      <h3>短剧工坊</h3>
-      <p>AI 拆解剧本分镜，一键生成短剧视频</p>
-    </div>
-  </a>
+<!-- 工具卡片 - 由 tools-config.js 动态渲染 -->
+<div class="platform-grid" id="home-tools-grid">
+  <!-- 动态加载 -->
 </div>
 
 <!-- 毛毛的其他产品 -->
 <div class="other-products-section">
   <h2 class="section-title">毛毛的其他产品</h2>
-  <div class="platform-grid">
-    <a href="https://my-nav-site.leo-maomao.workers.dev/" target="_blank" rel="noopener" class="platform-card platform-card--nav">
-      <div class="platform-icon">
-        <i class="ri-compass-3-line"></i>
-      </div>
-      <div class="platform-info">
-        <h3>毛毛的导航站</h3>
-        <p>精选实用网站导航，AI 工具流量榜单</p>
-      </div>
-    </a>
-    <a href="https://my-blog-site.leo-maomao.workers.dev/" target="_blank" rel="noopener" class="platform-card platform-card--blog">
-      <div class="platform-icon">
-        <i class="ri-book-2-line"></i>
-      </div>
-      <div class="platform-info">
-        <h3>毛毛的产品日记</h3>
-        <p>产品思考与体验记录，写给自己的备忘录</p>
-      </div>
-    </a>
+  <div class="platform-grid" id="home-external-grid">
+    <!-- 动态加载 -->
   </div>
 </div>
 
@@ -115,44 +21,4 @@
   涉及大模型能力的工具需在<a href="#settings">设置</a>中配置 API Key · 您的 Key 仅存储在本地，不会上传服务器，可放心使用
 </p>
 
-<script>
-// 首页加载时检查管理员权限，显示/隐藏受限工具
-(function() {
-  function updateAdminCards() {
-    var isAdmin = window.ToolsAuth && window.ToolsAuth.isAdmin();
-    var adminItems = document.querySelectorAll('.platform-grid [data-require-admin="true"]');
-    adminItems.forEach(function(item) {
-      // platform-card 使用 flex 布局
-      item.style.display = isAdmin ? 'flex' : 'none';
-    });
-  }
-  
-  // 异步检查并更新
-  if (window.ToolsAuth && window.ToolsAuth.checkAdmin) {
-    window.ToolsAuth.checkAdmin().then(updateAdminCards);
-  } else {
-    updateAdminCards();
-  }
-  
-  // 监听登录状态变化
-  window.addEventListener('toolsAuthChanged', updateAdminCards);
-  
-  // 监听路由切换到首页时重新检查权限
-  window.addEventListener('toolContentLoaded', function(e) {
-    if (e.detail === 'home' || e.detail === '') {
-      updateAdminCards();
-    }
-  });
-  
-  // 工具卡片点击埋点
-  document.querySelectorAll('.platform-card').forEach(function(card) {
-    card.addEventListener('click', function() {
-      var toolName = this.querySelector('h3') ? this.querySelector('h3').textContent : 'unknown';
-      if (typeof trackEvent === 'function') {
-        trackEvent('tool_click', { tool_name: toolName });
-      }
-    });
-  });
-})();
-</script>
-
+<!-- 初始化逻辑已移至 tools-config.js -->

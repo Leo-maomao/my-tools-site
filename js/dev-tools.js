@@ -102,6 +102,8 @@
     els = {
       nav: document.getElementById('devToolsNav'),
       search: document.getElementById('devToolsSearch'),
+      searchClear: document.getElementById('devToolsSearchClear'),
+      searchContainer: document.querySelector('.dev-tools-search'),
       title: document.getElementById('toolTitle'),
       desc: document.getElementById('toolDesc'),
       body: document.getElementById('toolBody')
@@ -138,8 +140,25 @@
 
     // 搜索
     els.search.addEventListener('input', function(e) {
-      filterTools(e.target.value.trim().toLowerCase());
+      var keyword = e.target.value.trim().toLowerCase();
+      filterTools(keyword);
+      // 更新清空按钮显示状态
+      if (els.searchContainer) {
+        els.searchContainer.classList.toggle('has-value', keyword.length > 0);
+      }
     });
+
+    // 清空搜索
+    if (els.searchClear) {
+      els.searchClear.addEventListener('click', function() {
+        els.search.value = '';
+        filterTools('');
+        if (els.searchContainer) {
+          els.searchContainer.classList.remove('has-value');
+        }
+        els.search.focus();
+      });
+    }
   }
 
   // 切换工具
@@ -163,9 +182,19 @@
     }
     
     // 更新导航激活状态
+    let activeItem = null;
     document.querySelectorAll('.tool-item').forEach(item => {
-      item.classList.toggle('is-active', item.dataset.tool === tool);
+      const isActive = item.dataset.tool === tool;
+      item.classList.toggle('is-active', isActive);
+      if (isActive) activeItem = item;
     });
+    
+    // 滚动到激活项
+    if (activeItem) {
+      setTimeout(() => {
+        activeItem.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }, 100);
+    }
     
     // 更新标题
     els.title.textContent = toolsConfig[tool].title;
@@ -414,7 +443,7 @@
           
           <div style="display:flex;gap:16px">
             <!-- 时间戳转时间 -->
-            <div class="tool-card" style="flex:1">
+            <div class="tool-card" style="flex:1;min-width:0;height:219px">
               <div class="tool-card-header">
                 <div class="tool-card-title"><i class="ri-arrow-right-line"></i>时间戳 → 时间</div>
               </div>
@@ -423,14 +452,14 @@
                   <input type="text" class="tool-input" id="tsInput" placeholder="输入时间戳（秒或毫秒）" style="flex:1;font-family:monospace">
                   <button class="tool-btn tool-btn-primary" id="ts2dateBtn">转换</button>
                 </div>
-                <div style="background:#f6ffed;border:1px solid #b7eb8f;border-radius:6px;padding:16px;height:100px;overflow:auto" id="ts2dateResult">
-                  <span style="color:rgba(0,0,0,0.45)">输入时间戳后点击转换</span>
+                <div style="background:#f6ffed;border:1px solid #b7eb8f;border-radius:6px;padding:16px;height:80px;overflow:auto" id="ts2dateResult">
+                  <span style="color:rgba(0,0,0,0.45)">输入后点击转换</span>
                 </div>
               </div>
             </div>
             
             <!-- 时间转时间戳 -->
-            <div class="tool-card" style="flex:1">
+            <div class="tool-card" style="flex:1;min-width:0;height:219px">
               <div class="tool-card-header">
                 <div class="tool-card-title"><i class="ri-arrow-left-line"></i>时间 → 时间戳</div>
               </div>
@@ -439,8 +468,8 @@
                   <input type="datetime-local" class="tool-input" id="dateInput" style="flex:1">
                   <button class="tool-btn tool-btn-primary" id="date2tsBtn">转换</button>
                 </div>
-                <div style="background:#e6f4ff;border:1px solid #91caff;border-radius:6px;padding:16px;height:100px;overflow:auto" id="date2tsResult">
-                  <span style="color:rgba(0,0,0,0.45)">选择时间后点击转换</span>
+                <div style="background:#e6f4ff;border:1px solid #91caff;border-radius:6px;padding:16px;height:80px;overflow:auto" id="date2tsResult">
+                  <span style="color:rgba(0,0,0,0.45)">选择后点击转换</span>
                 </div>
               </div>
             </div>
