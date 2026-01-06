@@ -1,0 +1,14 @@
+# robots.txt for 毛毛的工具箱
+# https://my-tools-site.leo-maomao.workers.dev/
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://my-tools-site.leo-maomao.workers.dev/sitemap.xml
+
+# Disallow internal pages
+Disallow: /api/
+Disallow: /templates/
+Disallow: /components-lib/
+

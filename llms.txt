@@ -1,0 +1,59 @@
+# 毛毛的工具箱
+
+> 一个实用的在线工具集合，提供多种 AI 辅助工具，帮助提升工作效率
+
+## 网站信息
+
+- 名称: 毛毛的工具箱
+- 网址: https://my-tools-site.leo-maomao.workers.dev/
+- 作者: 毛毛 (Leo-maomao)
+- 类型: 在线工具集合
+
+## 工具列表
+
+### 小红书助手
+帮助快速生成小红书图文内容。
+- 封面图生成（自定义背景图）
+- 正文图生成（9宫格布局）
+- 自动分页功能
+- 一键下载所有图片
+
+### 产品助理
+AI 辅助生成原型图和 PRD 文档。
+- AI 对话生成原型
+- 原型 HTML 实时预览
+- 全屏预览和 PNG 下载
+- 多模态对话支持
+
+### 报告小助手
+AI 帮你写工作报告。
+- 支持日报/周报/季报/半年报/年报
+- 多种模板：简洁版、详细版、OKR版等
+- 多种输出格式：纯文本、Markdown、富文本
+
+### 基金助手
+基金投资辅助工具。
+- 实时大盘指数
+- 基金净值查询
+- 自选基金管理
+
+### 组件库
+UI 组件预览与代码复制。
+- 组件分类导航
+- 组件实时预览
+- 一键复制代码
+
+## 技术栈
+
+- HTML / CSS / JavaScript
+- Canvas API（图片生成）
+- Cloudflare Workers（部署 + API 代理）
+- Supabase（用户认证 + 数据存储）
+
+## 相关链接
+
+- AI工具导航站: https://my-nav-site.leo-maomao.workers.dev/
+- 产品日记博客: https://my-blog-site.leo-maomao.workers.dev/
+- GitHub: https://github.com/Leo-maomao
+- 邮箱: 736512876@qq.com
+

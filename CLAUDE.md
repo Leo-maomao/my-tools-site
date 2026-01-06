@@ -41,6 +41,20 @@
 | `component_view` | 组件预览 | 查看组件（UV 去重） | category: 分类, component: 组件名 |
 | `component_copy` | 组件复制 | 复制组件代码 | category: 分类, component: 组件名, type: html/css/js/all |
 
+## SEO 配置
+
+> 遵循 `rules/06-operations/seo.md` 的「项目统一配置」标准
+
+| 文件 | 说明 |
+|------|------|
+| `robots.txt` | 爬虫规则，禁止 api/templates/components-lib |
+| `sitemap.xml` | 站点地图 |
+| `llms.txt` | LLM 爬虫说明 |
+
+`index.html` 包含完整 SEO 配置：Google 验证、Meta 标签、Open Graph、Twitter Card、canonical、JSON-LD。
+
+---
+
 ## 项目功能
 
 ### 已实现
