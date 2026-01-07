@@ -1,10 +1,10 @@
-# 毛毛的工具箱
+# 在线工具箱
 
 自媒体内容生成工具集，帮助快速制作各平台的图文内容。
 
 ## 在线访问
 
-https://my-tools-site.leo-maomao.workers.dev/
+https://your-domain.workers.dev/
 
 ## 功能列表
 
@@ -25,8 +25,8 @@ https://my-tools-site.leo-maomao.workers.dev/
 
 ## 关联站点
 
-- [毛毛的导航站](https://my-nav-site.leo-maomao.workers.dev/) - 精选实用网站导航，AI 工具流量榜单
-- [毛毛的产品日记](https://my-blog-site.leo-maomao.workers.dev/) - 产品思考与体验记录
+- [AI 智能导航站](https://github.com/your-username/my-nav-site) - 精选实用网站导航
+- [个人博客](https://github.com/your-username/my-blog-site) - 个人博客系统
 
 ## 技术栈
 
@@ -39,7 +39,7 @@ https://my-tools-site.leo-maomao.workers.dev/
 
 ```bash
 # 克隆项目
-git clone https://github.com/Leo-maomao/my-tools-site.git
+git clone https://github.com/your-username/my-tools-site.git
 
 # 安装依赖
 npm install
@@ -51,3 +51,7 @@ npx wrangler dev --port 8787
 ## 部署
 
 推送到 main 分支后，Cloudflare Pages 自动部署。
+
+## 📄 许可证
+
+MIT License

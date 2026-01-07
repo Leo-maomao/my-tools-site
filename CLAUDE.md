@@ -17,7 +17,7 @@
 ## AI API 代理
 
 所有 AI 功能统一使用 Cloudflare Worker 代理：
-- **Worker**: `ai-api.leo-maomao.workers.dev`
+- **Worker**: `your-ai-api.workers.dev`（需自建）
 - **环境变量**: `QWEN_API_KEY`（阿里百炼 API Key）
 - **路由**:
   - `/chat` - 通用对话
@@ -26,7 +26,7 @@
 
 ## 51.la 埋点事件
 
-统计ID: `3OV3C1DLozIUagyB`
+统计ID: `your-51la-id`（需替换为你自己的）
 
 | 事件标识 | 事件名称 | 说明 | 参数 |
 |---------|---------|------|------|

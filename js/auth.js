@@ -1,8 +1,9 @@
 // 快捷键登录组件 - Tools 项目
 (function() {
   // ToolSite 数据库配置
-  const SUPABASE_URL = "https://aexcnubowsarpxkohqvv.supabase.co";
-  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFleGNudWJvd3NhcnB4a29ocXZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyMjYyOTksImV4cCI6MjA3OTgwMjI5OX0.TCGkoBou99fui-cgcpod-b3BaSdq1mg7SFUtR2mIxms";
+  // TODO: 替换为你自己的 Supabase 项目配置
+  const SUPABASE_URL = "https://your-project-id.supabase.co";
+  const SUPABASE_KEY = "your-supabase-anon-key";
   
   let supabase = null;
   
