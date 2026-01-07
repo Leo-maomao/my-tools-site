@@ -1,14 +1,13 @@
-# robots.txt for 毛毛的工具箱
-# https://my-tools-site.leo-maomao.workers.dev/
+# robots.txt for 在线工具箱
+# TODO: 替换为你的域名
+# https://your-domain.com/
 
 User-agent: *
 Allow: /
 
-# Sitemap
-Sitemap: https://my-tools-site.leo-maomao.workers.dev/sitemap.xml
-
-# Disallow internal pages
+# 禁止爬取 API 和组件库源码
 Disallow: /api/
 Disallow: /templates/
 Disallow: /components-lib/
 
+Sitemap: https://your-domain.com/sitemap.xml

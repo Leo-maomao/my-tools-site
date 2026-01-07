@@ -1,12 +1,12 @@
-# 毛毛的工具箱
+# 在线工具箱
 
 > 一个实用的在线工具集合，提供多种 AI 辅助工具，帮助提升工作效率
 
 ## 网站信息
 
-- 名称: 毛毛的工具箱
-- 网址: https://my-tools-site.leo-maomao.workers.dev/
-- 作者: 毛毛 (Leo-maomao)
+- 名称: 在线工具箱
+- 网址: https://your-domain.com/
+- 作者: Your Name
 - 类型: 在线工具集合
 
 ## 工具列表
@@ -50,10 +50,6 @@ UI 组件预览与代码复制。
 - Cloudflare Workers（部署 + API 代理）
 - Supabase（用户认证 + 数据存储）
 
-## 相关链接
+## 联系方式
 
-- AI工具导航站: https://my-nav-site.leo-maomao.workers.dev/
-- 产品日记博客: https://my-blog-site.leo-maomao.workers.dev/
-- GitHub: https://github.com/Leo-maomao
-- 邮箱: 736512876@qq.com
-
+- GitHub: https://github.com/your-username

@@ -22,7 +22,7 @@ node_modules/
 # Wrangler / Cloudflare Workers
 .mf/
 .wrangler/
-wrangler.toml
+# wrangler.toml  # 保留此文件作为模板配置示例
 
 # Build
 dist/
