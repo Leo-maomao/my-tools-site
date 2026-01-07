@@ -3,8 +3,9 @@
 (function() {
   var CONFIG = {
     // Supabase 配置
-    SUPABASE_URL: 'https://aexcnubowsarpxkohqvv.supabase.co',
-    SUPABASE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFleGNudWJvd3NhcnB4a29ocXZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyMjYyOTksImV4cCI6MjA3OTgwMjI5OX0.TCGkoBou99fui-cgcpod-b3BaSdq1mg7SFUtR2mIxms'
+    // TODO: 替换为你自己的 Supabase 配置
+    SUPABASE_URL: 'https://your-project-id.supabase.co',
+    SUPABASE_KEY: 'your-supabase-anon-key'
   };
 
   // 各厂商支持的模型列表

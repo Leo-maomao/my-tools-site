@@ -5,8 +5,9 @@
   var CONFIG = {
     STORAGE_KEY: 'pa_conversations',
     MODEL_STORAGE_KEY: 'pa_selected_model',
-    SUPABASE_URL: 'https://aexcnubowsarpxkohqvv.supabase.co',
-    SUPABASE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFleGNudWJvd3NhcnB4a29ocXZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyMjYyOTksImV4cCI6MjA3OTgwMjI5OX0.TCGkoBou99fui-cgcpod-b3BaSdq1mg7SFUtR2mIxms'
+    // TODO: 替换为你自己的 Supabase 配置
+    SUPABASE_URL: 'https://your-project-id.supabase.co',
+    SUPABASE_KEY: 'your-supabase-anon-key'
   };
 
   // 各厂商支持的模型列表
@@ -773,7 +774,7 @@
       return await callAISimple(text || '请分析');
     }
 
-    var systemPrompt = '你是毛毛的产品助理，可以帮助分析界面截图、竞品分析等。请用中文回答，简洁专业。';
+    var systemPrompt = '你是AI产品助理，可以帮助分析界面截图、竞品分析等。请用中文回答，简洁专业。';
     var userContent = [{ type: 'text', text: text || '请分析这张图片' }];
     validUrls.forEach(function(url) {
       userContent.push({ type: 'image_url', image_url: { url: url } });
@@ -864,7 +865,7 @@
       throw new Error('请先在设置中配置 API');
     }
 
-    var systemPrompt = customSystemPrompt || '你是毛毛的产品助理，可以帮助回答产品设计、需求分析、用户体验等问题。请用中文回答，简洁专业。';
+    var systemPrompt = customSystemPrompt || '你是AI产品助理，可以帮助回答产品设计、需求分析、用户体验等问题。请用中文回答，简洁专业。';
 
     try {
       var result = await callAPIWithConfig(apiConfig, [
@@ -1077,7 +1078,7 @@
     if (!conv || conv.messages.length === 0) {
       els.messageList.innerHTML = '<div class="pa-welcome">' +
         '<i class="ri-robot-line"></i>' +
-        '<h3>毛毛的产品助理</h3>' +
+        '<h3>AI产品助理</h3>' +
         '<p>我可以帮你分析PRD、回答产品问题</p>' +
         '<div class="pa-welcome-tips">' +
         '<div class="pa-tip"><i class="ri-image-add-line"></i><span>粘贴或上传图片，帮你分析界面</span></div>' +

@@ -142,18 +142,18 @@
   // 外部链接
   const EXTERNAL_LINKS = [
     {
-      name: '毛毛的导航站',
+      name: 'AI导航站',
       desc: '精选实用网站导航，AI 工具流量榜单',
       icon: 'ri-compass-3-line',
       color: '#6366f1',
-      url: 'https://my-nav-site.leo-maomao.workers.dev/'
+      url: '#'  // TODO: 替换为你的导航站地址
     },
     {
-      name: '毛毛的产品日记',
+      name: '个人博客',
       desc: '产品思考与体验记录，写给自己的备忘录',
       icon: 'ri-book-2-line',
       color: '#f59e0b',
-      url: 'https://my-blog-site.leo-maomao.workers.dev/'
+      url: '#'  // TODO: 替换为你的博客站地址
     }
   ];
 

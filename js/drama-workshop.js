@@ -1,5 +1,5 @@
 /**
- * 短剧工坊 - 毛毛的工具箱
+ * 短剧工坊 - 在线工具箱
  * Part 1: 基础框架（状态管理、Tab切换、Toast）
  */
 
@@ -1400,7 +1400,7 @@ async function generateOutline() {
   btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i><span>生成中...</span>';
   
   try {
-    const response = await fetch('https://ai-api.leo-maomao.workers.dev/chat', {
+    const response = await fetch('https://your-ai-api.workers.dev/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1515,7 +1515,7 @@ async function generateEpisodeScript() {
   $('#nextEpisodeBtn').disabled = true;
 
   try {
-    const response = await fetch('https://ai-api.leo-maomao.workers.dev/chat', {
+    const response = await fetch('https://your-ai-api.workers.dev/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1584,7 +1584,7 @@ async function analyzeShots() {
   btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i><span>拆解中...</span>';
 
   try {
-    const response = await fetch('https://ai-api.leo-maomao.workers.dev/chat', {
+    const response = await fetch('https://your-ai-api.workers.dev/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

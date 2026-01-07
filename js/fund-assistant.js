@@ -6,7 +6,7 @@
   'use strict';
 
   // API 基础地址
-  var API_BASE = 'https://fund-api.leo-maomao.workers.dev';
+  var API_BASE = 'https://your-fund-api.workers.dev';
 
   // DOM 元素
   var els = {
