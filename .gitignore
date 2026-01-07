@@ -2,9 +2,6 @@
 .DS_Store
 ._*
 
-# Claude Code - 保留 ui-ux-pro-max-skill
-# .claude/  # 不忽略，需要提交 ui-ux-pro-max-skill
-
 # Environment
 .env
 .env.local
@@ -12,9 +9,6 @@
 # Editor
 .idea
 .vscode
-
-# Cursor - 保留 ui-ux-pro-max-skill
-# .cursor/  # 不忽略，需要提交 ui-ux-pro-max-skill
 
 # Node
 node_modules/

@@ -35,6 +35,29 @@ https://your-domain.workers.dev/
 - Cloudflare Workers（部署 + API 代理）
 - Supabase（用户认证 + 数据存储）
 
+## 项目结构
+
+```text
+tools/
+├── .github/
+│   └── workflows/
+│       └── deploy.yml        # GitHub Pages 自动部署配置
+├── public/                    # 静态资源目录
+│   ├── index.html            # 入口页面
+│   ├── css/                  # 样式文件
+│   ├── js/                   # 脚本文件
+│   ├── templates/            # 页面模板
+│   ├── components-lib/       # 组件库
+│   ├── images/               # 图片资源
+│   ├── llms.txt              # LLMs 描述文件
+│   ├── robots.txt            # 爬虫规则
+│   └── sitemap.xml           # 站点地图
+├── worker.js                  # Cloudflare Worker 入口
+├── wrangler.toml             # Cloudflare 部署配置
+├── .gitignore                # Git 忽略文件
+└── README.md                 # 项目文档
+```
+
 ## 本地开发
 
 ```bash
